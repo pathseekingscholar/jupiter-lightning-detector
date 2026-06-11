@@ -39,6 +39,12 @@ The app opens at `http://127.0.0.1:8765`. It provides:
 - click-to-place Cassini image coordinates
 - local candidate classifications and research notes
 - processed PNG export
+- browser-local IndexedDB image library and processing history
+- portable JSON library backup/import
+- storage quota monitoring with a backup warning before the browser fills
+
+Uploaded PNG, JPEG, WebP, and BMP images are processed locally in the browser.
+They are not sent to OPUS or another external service.
 
 The static meeting report remains at `outputs/report.html`.
 

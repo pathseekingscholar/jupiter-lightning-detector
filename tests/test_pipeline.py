@@ -62,6 +62,14 @@ END_OBJECT = IMAGE
             self.assertEqual(image.size, (64, 64))
         self.assertIn("N1357029177", filename)
 
+    def test_app_observations_include_opus_provenance(self):
+        if not pipeline.DB_PATH.exists():
+            self.skipTest("Research products have not been initialized")
+        payload = app_server.observation_payload()
+        self.assertEqual(len(payload["observations"]), 3)
+        for observation in payload["observations"]:
+            self.assertIn(observation["opus_id"], observation["opus_detail_url"])
+
 
 if __name__ == "__main__":
     unittest.main()

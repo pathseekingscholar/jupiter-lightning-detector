@@ -143,6 +143,7 @@ button:hover, button:focus-visible { background: var(--ink); color: var(--paper)
 dl { display: grid; grid-template-columns: repeat(2, auto); gap: 4px 18px; margin: 0; font-family: var(--mono); font-size: 11px; }
 dt { color: var(--muted); }
 dd { margin: 0; text-align: right; }
+dd a { color: var(--red); }
 
 .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
 figure { margin: 0; min-width: 0; }
@@ -164,13 +165,30 @@ figcaption { margin-bottom: 7px; }
 .loading.visible { opacity: .8; }
 .desk-note { font-family: var(--mono); font-size: 11px; color: var(--muted); margin: 12px 0 0; }
 
-.logbook {
+.logbook, .library-sheet {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(300px, .6fr);
   gap: 42px;
   padding: 34px 0;
   border-bottom: 1px solid var(--ink);
 }
+
+.library-sheet { display: block; }
+.library-heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; }
+.library-heading h2 { margin: -9px 0 0; font-size: 30px; font-weight: 500; }
+.library-actions { display: flex; gap: 8px; }
+.storage-line { display: grid; grid-template-columns: minmax(240px, auto) minmax(180px, 360px); gap: 20px; align-items: center; margin: 24px 0 15px; font: 11px var(--mono); color: var(--muted); }
+.storage-track { height: 7px; border: 1px solid var(--rule); display: block; }
+.storage-track i { display: block; width: 0; height: 100%; background: var(--red); transition: width .2s ease; }
+.library-list { border-top: 1px solid var(--ink); }
+.library-item { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--rule); }
+.library-item img { width: 64px; height: 52px; object-fit: cover; background: #111; border: 3px solid #d9d3c4; outline: 1px solid var(--rule); }
+.library-item h3 { margin: 0; font: 13px var(--mono); font-weight: 600; }
+.library-item p, .empty-library { margin: 4px 0 0; color: var(--muted); font: 11px var(--mono); }
+.library-item-actions { display: flex; gap: 7px; }
+.library-item details { margin-top: 8px; font: 10px var(--mono); color: var(--muted); }
+.library-item summary { cursor: pointer; color: var(--red); }
+.library-item details ol { margin: 7px 0 0; padding-left: 18px; line-height: 1.6; }
 
 table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; }
 th, td { text-align: left; border-bottom: 1px solid var(--rule); padding: 9px 8px 9px 0; }
@@ -196,6 +214,8 @@ footer { display: flex; justify-content: space-between; padding: 17px 0 34px; bo
   .controls { border-right: 0; border-bottom: 1px solid var(--rule); padding: 0 0 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
   .controls .section-label, .controls .primary, .controls .text-link { grid-column: 1 / -1; }
   .logbook { grid-template-columns: 1fr; }
+  .library-heading { display: block; }
+  .library-actions { margin-top: 18px; flex-wrap: wrap; }
   .meeting-sheet { padding-left: 0; padding-top: 90px; }
   .meeting-sheet::before { top: 35px; }
 }
@@ -208,6 +228,8 @@ footer { display: flex; justify-content: space-between; padding: 17px 0 34px; bo
   .desk-heading { display: block; }
   dl { margin-top: 15px; }
   footer { display: block; line-height: 1.8; }
+  .storage-line, .library-item { grid-template-columns: 1fr; }
+  .library-item img { width: 100%; height: 120px; }
   blockquote { font-size: 19px; }
 }
 
@@ -215,4 +237,3 @@ footer { display: flex; justify-content: space-between; padding: 17px 0 34px; bo
   .image-mat img { transition: opacity .16s ease; }
   .observation-tab { transition: color .12s ease, box-shadow .12s ease; }
 }
-

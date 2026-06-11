@@ -57,7 +57,14 @@ def observation_payload() -> dict:
         grouped.setdefault(candidate["opus_id"], []).append(dict(candidate))
     return {
         "observations": [
-            {**dict(row), "candidates": grouped.get(row["opus_id"], [])}
+            {
+                **dict(row),
+                "candidates": grouped.get(row["opus_id"], []),
+                "opus_detail_url": (
+                    "https://opus.pds-rings.seti.org/#/"
+                    f"detail={row['opus_id']}"
+                ),
+            }
             for row in observations
         ],
         "notes": read_notes().get("notes", {}),
@@ -230,4 +237,3 @@ def run(open_browser: bool = True) -> None:
 
 if __name__ == "__main__":
     run(open_browser="--no-browser" not in sys.argv)
-

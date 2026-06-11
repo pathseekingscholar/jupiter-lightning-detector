@@ -80,6 +80,8 @@
 
         <label class="check"><input id="mark" type="checkbox" checked> Mark inspection coordinate</label>
 
+        <button type="button" id="upload">Add image to library</button>
+        <input id="upload-file" type="file" accept="image/png,image/jpeg,image/webp,image/bmp" hidden>
         <button class="primary" id="export">Export processed PNG</button>
         <a class="text-link" href="https://opus.pds-rings.seti.org/" target="_blank" rel="noreferrer">Open OPUS archive ↗</a>
       </aside>
@@ -107,6 +109,27 @@
           </figure>
         </div>
         <p class="desk-note">Click either image to move the inspection coordinate. The processed panel is generated directly from the calibrated 32-bit I/F product.</p>
+      </div>
+    </section>
+
+    <section class="library-sheet">
+      <div class="library-heading">
+        <div>
+          <p class="section-label">LOCAL IMAGE LIBRARY</p>
+          <h2>Uploads and processing history</h2>
+        </div>
+        <div class="library-actions">
+          <button type="button" id="export-library">Export library backup</button>
+          <button type="button" id="import-library">Import backup</button>
+          <input id="import-file" type="file" accept="application/json" hidden>
+        </div>
+      </div>
+      <div class="storage-line">
+        <span id="storage-copy">Checking browser storage…</span>
+        <span class="storage-track"><i id="storage-fill"></i></span>
+      </div>
+      <div class="library-list" id="library-list">
+        <p class="empty-library">No uploaded images yet. Add a PNG or JPEG from OPUS to begin an open-ended local collection.</p>
       </div>
     </section>
 
@@ -163,4 +186,3 @@
   <script src="/app.js"></script>
 </body>
 </html>
-
