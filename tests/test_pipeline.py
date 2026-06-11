@@ -1,11 +1,14 @@
+import io
 import json
 import tempfile
 import unittest
 from pathlib import Path
 
 import numpy as np
+from PIL import Image
 
 import jupiter_pipeline as pipeline
+import app_server
 
 
 class PipelineTests(unittest.TestCase):
@@ -39,6 +42,25 @@ END_OBJECT = IMAGE
         payload = json.loads(pipeline.EVENTS_PATH.read_text(encoding="utf-8"))
         events = sum(len(item["events"]) for item in payload["observations"])
         self.assertEqual(events, 6)
+
+    def test_app_processes_and_resizes_calibrated_image(self):
+        if not pipeline.DB_PATH.exists():
+            self.skipTest("Research products have not been initialized")
+        payload, filename = app_server.render_processed(
+            {
+                "image": ["1357029177"],
+                "crop": ["128"],
+                "scale": ["0.5"],
+                "x": ["731"],
+                "y": ["211"],
+                "low": ["2"],
+                "high": ["99.8"],
+                "gamma": ["1"],
+            }
+        )
+        with Image.open(io.BytesIO(payload)) as image:
+            self.assertEqual(image.size, (64, 64))
+        self.assertIn("N1357029177", filename)
 
 
 if __name__ == "__main__":

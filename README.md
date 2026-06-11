@@ -24,17 +24,23 @@ The command:
 4. Measures the published lightning locations against local backgrounds.
 5. Generates enhanced full frames, annotated crops, CSV exports, and a report.
 
-Open the generated report at:
+Launch the interactive local workbench:
 
-```text
-outputs/report.html
+```powershell
+.\run.ps1 app
 ```
 
-The main presentation figure is:
+The app opens at `http://127.0.0.1:8765`. It provides:
 
-```text
-outputs/known_lightning_contact_sheet.png
-```
+- original versus calibrated/processed image comparison
+- output resizing to 75%, 50%, or 25%
+- 512, 256, and 128 pixel inspection crops
+- black point, white point, and midtone controls
+- click-to-place Cassini image coordinates
+- local candidate classifications and research notes
+- processed PNG export
+
+The static meeting report remains at `outputs/report.html`.
 
 ## Important coordinate convention
 
@@ -58,6 +64,7 @@ missing image lines for these products.
 .\run.ps1 report
 .\run.ps1 all
 .\run.ps1 test
+.\run.ps1 app
 ```
 
 ## Project layout
@@ -65,6 +72,8 @@ missing image lines for these products.
 - `jupiter_pipeline.py`: archive, database, image, and reporting pipeline
 - `known_events.json`: published ground-truth detections
 - `meeting_walkthrough.ipynb`: concise notebook for the research meeting
+- `app_server.py` and `web/`: local research workbench
+- `start_workbench.ps1`: desktop-launch entry point
 - `data/calibrated`: calibrated I/F images and labels
 - `data/metadata`: OPUS metadata snapshots
 - `data/previews`: archive browse images
@@ -83,4 +92,3 @@ rotation; single bright pixels alone remain cosmic-ray candidates.
 - OPUS API guide: <https://opus.pds-rings.seti.org/apiguide.pdf>
 - OPUS archive: <https://opus.pds-rings.seti.org/>
 - Dyudina et al. (2004), Icarus 172, 24-36
-

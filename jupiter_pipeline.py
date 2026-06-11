@@ -507,23 +507,28 @@ def generate_report() -> None:
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cassini Jupiter Lightning Reproduction</title>
 <style>
-  :root {{ color-scheme: dark; font-family: Inter, Segoe UI, sans-serif; }}
-  body {{ margin: 0; background: #090d16; color: #edf2ff; line-height: 1.55; }}
+  :root {{ font-family: Georgia, "Times New Roman", serif; color: #27251f; }}
+  body {{ margin: 0; color: #27251f; line-height: 1.55;
+          background-color: #f2efe4;
+          background-image: linear-gradient(rgba(76,103,112,.09) 1px, transparent 1px),
+                            linear-gradient(90deg, rgba(76,103,112,.09) 1px, transparent 1px);
+          background-size: 24px 24px; }}
   main {{ max-width: 1100px; margin: auto; padding: 48px 28px 80px; }}
-  h1 {{ font-size: 44px; line-height: 1.08; margin-bottom: 10px; }}
-  h2 {{ margin-top: 42px; color: #ffcc66; }}
-  .lede {{ color: #afbdd6; font-size: 19px; max-width: 820px; }}
-  .status {{ display: inline-block; padding: 7px 12px; border-radius: 999px;
-             background: #153c31; color: #8ff0c8; font-weight: 700; }}
-  img {{ max-width: 100%; border-radius: 16px; border: 1px solid #29344a; }}
-  table {{ width: 100%; border-collapse: collapse; background: #101827; }}
-  th, td {{ text-align: left; padding: 11px; border-bottom: 1px solid #29344a; }}
-  th {{ color: #9fb5d8; }}
-  code {{ color: #b5d4ff; }}
-  a {{ color: #82b7ff; }}
+  h1 {{ font-size: 50px; line-height: 1; margin-bottom: 12px; font-weight: 500;
+        border-bottom: 3px double #27251f; padding-bottom: 18px; }}
+  h2 {{ margin-top: 42px; color: #a52d25; font-weight: 500; }}
+  .lede {{ color: #625e52; font-size: 19px; max-width: 820px; }}
+  .status {{ display: inline-block; padding: 5px 9px; border: 1px solid #a52d25;
+             color: #a52d25; font: 12px "Courier New", monospace;
+             transform: rotate(-1deg); }}
+  img {{ max-width: 100%; border: 8px solid #ded8c8; outline: 1px solid #27251f; }}
+  table {{ width: 100%; border-collapse: collapse; background: rgba(255,255,255,.25); }}
+  th, td {{ text-align: left; padding: 11px; border-bottom: 1px solid #aaa18c; }}
+  th {{ color: #625e52; font-family: "Courier New", monospace; font-size: 12px; }}
+  code {{ color: #a52d25; }}
+  a {{ color: #8d2721; }}
   .grid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }}
-  .card {{ padding: 18px; background: #101827; border: 1px solid #29344a;
-           border-radius: 14px; }}
+  .card {{ padding: 18px 18px 18px 0; border-top: 1px solid #27251f; }}
   @media (max-width: 760px) {{ .grid {{ grid-template-columns: 1fr; }} }}
 </style>
 </head>

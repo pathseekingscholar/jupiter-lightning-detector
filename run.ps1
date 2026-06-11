@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("init", "download", "analyze", "report", "all", "test")]
+    [ValidateSet("init", "download", "analyze", "report", "all", "test", "app")]
     [string]$Command = "all"
 )
 
@@ -18,7 +18,8 @@ if (Test-Path $workspacePython) {
 
 if ($Command -eq "test") {
     & $python -m unittest discover -s tests -v
+} elseif ($Command -eq "app") {
+    & $python app_server.py
 } else {
     & $python jupiter_pipeline.py $Command
 }
-
