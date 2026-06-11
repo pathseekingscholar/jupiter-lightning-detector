@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+
+# Downloaded and generated research products
+data/
+outputs/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# Locally extracted reference material
+proposal.txt
+published_paper.txt
+OPUS_API_Guide.pdf
+co-iss-*-metadata.json
+co-iss-*-files.json

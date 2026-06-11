@@ -1,0 +1,31 @@
+{
+  "source": "Dyudina et al. (2004), Table 2",
+  "coordinate_convention": "paper pair is displayed image x,y; numpy index is [y-1,x-1]",
+  "observations": [
+    {
+      "opus_id": "co-iss-n1357029177",
+      "image_number": "1357029177",
+      "events": [
+        {"label": "1", "x": 731, "y": 211, "published_power_w": 413000000},
+        {"label": "2", "x": 846, "y": 397, "published_power_w": 135000000}
+      ]
+    },
+    {
+      "opus_id": "co-iss-n1357810970",
+      "image_number": "1357810970",
+      "events": [
+        {"label": "3", "x": 955, "y": 357, "published_power_w": 263000000},
+        {"label": "3*", "x": 951, "y": 330, "published_power_w": 72000000}
+      ]
+    },
+    {
+      "opus_id": "co-iss-n1357885387",
+      "image_number": "1357885387",
+      "events": [
+        {"label": "4", "x": 775, "y": 341, "published_power_w": 100000000},
+        {"label": "4*", "x": 775, "y": 316, "published_power_w": 16000000}
+      ]
+    }
+  ]
+}
+
