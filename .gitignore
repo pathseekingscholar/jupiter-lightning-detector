@@ -13,6 +13,7 @@ outputs/
 proposal.txt
 published_paper.txt
 OPUS_API_Guide.pdf
+OPUS_API_Guide.txt
 co-iss-*-metadata.json
 co-iss-*-files.json
 research_notes.json

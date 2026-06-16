@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("init", "download", "analyze", "report", "all", "test", "app")]
+    [ValidateSet("init", "download", "analyze", "report", "all", "test", "app", "detect")]
     [string]$Command = "all"
 )
 
@@ -20,6 +20,8 @@ if ($Command -eq "test") {
     & $python -m unittest discover -s tests -v
 } elseif ($Command -eq "app") {
     & $python app_server.py
+} elseif ($Command -eq "detect") {
+    & $python detection_pipeline.py detect
 } else {
     & $python jupiter_pipeline.py $Command
 }

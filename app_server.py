@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import csv
 import json
 import mimetypes
 import sqlite3
@@ -23,6 +24,7 @@ WEB = ROOT / "web"
 NOTES_PATH = ROOT / "research_notes.json"
 HOST = "127.0.0.1"
 PORT = 8765
+DETECTION_DIR = ROOT / "outputs" / "detection"
 
 
 def read_notes() -> dict:
@@ -68,6 +70,57 @@ def observation_payload() -> dict:
             for row in observations
         ],
         "notes": read_notes().get("notes", {}),
+    }
+
+
+def read_detection_rows(limit: int = 150) -> dict:
+    review_path = DETECTION_DIR / "review_candidates.csv"
+    summary_path = DETECTION_DIR / "summary.json"
+    if not review_path.exists():
+        return {
+            "available": False,
+            "summary": {},
+            "tracks": [],
+            "message": "Run .\\run.ps1 detect to generate candidate detections.",
+        }
+    summary = json.loads(summary_path.read_text(encoding="utf-8")) if summary_path.exists() else {}
+    with review_path.open(newline="", encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
+    rows = rows[:limit]
+    tracks: dict[str, dict] = {}
+    for row in rows:
+        track = tracks.setdefault(
+            row["track_id"],
+            {
+                "track_id": row["track_id"],
+                "confidence": float(row["confidence"]),
+                "track_length": int(row["track_length"]),
+                "reason": row["reason"],
+                "items": [],
+            },
+        )
+        track["items"].append({
+            **row,
+            "confidence": float(row["confidence"]),
+            "track_length": int(row["track_length"]),
+            "frame_index": int(row["frame_index"]),
+            "x": float(row["x"]),
+            "y": float(row["y"]),
+            "area_px": int(row["area_px"]),
+            "peak_snr": float(row["peak_snr"]),
+            "mean_snr": float(row["mean_snr"]),
+            "integrated_snr": float(row["integrated_snr"]),
+            "sharpness": float(row["sharpness"]),
+            "elongation": float(row["elongation"]),
+            "preview_image": f"/data/previews/N{row['image_number']}_2_full.png",
+            "opus_detail_url": f"https://opus.pds-rings.seti.org/#/detail={row['opus_id']}",
+        })
+    return {
+        "available": True,
+        "summary": summary,
+        "tracks": sorted(tracks.values(), key=lambda item: item["confidence"], reverse=True),
+        "csv_url": "/outputs/detection/review_candidates.csv",
+        "contact_sheet_url": "/outputs/detection/candidate_contact_sheet.png",
     }
 
 
@@ -133,6 +186,33 @@ def render_processed(query: dict[str, list[str]]) -> tuple[bytes, str]:
     return buffer.getvalue(), filename
 
 
+def render_detection_crop(query: dict[str, list[str]]) -> bytes:
+    image_number = query.get("image", ["1357029177"])[0]
+    center_x = query_int(query, "x", 512)
+    center_y = query_int(query, "y", 512)
+    crop_size = max(48, min(256, query_int(query, "crop", 128)))
+    image_path, label_path = pipeline.image_paths_for_number(image_number)
+    array = pipeline.load_calibrated_image(image_path, label_path)
+    half = crop_size // 2
+    x0 = max(0, min(array.shape[1] - crop_size, center_x - half))
+    y0 = max(0, min(array.shape[0] - crop_size, center_y - half))
+    patch = np.asarray(array[y0:y0 + crop_size, x0:x0 + crop_size])
+    values = patch[pipeline.valid_mask(patch)]
+    if values.size == 0:
+        raise ValueError("Selected crop has no valid pixels")
+    low = float(np.percentile(values, 2.0))
+    high = float(np.percentile(values, 99.8))
+    rendered = Image.fromarray(pipeline.normalize_to_u8(patch, low, high), mode="L").convert("RGB")
+    draw = ImageDraw.Draw(rendered)
+    px, py = center_x - x0, center_y - y0
+    radius = max(6, crop_size // 22)
+    draw.ellipse((px - radius, py - radius, px + radius, py + radius), outline=(177, 38, 29), width=2)
+    rendered = rendered.resize((176, 176), Image.Resampling.NEAREST)
+    buffer = io.BytesIO()
+    rendered.save(buffer, format="PNG", optimize=True)
+    return buffer.getvalue()
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "JupiterWorkbench/1.0"
 
@@ -166,6 +246,17 @@ class Handler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         if parsed.path == "/api/observations":
             self.send_json(observation_payload())
+            return
+        if parsed.path == "/api/detection":
+            self.send_json(read_detection_rows())
+            return
+        if parsed.path == "/api/detection-crop":
+            try:
+                payload = render_detection_crop(parse_qs(parsed.query))
+            except Exception as exc:
+                self.send_json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
+                return
+            self.send_bytes(payload, "image/png")
             return
         if parsed.path in ("/api/process", "/api/export"):
             try:

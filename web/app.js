@@ -1,6 +1,7 @@
 const state = {
   data: null,
   current: null,
+  detection: null,
   timer: null,
   historyTimer: null,
   originalObjectUrl: null,
@@ -202,6 +203,107 @@ function renderCandidates() {
       updateProcessed();
     });
   });
+}
+
+function observationForDetection(candidate) {
+  return state.data.observations.find((observation) => observation.opus_id === candidate.opus_id);
+}
+
+function selectDetectionCandidate(candidate) {
+  const knownObservation = observationForDetection(candidate);
+  if (knownObservation) {
+    selectObservation(knownObservation);
+  } else {
+    revokeOriginalUrl();
+    state.current = {
+      opus_id: candidate.opus_id,
+      image_number: candidate.image_number,
+      start_time: candidate.time,
+      exposure_seconds: "32",
+      camera: "NAC",
+      filter_name: "HAL",
+      center_resolution_km: 60,
+      preview_image: candidate.preview_image,
+      candidates: [],
+      opus_detail_url: candidate.opus_detail_url,
+      source_type: "opus",
+      width: 1024,
+      height: 1024,
+    };
+    document.querySelectorAll(".observation-tab").forEach((tab) => tab.classList.remove("active"));
+    configureCoordinateBounds(1024, 1024);
+    $("image-title").textContent = `N${candidate.image_number}`;
+    $("original").src = candidate.preview_image;
+    $("metadata").innerHTML = `
+      <dt>Source</dt><dd>OPUS detector sequence</dd>
+      <dt>Record</dt><dd><a href="${candidate.opus_detail_url}" target="_blank" rel="noreferrer">${candidate.opus_id}</a></dd>
+      <dt>UTC</dt><dd>${candidate.time.replace("T", " ")}</dd>
+      <dt>Exposure</dt><dd>32s</dd>
+      <dt>Camera/filter</dt><dd>NAC / HAL</dd>
+      <dt>Track</dt><dd>${candidate.track_id}</dd>`;
+    renderCandidates();
+  }
+  $("x").value = Math.round(candidate.x);
+  $("y").value = Math.round(candidate.y);
+  $("crop").value = "128";
+  $("mark").checked = true;
+  updateProcessed();
+  document.querySelectorAll(".track-card").forEach((card) => {
+    card.classList.toggle("active", card.dataset.candidateId === candidate.candidate_id);
+  });
+}
+
+function renderDetectionReview() {
+  const summary = state.detection?.summary || {};
+  const tracks = state.detection?.tracks || [];
+  if (!state.detection?.available) {
+    $("detection-summary").textContent = state.detection?.message || "No detector output found yet.";
+    $("track-list").innerHTML = "";
+    $("contact-sheet").removeAttribute("src");
+    return;
+  }
+  $("review-csv-link").href = state.detection.csv_url;
+  $("contact-sheet-link").href = state.detection.contact_sheet_url;
+  $("contact-sheet").src = `${state.detection.contact_sheet_url}?t=${Date.now()}`;
+  $("detection-summary").textContent =
+    `${summary.frames || 0} frames scanned, ${summary.candidates || 0} bright regions found, ` +
+    `${summary.review_candidates || 0} review candidates after artifact filters. This is a review queue, not a confirmed lightning catalog.`;
+
+  const topTracks = tracks.slice(0, 18);
+  $("track-list").innerHTML = topTracks.map((track) => {
+    const lead = track.items[0];
+    const cropUrl = `/api/detection-crop?image=${encodeURIComponent(lead.image_number)}&x=${Math.round(lead.x)}&y=${Math.round(lead.y)}&crop=128`;
+    const frames = track.items.map((item) => `N${item.image_number.slice(-4)}`).join(" -> ");
+    return `
+      <article class="track-card" data-candidate-id="${lead.candidate_id}">
+        <button type="button" class="track-open" data-candidate-id="${lead.candidate_id}">
+          <img src="${cropUrl}" alt="">
+          <span>
+            <b>${track.track_id}</b>
+            <small>confidence ${track.confidence.toFixed(2)} / ${track.track_length} frame(s)</small>
+          </span>
+        </button>
+        <dl>
+          <dt>Lead frame</dt><dd>N${lead.image_number}</dd>
+          <dt>Coordinate</dt><dd>${lead.x.toFixed(1)}, ${lead.y.toFixed(1)}</dd>
+          <dt>Peak SNR</dt><dd>${lead.peak_snr.toFixed(1)}</dd>
+          <dt>Area</dt><dd>${lead.area_px} px</dd>
+        </dl>
+        <p>${escapeHtml(track.reason)}</p>
+        <p class="track-frames">${escapeHtml(frames)}</p>
+      </article>`;
+  }).join("");
+  const candidatesById = new Map();
+  topTracks.forEach((track) => track.items.forEach((item) => candidatesById.set(item.candidate_id, item)));
+  document.querySelectorAll(".track-open").forEach((button) => {
+    button.addEventListener("click", () => selectDetectionCandidate(candidatesById.get(button.dataset.candidateId)));
+  });
+}
+
+async function loadDetectionReview() {
+  const response = await fetch("/api/detection");
+  state.detection = await response.json();
+  renderDetectionReview();
 }
 
 function updateOutputs() {
@@ -554,6 +656,7 @@ async function init() {
   const response = await fetch("/api/observations");
   state.data = await response.json();
   renderStrip();
+  await loadDetectionReview();
   controls.forEach((id) => $(id).addEventListener("input", scheduleUpdate));
   $("notes-form").addEventListener("submit", saveNote);
   $("export").addEventListener("click", exportProcessed);

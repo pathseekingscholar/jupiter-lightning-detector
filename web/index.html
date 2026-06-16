@@ -112,6 +112,27 @@
       </div>
     </section>
 
+    <section class="detection-sheet" aria-labelledby="detection-title">
+      <div class="detection-heading">
+        <div>
+          <p class="section-label">DETECTION REVIEW</p>
+          <h2 id="detection-title">Candidate tracks from the January 1 sequence</h2>
+        </div>
+        <div class="detection-actions">
+          <a id="review-csv-link" class="button-link" href="/outputs/detection/review_candidates.csv">Open review CSV</a>
+          <a id="contact-sheet-link" class="button-link" href="/outputs/detection/candidate_contact_sheet.png">Open contact sheet</a>
+        </div>
+      </div>
+      <p class="detection-note" id="detection-summary">Loading detector output...</p>
+      <div class="candidate-review-layout">
+        <figure class="contact-sheet">
+          <figcaption>Top candidates overview</figcaption>
+          <img id="contact-sheet" alt="Contact sheet of first-pass candidate detections">
+        </figure>
+        <div class="track-list" id="track-list"></div>
+      </div>
+    </section>
+
     <section class="library-sheet">
       <div class="library-heading">
         <div>

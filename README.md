@@ -28,6 +28,7 @@ Launch the interactive local workbench:
 
 ```powershell
 .\run.ps1 app
+.\run.ps1 detect
 ```
 
 The app opens at `http://127.0.0.1:8765`. It provides:
@@ -79,6 +80,7 @@ missing image lines for these products.
 - `known_events.json`: published ground-truth detections
 - `meeting_walkthrough.ipynb`: concise notebook for the research meeting
 - `app_server.py` and `web/`: local research workbench
+- `detection_pipeline.py`: first-pass bright blob detection and tracking
 - `start_workbench.ps1`: desktop-launch entry point
 - `data/calibrated`: calibrated I/F images and labels
 - `data/metadata`: OPUS metadata snapshots
@@ -92,6 +94,26 @@ reproduction of known detections. It does not yet claim a new lightning
 detection. A defensible new-event search should add image navigation and
 temporal registration so repeated features can be tested against Jupiter's
 rotation; single bright pixels alone remain cosmic-ray candidates.
+
+## First Detection Milestone
+
+Run:
+
+```powershell
+.\run.ps1 detect
+```
+
+This queries the 23 Cassini ISS NAC/HAL Jupiter frames from January 1, 2001,
+downloads calibrated products if missing, performs high-pass enhancement,
+detects connected bright regions, links nearby detections across adjacent
+frames, and writes:
+
+- `outputs/detection/candidates.csv`
+- `outputs/detection/summary.json`
+- `outputs/detection/candidate_contact_sheet.png`
+
+This is an explainable first-pass candidate finder. It is meant to generate
+review targets, not final lightning claims.
 
 ## Sources
 
