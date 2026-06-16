@@ -84,6 +84,12 @@
         <input id="upload-file" type="file" accept="image/png,image/jpeg,image/webp,image/bmp" hidden>
         <button class="primary" id="export">Export processed PNG</button>
         <a class="text-link" href="https://opus.pds-rings.seti.org/" target="_blank" rel="noreferrer">Open OPUS archive ↗</a>
+        <details class="help-card">
+          <summary>What are these controls?</summary>
+          <p><b>Add image to library</b> is for a PNG/JPEG you manually download from OPUS. It does not run the Cassini detector.</p>
+          <p><b>Export processed PNG</b> saves the current stretched crop as an image for slides, notes, or email.</p>
+          <p><b>Output size</b>, <b>crop</b>, and <b>stretch</b> only change how the image is displayed. They do not alter the original data.</p>
+        </details>
       </aside>
 
       <div class="image-desk">
@@ -124,9 +130,16 @@
         </div>
       </div>
       <p class="detection-note" id="detection-summary">Loading detector output...</p>
+      <div class="plain-guide">
+        <b>How to read this section:</b>
+        <span><b>N1357029177</b> means Cassini image number 1357029177.</span>
+        <span><b>Track</b> means the detector linked bright spots across nearby frames. A track is evidence to review, not proof of lightning.</span>
+        <span><b>Confidence</b> ranks review priority from shape, brightness, and persistence. It is not a final probability.</span>
+        <span><b>Open review CSV</b> is the full machine-readable table. Use the cards below for human review.</span>
+      </div>
       <div class="candidate-review-layout">
         <figure class="contact-sheet">
-          <figcaption>Top candidates overview</figcaption>
+          <figcaption>Auto-generated crop sheet, not a paper screenshot</figcaption>
           <img id="contact-sheet" alt="Contact sheet of first-pass candidate detections">
         </figure>
         <div class="track-list" id="track-list"></div>
@@ -137,14 +150,15 @@
       <div class="library-heading">
         <div>
           <p class="section-label">LOCAL IMAGE LIBRARY</p>
-          <h2>Uploads and processing history</h2>
+          <h2>Manual uploads and saved stretch settings</h2>
         </div>
         <div class="library-actions">
-          <button type="button" id="export-library">Export library backup</button>
+          <button type="button" id="export-library">Export browser-library backup</button>
           <button type="button" id="import-library">Import backup</button>
           <input id="import-file" type="file" accept="application/json" hidden>
         </div>
       </div>
+      <p class="detection-note">This library is separate from the OPUS downloader. It is for images you personally upload into the browser so you can remember crop/stretch settings. A backup is a JSON file containing those local uploads and notes.</p>
       <div class="storage-line">
         <span id="storage-copy">Checking browser storage…</span>
         <span class="storage-track"><i id="storage-fill"></i></span>

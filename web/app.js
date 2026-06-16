@@ -266,21 +266,21 @@ function renderDetectionReview() {
   $("contact-sheet-link").href = state.detection.contact_sheet_url;
   $("contact-sheet").src = `${state.detection.contact_sheet_url}?t=${Date.now()}`;
   $("detection-summary").textContent =
-    `${summary.frames || 0} frames scanned, ${summary.candidates || 0} bright regions found, ` +
+    `${summary.frames || 0} long-exposure H-alpha frames scanned, ${summary.candidates || 0} bright regions found, ` +
     `${summary.review_candidates || 0} review candidates after artifact filters. This is a review queue, not a confirmed lightning catalog.`;
 
   const topTracks = tracks.slice(0, 18);
   $("track-list").innerHTML = topTracks.map((track) => {
     const lead = track.items[0];
     const cropUrl = `/api/detection-crop?image=${encodeURIComponent(lead.image_number)}&x=${Math.round(lead.x)}&y=${Math.round(lead.y)}&crop=128`;
-    const frames = track.items.map((item) => `N${item.image_number.slice(-4)}`).join(" -> ");
+    const frames = track.items.map((item) => `N${item.image_number}`).join(" -> ");
     return `
       <article class="track-card" data-candidate-id="${lead.candidate_id}">
         <button type="button" class="track-open" data-candidate-id="${lead.candidate_id}">
           <img src="${cropUrl}" alt="">
           <span>
-            <b>${track.track_id}</b>
-            <small>confidence ${track.confidence.toFixed(2)} / ${track.track_length} frame(s)</small>
+            <b>Possible track ${track.track_id}</b>
+            <small>review priority ${track.confidence.toFixed(2)} / seen in ${track.track_length} frame(s)</small>
           </span>
         </button>
         <dl>
@@ -290,7 +290,7 @@ function renderDetectionReview() {
           <dt>Area</dt><dd>${lead.area_px} px</dd>
         </dl>
         <p>${escapeHtml(track.reason)}</p>
-        <p class="track-frames">${escapeHtml(frames)}</p>
+        <p class="track-frames">Frames linked by detector: ${escapeHtml(frames)}</p>
       </article>`;
   }).join("");
   const candidatesById = new Map();

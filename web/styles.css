@@ -138,6 +138,15 @@ button, .primary, .button-link {
 button:hover, button:focus-visible, .button-link:hover, .button-link:focus-visible { background: var(--ink); color: var(--paper); }
 .primary { width: 100%; background: var(--ink); color: var(--paper); }
 .text-link { display: inline-block; color: var(--red); margin-top: 16px; font-family: var(--mono); font-size: 12px; }
+.help-card {
+  margin-top: 18px;
+  border-top: 1px dotted var(--rule);
+  padding-top: 12px;
+  font: 11px/1.5 var(--mono);
+  color: var(--muted);
+}
+.help-card summary { cursor: pointer; color: var(--red); }
+.help-card p { margin: 9px 0 0; }
 
 .desk-heading { display: flex; justify-content: space-between; align-items: start; gap: 24px; margin-bottom: 16px; }
 .desk-heading h2 { margin: -8px 0 0; font-family: var(--mono); font-size: 28px; font-weight: 500; }
@@ -180,6 +189,18 @@ figcaption { margin-bottom: 7px; }
 .library-actions { display: flex; gap: 8px; }
 .detection-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: end; }
 .detection-note { margin: 18px 0; max-width: 960px; font: 12px/1.6 var(--mono); color: var(--muted); }
+.plain-guide {
+  display: grid;
+  gap: 7px;
+  margin: 0 0 22px;
+  padding: 13px 0;
+  border-top: 1px dotted var(--rule);
+  border-bottom: 1px dotted var(--rule);
+  font: 12px/1.5 var(--mono);
+  color: var(--muted);
+}
+.plain-guide b { color: var(--ink); }
+.plain-guide > b { color: var(--red); }
 .candidate-review-layout { display: grid; grid-template-columns: minmax(280px, .55fr) minmax(0, 1fr); gap: 28px; align-items: start; }
 .contact-sheet img { width: 100%; border: 10px solid #d9d3c4; outline: 1px solid var(--ink); background: #111; }
 .track-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 14px; max-height: 760px; overflow: auto; padding-right: 6px; }
@@ -229,7 +250,7 @@ footer { display: flex; justify-content: space-between; padding: 17px 0 34px; bo
   .margin-note { padding: 0; }
   .bench { grid-template-columns: 1fr; }
   .controls { border-right: 0; border-bottom: 1px solid var(--rule); padding: 0 0 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
-  .controls .section-label, .controls .primary, .controls .text-link { grid-column: 1 / -1; }
+  .controls .section-label, .controls .primary, .controls .text-link, .controls .help-card { grid-column: 1 / -1; }
   .logbook { grid-template-columns: 1fr; }
   .library-heading, .detection-heading { display: block; }
   .library-actions, .detection-actions { margin-top: 18px; flex-wrap: wrap; justify-content: start; }
