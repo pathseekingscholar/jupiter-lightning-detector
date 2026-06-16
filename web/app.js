@@ -1,6 +1,7 @@
 const state = {
   data: null,
   current: null,
+  detectionDate: "2001-01-01",
   detection: null,
   validation: null,
   detectorStatusTimer: null,
@@ -267,7 +268,7 @@ function renderDetectionReview() {
   $("contact-sheet-link").href = state.detection.contact_sheet_url;
   $("contact-sheet").src = `${state.detection.contact_sheet_url}?t=${Date.now()}`;
   $("detection-summary").textContent =
-    `${summary.frames || 0} long-exposure H-alpha frames scanned, ${summary.candidates || 0} bright regions found, ` +
+    `${state.detectionDate}: ${summary.frames || 0} long-exposure H-alpha frames scanned, ${summary.candidates || 0} bright regions found, ` +
     `${summary.review_candidates || 0} review candidates after artifact filters. This is a review queue, not a confirmed lightning catalog.`;
 
   const topTracks = tracks.slice(0, 18);
@@ -302,9 +303,21 @@ function renderDetectionReview() {
 }
 
 async function loadDetectionReview() {
-  const response = await fetch("/api/detection");
+  const response = await fetch(`/api/detection?date=${encodeURIComponent(state.detectionDate)}`);
   state.detection = await response.json();
   renderDetectionReview();
+}
+
+function renderDetectionDateTabs() {
+  document.querySelectorAll("#detection-date-tabs button").forEach((button) => {
+    button.classList.toggle("active", button.dataset.date === state.detectionDate);
+  });
+}
+
+async function selectDetectionDate(runDate) {
+  state.detectionDate = runDate;
+  renderDetectionDateTabs();
+  await loadDetectionReview();
 }
 
 function renderValidation() {
@@ -355,8 +368,8 @@ async function refreshDetectorStatus() {
 }
 
 async function runDetectorAgain() {
-  renderDetectorStatus({running: true, message: "Starting detector..."});
-  await fetch("/api/run-detection", {method: "POST"});
+  renderDetectorStatus({running: true, message: `Starting detector for ${state.detectionDate}...`});
+  await fetch(`/api/run-detection?date=${encodeURIComponent(state.detectionDate)}`, {method: "POST"});
   await refreshDetectorStatus();
 }
 
@@ -715,6 +728,9 @@ async function init() {
   await refreshDetectorStatus();
   controls.forEach((id) => $(id).addEventListener("input", scheduleUpdate));
   $("run-detector").addEventListener("click", runDetectorAgain);
+  document.querySelectorAll("#detection-date-tabs button").forEach((button) => {
+    button.addEventListener("click", () => selectDetectionDate(button.dataset.date));
+  });
   $("notes-form").addEventListener("submit", saveNote);
   $("export").addEventListener("click", exportProcessed);
   $("upload").addEventListener("click", () => $("upload-file").click());

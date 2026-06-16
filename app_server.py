@@ -28,6 +28,8 @@ PORT = 8765
 DETECTION_DIR = ROOT / "outputs" / "detection"
 DETECTION_STATUS_PATH = DETECTION_DIR / "status.json"
 DETECTION_LOCK = threading.Lock()
+DETECTION_DATES = ("2001-01-01", "2001-01-10", "2001-01-11")
+DEFAULT_DETECTION_DATE = "2001-01-01"
 
 
 def read_notes() -> dict:
@@ -76,15 +78,25 @@ def observation_payload() -> dict:
     }
 
 
-def read_detection_rows(limit: int = 150) -> dict:
-    review_path = DETECTION_DIR / "review_candidates.csv"
-    summary_path = DETECTION_DIR / "summary.json"
+def safe_detection_date(value: str | None) -> str:
+    return value if value in DETECTION_DATES else DEFAULT_DETECTION_DATE
+
+
+def detection_date_dir(run_date: str) -> Path:
+    return DETECTION_DIR / run_date
+
+
+def read_detection_rows(run_date: str = DEFAULT_DETECTION_DATE, limit: int = 150) -> dict:
+    directory = detection_date_dir(run_date)
+    review_path = directory / "review_candidates.csv"
+    summary_path = directory / "summary.json"
     if not review_path.exists():
         return {
             "available": False,
+            "run_date": run_date,
             "summary": {},
             "tracks": [],
-            "message": "Run .\\run.ps1 detect to generate candidate detections.",
+            "message": f"Run detector for {run_date} to generate candidate detections.",
         }
     summary = json.loads(summary_path.read_text(encoding="utf-8")) if summary_path.exists() else {}
     with review_path.open(newline="", encoding="utf-8") as handle:
@@ -120,10 +132,11 @@ def read_detection_rows(limit: int = 150) -> dict:
         })
     return {
         "available": True,
+        "run_date": run_date,
         "summary": summary,
         "tracks": sorted(tracks.values(), key=lambda item: item["confidence"], reverse=True),
-        "csv_url": "/outputs/detection/review_candidates.csv",
-        "contact_sheet_url": "/outputs/detection/candidate_contact_sheet.png",
+        "csv_url": f"/outputs/detection/{run_date}/review_candidates.csv",
+        "contact_sheet_url": f"/outputs/detection/{run_date}/candidate_contact_sheet.png",
     }
 
 
@@ -138,47 +151,63 @@ def write_detection_status(payload: dict) -> None:
     DETECTION_STATUS_PATH.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
-def run_detection_job() -> None:
+def run_detection_job(run_date: str) -> None:
     with DETECTION_LOCK:
         try:
             write_detection_status({
                 "running": True,
-                "message": "Running detector: loading OPUS sequence, enhancing frames, finding blobs, filtering artifacts, and linking tracks.",
+                "run_date": run_date,
+                "message": f"Running detector for {run_date}: loading OPUS sequence, enhancing frames, finding blobs, filtering artifacts, and linking tracks.",
             })
             import detection_pipeline
 
-            candidates = detection_pipeline.run_detection()
+            candidates = detection_pipeline.run_detection(run_date=run_date)
             write_detection_status({
                 "running": False,
                 "ok": True,
-                "message": f"Detector finished. Found {len(candidates)} bright regions; refreshed review cards and contact sheet.",
+                "run_date": run_date,
+                "message": f"Detector finished for {run_date}. Found {len(candidates)} bright regions; refreshed that date's review cards and contact sheet.",
             })
         except Exception as exc:
             write_detection_status({
                 "running": False,
                 "ok": False,
+                "run_date": run_date,
                 "message": str(exc),
                 "traceback": traceback.format_exc(),
             })
 
 
-def start_detection_job() -> dict:
+def start_detection_job(run_date: str) -> dict:
     current = read_detection_status()
     if current.get("running"):
         return current
-    thread = threading.Thread(target=run_detection_job, daemon=True)
+    thread = threading.Thread(target=run_detection_job, args=(run_date,), daemon=True)
     thread.start()
-    return {"running": True, "message": "Detector started."}
+    return {"running": True, "run_date": run_date, "message": f"Detector started for {run_date}."}
+
+
+def load_all_candidate_rows() -> list[dict]:
+    rows = []
+    for run_date in DETECTION_DATES:
+        candidates_path = detection_date_dir(run_date) / "candidates.csv"
+        if not candidates_path.exists():
+            continue
+        with candidates_path.open(newline="", encoding="utf-8") as handle:
+            for row in csv.DictReader(handle):
+                row["run_date"] = run_date
+                rows.append(row)
+    return rows
 
 
 def validation_payload() -> dict:
-    candidates_path = DETECTION_DIR / "candidates.csv"
     known_path = ROOT / "known_events.json"
-    if not candidates_path.exists() or not known_path.exists():
-        return {"available": False, "message": "Run .\\run.ps1 detect before validating known lightning recovery."}
+    if not known_path.exists():
+        return {"available": False, "message": "Known lightning reference file is missing."}
 
-    with candidates_path.open(newline="", encoding="utf-8") as handle:
-        candidates = list(csv.DictReader(handle))
+    candidates = load_all_candidate_rows()
+    if not candidates:
+        return {"available": False, "message": "Run the detector for at least one published date before validating known lightning recovery."}
     known = json.loads(known_path.read_text(encoding="utf-8"))
     results = []
     for observation in known["observations"]:
@@ -204,14 +233,15 @@ def validation_payload() -> dict:
                 "detected_y": round(float(best["y"]), 2) if best else None,
                 "candidate_id": best["candidate_id"] if best else "",
                 "peak_snr": round(float(best["peak_snr"]), 2) if best else None,
-                "note": "In current detector sequence" if image_rows else "Not in the January 1 detector sequence",
+                "run_date": best["run_date"] if best else "",
+                "note": "In detector output" if image_rows else "Date has not been run yet",
             })
     recovered = sum(1 for row in results if row["recovered"])
     return {
         "available": True,
         "source": known["source"],
         "results": results,
-        "summary": f"{recovered} of {len(results)} published marks recovered in the current detector output.",
+        "summary": f"{recovered} of {len(results)} published marks recovered across generated detector outputs.",
     }
 
 
@@ -339,7 +369,8 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(observation_payload())
             return
         if parsed.path == "/api/detection":
-            self.send_json(read_detection_rows())
+            query = parse_qs(parsed.query)
+            self.send_json(read_detection_rows(safe_detection_date(query.get("date", [None])[0])))
             return
         if parsed.path == "/api/detection-status":
             self.send_json(read_detection_status())
@@ -376,10 +407,12 @@ class Handler(BaseHTTPRequestHandler):
         self.serve_file(WEB / relative)
 
     def do_POST(self) -> None:
-        if urlparse(self.path).path == "/api/run-detection":
-            self.send_json(start_detection_job())
+        parsed = urlparse(self.path)
+        if parsed.path == "/api/run-detection":
+            query = parse_qs(parsed.query)
+            self.send_json(start_detection_job(safe_detection_date(query.get("date", [None])[0])))
             return
-        if urlparse(self.path).path != "/api/notes":
+        if parsed.path != "/api/notes":
             self.send_json({"error": "Not found"}, HTTPStatus.NOT_FOUND)
             return
         try:

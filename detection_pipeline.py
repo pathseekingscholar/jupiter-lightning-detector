@@ -4,6 +4,8 @@ import argparse
 import csv
 import json
 import math
+import time
+import urllib.error
 from collections import deque
 from dataclasses import dataclass
 from datetime import datetime
@@ -19,7 +21,24 @@ import jupiter_pipeline as jp
 
 DETECTION_DIR = jp.OUTPUTS / "detection"
 SEQUENCES_DIR = jp.DATA / "sequences"
-NEW_YEAR_SEQUENCE = SEQUENCES_DIR / "new_year_2001_hal.json"
+DETECTION_RUNS = {
+    "2001-01-01": {
+        "label": "January 1, 2001 NAC/H-alpha",
+        "time1": "2001-01-01T00:00:00",
+        "time2": "2001-01-01T23:59:59",
+    },
+    "2001-01-10": {
+        "label": "January 10, 2001 NAC/H-alpha",
+        "time1": "2001-01-10T00:00:00",
+        "time2": "2001-01-10T23:59:59",
+    },
+    "2001-01-11": {
+        "label": "January 11, 2001 NAC/H-alpha",
+        "time1": "2001-01-11T00:00:00",
+        "time2": "2001-01-11T23:59:59",
+    },
+}
+DEFAULT_RUN_DATE = "2001-01-01"
 
 
 @dataclass
@@ -49,21 +68,61 @@ def ensure_dirs() -> None:
         path.mkdir(parents=True, exist_ok=True)
 
 
-def query_new_year_sequence() -> list[dict[str, str]]:
+def fetch_json(url: str, attempts: int = 4) -> Any:
+    last_error: Exception | None = None
+    for attempt in range(attempts):
+        try:
+            return jp.fetch_json(url)
+        except (urllib.error.URLError, ConnectionResetError) as exc:
+            last_error = exc
+            time.sleep(1.5 * (attempt + 1))
+    raise last_error or RuntimeError(f"Could not fetch {url}")
+
+
+def download_file(url: str, destination: Path, attempts: int = 4) -> None:
+    if destination.exists():
+        return
+    last_error: Exception | None = None
+    for attempt in range(attempts):
+        try:
+            jp.download_file(url, destination)
+            return
+        except (urllib.error.URLError, ConnectionResetError) as exc:
+            last_error = exc
+            time.sleep(1.5 * (attempt + 1))
+    raise last_error or RuntimeError(f"Could not download {url}")
+
+
+def run_config(run_date: str) -> dict[str, str]:
+    if run_date not in DETECTION_RUNS:
+        raise ValueError(f"Unknown detector run date: {run_date}")
+    return DETECTION_RUNS[run_date]
+
+
+def sequence_path(run_date: str) -> Path:
+    return SEQUENCES_DIR / f"{run_date}_nac_hal.json"
+
+
+def output_dir(run_date: str) -> Path:
+    return DETECTION_DIR / run_date
+
+
+def query_sequence(run_date: str = DEFAULT_RUN_DATE) -> list[dict[str, str]]:
     ensure_dirs()
+    config = run_config(run_date)
     params = {
         "instrument": "Cassini ISS",
         "planet": "Jupiter",
         "target": "Jupiter",
         "COISScamera": "Narrow Angle",
         "COISSfilter": "HAL",
-        "time1": "2001-01-01T00:00:00",
-        "time2": "2001-01-02T00:00:00",
+        "time1": config["time1"],
+        "time2": config["time2"],
         "cols": "opusid,time1,observationduration,COISScamera,COISSfilter,COISSimagenumber,SURFACEGEOjupiter_centerresolution",
         "order": "time1,opusid",
-        "limit": "100",
+        "limit": "200",
     }
-    payload = jp.fetch_json(f"{jp.OPUS_API}/data.json?{urlencode(params)}")
+    payload = fetch_json(f"{jp.OPUS_API}/data.json?{urlencode(params)}")
     keys = [
         "opus_id",
         "time",
@@ -74,14 +133,15 @@ def query_new_year_sequence() -> list[dict[str, str]]:
         "center_resolution_km_px",
     ]
     sequence = [dict(zip(keys, row)) for row in payload["page"]]
-    NEW_YEAR_SEQUENCE.write_text(json.dumps(sequence, indent=2), encoding="utf-8")
+    sequence_path(run_date).write_text(json.dumps(sequence, indent=2), encoding="utf-8")
     return sequence
 
 
-def load_sequence() -> list[dict[str, str]]:
-    if NEW_YEAR_SEQUENCE.exists():
-        return json.loads(NEW_YEAR_SEQUENCE.read_text(encoding="utf-8"))
-    return query_new_year_sequence()
+def load_sequence(run_date: str = DEFAULT_RUN_DATE) -> list[dict[str, str]]:
+    path = sequence_path(run_date)
+    if path.exists():
+        return json.loads(path.read_text(encoding="utf-8"))
+    return query_sequence(run_date)
 
 
 def download_sequence(sequence: list[dict[str, str]]) -> None:
@@ -93,12 +153,12 @@ def download_sequence(sequence: list[dict[str, str]]) -> None:
         metadata = (
             json.loads(metadata_path.read_text(encoding="utf-8"))
             if metadata_path.exists()
-            else jp.fetch_json(f"{jp.OPUS_API}/metadata/{opus_id}.json")
+            else fetch_json(f"{jp.OPUS_API}/metadata/{opus_id}.json")
         )
         files = (
             json.loads(files_path.read_text(encoding="utf-8"))
             if files_path.exists()
-            else jp.fetch_json(f"{jp.OPUS_API}/files/{opus_id}.json")
+            else fetch_json(f"{jp.OPUS_API}/files/{opus_id}.json")
         )
         metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
         files_path.write_text(json.dumps(files, indent=2), encoding="utf-8")
@@ -108,7 +168,7 @@ def download_sequence(sequence: list[dict[str, str]]) -> None:
             (label_url, jp.CALIBRATED),
             (preview_url, jp.PREVIEWS),
         ):
-            jp.download_file(url, directory / Path(url).name)
+            download_file(url, directory / Path(url).name)
 
 
 def paths_for_item(item: dict[str, str]) -> tuple[Path, Path]:
@@ -318,7 +378,7 @@ def explain_track(track: list[Candidate]) -> str:
     return "; ".join(bits)
 
 
-def draw_candidate_sheet(sequence: list[dict[str, str]], candidates: list[Candidate]) -> None:
+def draw_candidate_sheet(sequence: list[dict[str, str]], candidates: list[Candidate], directory: Path) -> None:
     ranked = [candidate for candidate in sorted(candidates, key=lambda item: item.confidence, reverse=True) if is_reviewable(candidate)][:24]
     cards = []
     for candidate in ranked:
@@ -352,11 +412,12 @@ def draw_candidate_sheet(sequence: list[dict[str, str]], candidates: list[Candid
     sheet = Image.new("RGB", (cols * 260, rows * 220), (235, 232, 222))
     for index, card in enumerate(cards):
         sheet.paste(card, ((index % cols) * 260, (index // cols) * 220))
-    sheet.save(DETECTION_DIR / "candidate_contact_sheet.png")
+    sheet.save(directory / "candidate_contact_sheet.png")
 
 
-def write_outputs(sequence: list[dict[str, str]], candidates: list[Candidate]) -> None:
-    DETECTION_DIR.mkdir(parents=True, exist_ok=True)
+def write_outputs(run_date: str, sequence: list[dict[str, str]], candidates: list[Candidate]) -> None:
+    directory = output_dir(run_date)
+    directory.mkdir(parents=True, exist_ok=True)
     rows = []
     for candidate in sorted(candidates, key=lambda item: item.confidence, reverse=True):
         rows.append({
@@ -379,17 +440,19 @@ def write_outputs(sequence: list[dict[str, str]], candidates: list[Candidate]) -
             "flags": "|".join(candidate.flags),
             "reason": candidate.reason,
         })
-    with (DETECTION_DIR / "candidates.csv").open("w", newline="", encoding="utf-8") as handle:
+    with (directory / "candidates.csv").open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()) if rows else ["track_id"])
         writer.writeheader()
         writer.writerows(rows)
     review_rows = [row for row in rows if not row["flags"] and float(row["confidence"]) >= 0.25]
-    with (DETECTION_DIR / "review_candidates.csv").open("w", newline="", encoding="utf-8") as handle:
+    with (directory / "review_candidates.csv").open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()) if rows else ["track_id"])
         writer.writeheader()
         writer.writerows(review_rows)
     summary = {
-        "sequence": "Cassini ISS NAC/HAL Jupiter, 2001-01-01",
+        "sequence": f"Cassini ISS NAC/HAL Jupiter, {run_date}",
+        "run_date": run_date,
+        "label": run_config(run_date)["label"],
         "frames": len(sequence),
         "candidates": len(candidates),
         "review_candidates": len(review_rows),
@@ -398,13 +461,13 @@ def write_outputs(sequence: list[dict[str, str]], candidates: list[Candidate]) -
         "top_review_candidates": review_rows[:12],
         "note": "This is a first-pass classical CV ranking, not a confirmed lightning catalog.",
     }
-    (DETECTION_DIR / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
-    draw_candidate_sheet(sequence, candidates)
+    (directory / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    draw_candidate_sheet(sequence, candidates, directory)
 
 
-def run_detection(limit: int | None = None) -> list[Candidate]:
+def run_detection(run_date: str = DEFAULT_RUN_DATE, limit: int | None = None) -> list[Candidate]:
     ensure_dirs()
-    sequence = load_sequence()
+    sequence = load_sequence(run_date)
     if limit:
         sequence = sequence[:limit]
     download_sequence(sequence)
@@ -412,27 +475,28 @@ def run_detection(limit: int | None = None) -> list[Candidate]:
     for frame_index, item in enumerate(sequence):
         candidates.extend(detect_frame(item, frame_index))
     link_tracks(candidates)
-    write_outputs(sequence, candidates)
+    write_outputs(run_date, sequence, candidates)
     return candidates
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=["query", "download", "detect"], nargs="?", default="detect")
+    parser.add_argument("--date", choices=list(DETECTION_RUNS), default=DEFAULT_RUN_DATE)
     parser.add_argument("--limit", type=int, default=None)
     args = parser.parse_args()
-    sequence = query_new_year_sequence() if args.command == "query" else load_sequence()
+    sequence = query_sequence(args.date) if args.command == "query" else load_sequence(args.date)
     if args.command == "download":
         if args.limit:
             sequence = sequence[: args.limit]
         download_sequence(sequence)
         print(f"Downloaded {len(sequence)} observations")
     elif args.command == "detect":
-        candidates = run_detection(limit=args.limit)
+        candidates = run_detection(run_date=args.date, limit=args.limit)
         print(f"Detected {len(candidates)} candidate regions")
-        print(DETECTION_DIR / "candidates.csv")
+        print(output_dir(args.date) / "candidates.csv")
     else:
-        print(f"Wrote {NEW_YEAR_SEQUENCE} with {len(sequence)} observations")
+        print(f"Wrote {sequence_path(args.date)} with {len(sequence)} observations")
 
 
 if __name__ == "__main__":

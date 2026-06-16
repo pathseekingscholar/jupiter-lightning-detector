@@ -103,14 +103,22 @@ Run:
 .\run.ps1 detect
 ```
 
-This queries the 23 Cassini ISS NAC/HAL Jupiter frames from January 1, 2001,
-downloads calibrated products if missing, performs high-pass enhancement,
-detects connected bright regions, links nearby detections across adjacent
-frames, and writes:
+By default this queries the 23 Cassini ISS NAC/HAL Jupiter frames from
+January 1, 2001. You can also run the other published-lightning validation
+dates:
 
-- `outputs/detection/candidates.csv`
-- `outputs/detection/summary.json`
-- `outputs/detection/candidate_contact_sheet.png`
+```powershell
+.\run.ps1 detect -Date 2001-01-10
+.\run.ps1 detect -Date 2001-01-11
+```
+
+Each run downloads calibrated products if missing, performs high-pass
+enhancement, detects connected bright regions, links nearby detections across
+adjacent frames, and writes date-specific outputs under `outputs/detection`:
+
+- `outputs/detection/<date>/candidates.csv`
+- `outputs/detection/<date>/summary.json`
+- `outputs/detection/<date>/candidate_contact_sheet.png`
 
 This is an explainable first-pass candidate finder. It is meant to generate
 review targets, not final lightning claims.

@@ -1,6 +1,8 @@
 param(
     [ValidateSet("init", "download", "analyze", "report", "all", "test", "app", "detect")]
-    [string]$Command = "all"
+    [string]$Command = "all",
+    [ValidateSet("2001-01-01", "2001-01-10", "2001-01-11")]
+    [string]$Date = "2001-01-01"
 )
 
 $ErrorActionPreference = "Stop"
@@ -21,7 +23,7 @@ if ($Command -eq "test") {
 } elseif ($Command -eq "app") {
     & $python app_server.py
 } elseif ($Command -eq "detect") {
-    & $python detection_pipeline.py detect
+    & $python detection_pipeline.py detect --date $Date
 } else {
     & $python jupiter_pipeline.py $Command
 }
