@@ -122,12 +122,32 @@
       <div class="detection-heading">
         <div>
           <p class="section-label">DETECTION REVIEW</p>
-          <h2 id="detection-title">Candidate tracks from the January 1 sequence</h2>
+          <h2 id="detection-title">Validation first, candidate search second</h2>
         </div>
         <div class="detection-actions">
-          <a id="review-csv-link" class="button-link" href="/outputs/detection/review_candidates.csv">Open review CSV</a>
+          <button type="button" id="run-detector">Run detector again</button>
           <a id="contact-sheet-link" class="button-link" href="/outputs/detection/candidate_contact_sheet.png">Open contact sheet</a>
         </div>
+      </div>
+      <div class="workflow-box">
+        <b>What happens when the detector runs:</b>
+        <span>1. Load calibrated Cassini H-alpha frames from OPUS/PDS.</span>
+        <span>2. Stretch contrast and subtract smooth background.</span>
+        <span>3. Find bright connected blobs.</span>
+        <span>4. Reject obvious single-pixel or sharp artifacts.</span>
+        <span>5. Link nearby blobs across neighboring frames as possible tracks.</span>
+      </div>
+      <p class="detector-status" id="detector-status">Detector status loading...</p>
+      <div class="validation-panel">
+        <div>
+          <p class="section-label">KNOWN LIGHTNING VALIDATION</p>
+          <h3>Can the detector recover the paper's answer key?</h3>
+          <p id="validation-summary">Loading validation...</p>
+        </div>
+        <table>
+          <thead><tr><th>Image</th><th>Paper coordinate</th><th>Detector coordinate</th><th>Offset</th><th>Result</th></tr></thead>
+          <tbody id="validation-body"></tbody>
+        </table>
       </div>
       <p class="detection-note" id="detection-summary">Loading detector output...</p>
       <div class="plain-guide">
@@ -135,7 +155,7 @@
         <span><b>N1357029177</b> means Cassini image number 1357029177.</span>
         <span><b>Track</b> means the detector linked bright spots across nearby frames. A track is evidence to review, not proof of lightning.</span>
         <span><b>Confidence</b> ranks review priority from shape, brightness, and persistence. It is not a final probability.</span>
-        <span><b>Open review CSV</b> is the full machine-readable table. Use the cards below for human review.</span>
+        <span>The cards below are the human-readable review queue. The large CSV stays behind the scenes for reproducibility.</span>
       </div>
       <div class="candidate-review-layout">
         <figure class="contact-sheet">

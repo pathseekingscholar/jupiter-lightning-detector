@@ -6,6 +6,7 @@ import json
 import mimetypes
 import sqlite3
 import sys
+import traceback
 import threading
 import webbrowser
 from http import HTTPStatus
@@ -25,6 +26,8 @@ NOTES_PATH = ROOT / "research_notes.json"
 HOST = "127.0.0.1"
 PORT = 8765
 DETECTION_DIR = ROOT / "outputs" / "detection"
+DETECTION_STATUS_PATH = DETECTION_DIR / "status.json"
+DETECTION_LOCK = threading.Lock()
 
 
 def read_notes() -> dict:
@@ -121,6 +124,94 @@ def read_detection_rows(limit: int = 150) -> dict:
         "tracks": sorted(tracks.values(), key=lambda item: item["confidence"], reverse=True),
         "csv_url": "/outputs/detection/review_candidates.csv",
         "contact_sheet_url": "/outputs/detection/candidate_contact_sheet.png",
+    }
+
+
+def read_detection_status() -> dict:
+    if DETECTION_STATUS_PATH.exists():
+        return json.loads(DETECTION_STATUS_PATH.read_text(encoding="utf-8"))
+    return {"running": False, "message": "Detector has not been run from this session."}
+
+
+def write_detection_status(payload: dict) -> None:
+    DETECTION_DIR.mkdir(parents=True, exist_ok=True)
+    DETECTION_STATUS_PATH.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
+def run_detection_job() -> None:
+    with DETECTION_LOCK:
+        try:
+            write_detection_status({
+                "running": True,
+                "message": "Running detector: loading OPUS sequence, enhancing frames, finding blobs, filtering artifacts, and linking tracks.",
+            })
+            import detection_pipeline
+
+            candidates = detection_pipeline.run_detection()
+            write_detection_status({
+                "running": False,
+                "ok": True,
+                "message": f"Detector finished. Found {len(candidates)} bright regions; refreshed review cards and contact sheet.",
+            })
+        except Exception as exc:
+            write_detection_status({
+                "running": False,
+                "ok": False,
+                "message": str(exc),
+                "traceback": traceback.format_exc(),
+            })
+
+
+def start_detection_job() -> dict:
+    current = read_detection_status()
+    if current.get("running"):
+        return current
+    thread = threading.Thread(target=run_detection_job, daemon=True)
+    thread.start()
+    return {"running": True, "message": "Detector started."}
+
+
+def validation_payload() -> dict:
+    candidates_path = DETECTION_DIR / "candidates.csv"
+    known_path = ROOT / "known_events.json"
+    if not candidates_path.exists() or not known_path.exists():
+        return {"available": False, "message": "Run .\\run.ps1 detect before validating known lightning recovery."}
+
+    with candidates_path.open(newline="", encoding="utf-8") as handle:
+        candidates = list(csv.DictReader(handle))
+    known = json.loads(known_path.read_text(encoding="utf-8"))
+    results = []
+    for observation in known["observations"]:
+        image_rows = [row for row in candidates if row["image_number"] == observation["image_number"]]
+        for event in observation["events"]:
+            best = None
+            best_distance = float("inf")
+            for row in image_rows:
+                dx = float(row["x"]) - float(event["x"])
+                dy = float(row["y"]) - float(event["y"])
+                distance = float((dx * dx + dy * dy) ** 0.5)
+                if distance < best_distance:
+                    best = row
+                    best_distance = distance
+            results.append({
+                "image_number": observation["image_number"],
+                "label": event["label"],
+                "published_x": event["x"],
+                "published_y": event["y"],
+                "recovered": best is not None and best_distance <= 8.0,
+                "distance_px": round(best_distance, 2) if best else None,
+                "detected_x": round(float(best["x"]), 2) if best else None,
+                "detected_y": round(float(best["y"]), 2) if best else None,
+                "candidate_id": best["candidate_id"] if best else "",
+                "peak_snr": round(float(best["peak_snr"]), 2) if best else None,
+                "note": "In current detector sequence" if image_rows else "Not in the January 1 detector sequence",
+            })
+    recovered = sum(1 for row in results if row["recovered"])
+    return {
+        "available": True,
+        "source": known["source"],
+        "results": results,
+        "summary": f"{recovered} of {len(results)} published marks recovered in the current detector output.",
     }
 
 
@@ -250,6 +341,12 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/api/detection":
             self.send_json(read_detection_rows())
             return
+        if parsed.path == "/api/detection-status":
+            self.send_json(read_detection_status())
+            return
+        if parsed.path == "/api/validation":
+            self.send_json(validation_payload())
+            return
         if parsed.path == "/api/detection-crop":
             try:
                 payload = render_detection_crop(parse_qs(parsed.query))
@@ -279,6 +376,9 @@ class Handler(BaseHTTPRequestHandler):
         self.serve_file(WEB / relative)
 
     def do_POST(self) -> None:
+        if urlparse(self.path).path == "/api/run-detection":
+            self.send_json(start_detection_job())
+            return
         if urlparse(self.path).path != "/api/notes":
             self.send_json({"error": "Not found"}, HTTPStatus.NOT_FOUND)
             return

@@ -2,6 +2,8 @@ const state = {
   data: null,
   current: null,
   detection: null,
+  validation: null,
+  detectorStatusTimer: null,
   timer: null,
   historyTimer: null,
   originalObjectUrl: null,
@@ -262,7 +264,6 @@ function renderDetectionReview() {
     $("contact-sheet").removeAttribute("src");
     return;
   }
-  $("review-csv-link").href = state.detection.csv_url;
   $("contact-sheet-link").href = state.detection.contact_sheet_url;
   $("contact-sheet").src = `${state.detection.contact_sheet_url}?t=${Date.now()}`;
   $("detection-summary").textContent =
@@ -304,6 +305,59 @@ async function loadDetectionReview() {
   const response = await fetch("/api/detection");
   state.detection = await response.json();
   renderDetectionReview();
+}
+
+function renderValidation() {
+  if (!state.validation?.available) {
+    $("validation-summary").textContent = state.validation?.message || "Validation is not available yet.";
+    $("validation-body").innerHTML = `<tr><td colspan="5">Run the detector first.</td></tr>`;
+    return;
+  }
+  $("validation-summary").textContent = `${state.validation.summary} Source: ${state.validation.source}.`;
+  $("validation-body").innerHTML = state.validation.results.map((row) => {
+    const paper = `(${row.published_x}, ${row.published_y})`;
+    const detector = row.detected_x === null ? "not in current run" : `(${row.detected_x}, ${row.detected_y})`;
+    const offset = row.distance_px === null ? row.note : `${row.distance_px} px`;
+    const result = row.recovered ? "Recovered" : row.note;
+    return `
+      <tr>
+        <td>N${row.image_number}</td>
+        <td>${paper}</td>
+        <td>${detector}</td>
+        <td>${offset}</td>
+        <td>${result}</td>
+      </tr>`;
+  }).join("");
+}
+
+async function loadValidation() {
+  const response = await fetch("/api/validation");
+  state.validation = await response.json();
+  renderValidation();
+}
+
+function renderDetectorStatus(status) {
+  $("detector-status").textContent = status.message || "Detector idle.";
+  $("run-detector").disabled = Boolean(status.running);
+}
+
+async function refreshDetectorStatus() {
+  const response = await fetch("/api/detection-status");
+  const status = await response.json();
+  renderDetectorStatus(status);
+  if (status.running) {
+    clearTimeout(state.detectorStatusTimer);
+    state.detectorStatusTimer = setTimeout(refreshDetectorStatus, 1800);
+    return;
+  }
+  await loadDetectionReview();
+  await loadValidation();
+}
+
+async function runDetectorAgain() {
+  renderDetectorStatus({running: true, message: "Starting detector..."});
+  await fetch("/api/run-detection", {method: "POST"});
+  await refreshDetectorStatus();
 }
 
 function updateOutputs() {
@@ -657,7 +711,10 @@ async function init() {
   state.data = await response.json();
   renderStrip();
   await loadDetectionReview();
+  await loadValidation();
+  await refreshDetectorStatus();
   controls.forEach((id) => $(id).addEventListener("input", scheduleUpdate));
+  $("run-detector").addEventListener("click", runDetectorAgain);
   $("notes-form").addEventListener("submit", saveNote);
   $("export").addEventListener("click", exportProcessed);
   $("upload").addEventListener("click", () => $("upload-file").click());
