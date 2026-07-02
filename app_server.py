@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import csv
 import json
+import math
 import mimetypes
 import sqlite3
 import sys
@@ -27,9 +28,18 @@ HOST = "127.0.0.1"
 PORT = 8765
 DETECTION_DIR = ROOT / "outputs" / "detection"
 DETECTION_STATUS_PATH = DETECTION_DIR / "status.json"
+LABELS_PATH = DETECTION_DIR / "candidate_labels.json"
+LABELS_CSV_PATH = DETECTION_DIR / "candidate_labels.csv"
 DETECTION_LOCK = threading.Lock()
-DETECTION_DATES = ("2001-01-01", "2001-01-10", "2001-01-11")
+DETECTION_DATES = ("2001-01-01", "2001-01-10", "2001-01-11", "2001-01-13")
 DEFAULT_DETECTION_DATE = "2001-01-01"
+LABEL_VALUES = {
+    "known-lightning",
+    "possible-lightning",
+    "artifact",
+    "cosmic-ray-hot-pixel",
+    "uncertain",
+}
 
 
 def read_notes() -> dict:
@@ -40,6 +50,43 @@ def read_notes() -> dict:
 
 def write_notes(payload: dict) -> None:
     NOTES_PATH.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
+def read_candidate_labels() -> dict:
+    if not LABELS_PATH.exists():
+        return {"labels": {}}
+    return json.loads(LABELS_PATH.read_text(encoding="utf-8"))
+
+
+def write_candidate_labels(payload: dict) -> None:
+    DETECTION_DIR.mkdir(parents=True, exist_ok=True)
+    LABELS_PATH.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    rows = sorted(payload.get("labels", {}).values(), key=lambda item: (item.get("run_date", ""), item.get("candidate_id", "")))
+    fieldnames = [
+        "run_date",
+        "candidate_id",
+        "image_id",
+        "image_number",
+        "x",
+        "y",
+        "brightness",
+        "blob_size",
+        "snr",
+        "artifact_flags",
+        "candidate_score",
+        "human_label",
+        "review_note",
+        "updated_at",
+    ]
+    with LABELS_CSV_PATH.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({key: row.get(key, "") for key in fieldnames})
+
+
+def labels_by_candidate_id() -> dict[str, dict]:
+    return read_candidate_labels().get("labels", {})
 
 
 def observation_payload() -> dict:
@@ -86,6 +133,13 @@ def detection_date_dir(run_date: str) -> Path:
     return DETECTION_DIR / run_date
 
 
+def preview_url_for_image(image_number: str) -> str:
+    matches = sorted((ROOT / "data" / "previews").glob(f"N{image_number}_*_full.png"))
+    if matches:
+        return f"/data/previews/{matches[0].name}"
+    return f"/data/previews/N{image_number}_2_full.png"
+
+
 def read_detection_rows(run_date: str = DEFAULT_DETECTION_DATE, limit: int = 150) -> dict:
     directory = detection_date_dir(run_date)
     review_path = directory / "review_candidates.csv"
@@ -99,6 +153,7 @@ def read_detection_rows(run_date: str = DEFAULT_DETECTION_DATE, limit: int = 150
             "message": f"Run detector for {run_date} to generate candidate detections.",
         }
     summary = json.loads(summary_path.read_text(encoding="utf-8")) if summary_path.exists() else {}
+    labels = labels_by_candidate_id()
     with review_path.open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
     rows = rows[:limit]
@@ -114,6 +169,7 @@ def read_detection_rows(run_date: str = DEFAULT_DETECTION_DATE, limit: int = 150
                 "items": [],
             },
         )
+        candidate_label = labels.get(row["candidate_id"], {})
         track["items"].append({
             **row,
             "confidence": float(row["confidence"]),
@@ -127,8 +183,10 @@ def read_detection_rows(run_date: str = DEFAULT_DETECTION_DATE, limit: int = 150
             "integrated_snr": float(row["integrated_snr"]),
             "sharpness": float(row["sharpness"]),
             "elongation": float(row["elongation"]),
-            "preview_image": f"/data/previews/N{row['image_number']}_2_full.png",
+            "preview_image": preview_url_for_image(row["image_number"]),
             "opus_detail_url": f"https://opus.pds-rings.seti.org/#/detail={row['opus_id']}",
+            "human_label": candidate_label.get("human_label", ""),
+            "review_note": candidate_label.get("review_note", ""),
         })
     return {
         "available": True,
@@ -136,6 +194,7 @@ def read_detection_rows(run_date: str = DEFAULT_DETECTION_DATE, limit: int = 150
         "summary": summary,
         "tracks": sorted(tracks.values(), key=lambda item: item["confidence"], reverse=True),
         "csv_url": f"/outputs/detection/{run_date}/review_candidates.csv",
+        "all_csv_url": f"/outputs/detection/{run_date}/candidates.csv",
         "contact_sheet_url": f"/outputs/detection/{run_date}/candidate_contact_sheet.png",
     }
 
@@ -243,6 +302,161 @@ def validation_payload() -> dict:
         "results": results,
         "summary": f"{recovered} of {len(results)} published marks recovered across generated detector outputs.",
     }
+
+
+def detector_characteristics_payload() -> dict:
+    known_path = ROOT / "known_events.json"
+    known_points = []
+    if known_path.exists():
+        known = json.loads(known_path.read_text(encoding="utf-8"))
+        for observation in known["observations"]:
+            for event in observation["events"]:
+                known_points.append({
+                    "image_number": observation["image_number"],
+                    "x": float(event["x"]),
+                    "y": float(event["y"]),
+                })
+
+    dates = []
+    totals = {
+        "frames": 0,
+        "raw_candidates": 0,
+        "review_candidates": 0,
+        "known_recovered": 0,
+        "known_total": len(known_points),
+        "unmatched_review": 0,
+    }
+    flag_counts: dict[str, int] = {}
+
+    for run_date in DETECTION_DATES:
+        directory = detection_date_dir(run_date)
+        summary_path = directory / "summary.json"
+        candidates_path = directory / "candidates.csv"
+        review_path = directory / "review_candidates.csv"
+        if not summary_path.exists() or not candidates_path.exists():
+            dates.append({
+                "date": run_date,
+                "available": False,
+                "message": "Detector has not been run for this date.",
+            })
+            continue
+
+        summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        with candidates_path.open(newline="", encoding="utf-8") as handle:
+            candidates = list(csv.DictReader(handle))
+        if review_path.exists():
+            with review_path.open(newline="", encoding="utf-8") as handle:
+                review_rows = list(csv.DictReader(handle))
+        else:
+            review_rows = []
+
+        recovered_ids = set()
+        for point in known_points:
+            image_rows = [row for row in candidates if row["image_number"] == point["image_number"]]
+            if not image_rows:
+                continue
+            best = min(
+                image_rows,
+                key=lambda row: math.hypot(float(row["x"]) - point["x"], float(row["y"]) - point["y"]),
+            )
+            distance = math.hypot(float(best["x"]) - point["x"], float(best["y"]) - point["y"])
+            if distance <= 8.0:
+                recovered_ids.add(best["candidate_id"])
+
+        for row in candidates:
+            for flag in filter(None, row.get("flags", "").split("|")):
+                flag_counts[flag] = flag_counts.get(flag, 0) + 1
+
+        unmatched_review = sum(1 for row in review_rows if row["candidate_id"] not in recovered_ids)
+        date_payload = {
+            "date": run_date,
+            "available": True,
+            "frames": int(summary.get("frames", 0)),
+            "raw_candidates": int(summary.get("candidates", 0)),
+            "review_candidates": int(summary.get("review_candidates", 0)),
+            "known_recovered": len(recovered_ids),
+            "unmatched_review": unmatched_review,
+        }
+        dates.append(date_payload)
+        totals["frames"] += date_payload["frames"]
+        totals["raw_candidates"] += date_payload["raw_candidates"]
+        totals["review_candidates"] += date_payload["review_candidates"]
+        totals["known_recovered"] += date_payload["known_recovered"]
+        totals["unmatched_review"] += date_payload["unmatched_review"]
+
+    return {
+        "rules": [
+            "Use calibrated Cassini ISS NAC/H-alpha images, not screenshot photometry.",
+            "Subtract a smooth local background and measure high-pass SNR.",
+            "Detect connected bright regions above SNR 7.",
+            "Flag single-pixel, too-small, sharp cosmic-ray-like, and streak-like detections.",
+            "Promote review candidates only when area >= 3 pixels, peak SNR >= 8, and no artifact flags.",
+            "Link reviewable candidates across nearby frames within 85 pixels and 12 minutes.",
+        ],
+        "classification": {
+            "positive": "A detection within 8 pixels of a published Dyudina et al. lightning coordinate.",
+            "negative_or_uncertain": "A detection that does not match the paper. It is not automatically wrong; it needs review as artifact, cosmic ray, uncertain, or possible new candidate.",
+            "not_claimed": "The detector has not confirmed new lightning yet.",
+        },
+        "dates": dates,
+        "totals": totals,
+        "flag_counts": sorted(
+            [{"flag": flag, "count": count} for flag, count in flag_counts.items()],
+            key=lambda item: item["count"],
+            reverse=True,
+        ),
+    }
+
+
+def candidate_labels_payload() -> dict:
+    payload = read_candidate_labels()
+    if not LABELS_PATH.exists() or not LABELS_CSV_PATH.exists():
+        write_candidate_labels(payload)
+    labels = payload.get("labels", {})
+    false_positives = [
+        row for row in labels.values()
+        if row.get("human_label") in {"artifact", "cosmic-ray-hot-pixel"}
+    ]
+    possible = [
+        row for row in labels.values()
+        if row.get("human_label") in {"known-lightning", "possible-lightning", "uncertain"}
+    ]
+    return {
+        "labels": labels,
+        "counts": {
+            "labeled": len(labels),
+            "false_positives": len(false_positives),
+            "possible_or_uncertain": len(possible),
+        },
+        "json_url": "/outputs/detection/candidate_labels.json",
+        "csv_url": "/outputs/detection/candidate_labels.csv",
+    }
+
+
+def save_candidate_label(payload: dict) -> dict:
+    candidate_id = str(payload["candidate_id"])
+    human_label = str(payload.get("human_label", "uncertain"))
+    if human_label not in LABEL_VALUES:
+        raise ValueError(f"Unknown label: {human_label}")
+    labels = read_candidate_labels()
+    labels.setdefault("labels", {})[candidate_id] = {
+        "run_date": str(payload.get("run_date", "")),
+        "candidate_id": candidate_id,
+        "image_id": str(payload.get("image_id", "")),
+        "image_number": str(payload.get("image_number", "")),
+        "x": payload.get("x", ""),
+        "y": payload.get("y", ""),
+        "brightness": payload.get("brightness", payload.get("peak_snr", "")),
+        "blob_size": payload.get("blob_size", payload.get("area_px", "")),
+        "snr": payload.get("snr", payload.get("peak_snr", "")),
+        "artifact_flags": str(payload.get("artifact_flags", payload.get("flags", ""))),
+        "candidate_score": payload.get("candidate_score", payload.get("confidence", "")),
+        "human_label": human_label,
+        "review_note": str(payload.get("review_note", ""))[:2000],
+        "updated_at": str(payload.get("updated_at", "")),
+    }
+    write_candidate_labels(labels)
+    return {"saved": True, "candidate_id": candidate_id, **candidate_labels_payload()}
 
 
 def query_float(query: dict[str, list[str]], key: str, default: float) -> float:
@@ -378,6 +592,12 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/api/validation":
             self.send_json(validation_payload())
             return
+        if parsed.path == "/api/detector-characteristics":
+            self.send_json(detector_characteristics_payload())
+            return
+        if parsed.path == "/api/candidate-labels":
+            self.send_json(candidate_labels_payload())
+            return
         if parsed.path == "/api/detection-crop":
             try:
                 payload = render_detection_crop(parse_qs(parsed.query))
@@ -411,6 +631,14 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/api/run-detection":
             query = parse_qs(parsed.query)
             self.send_json(start_detection_job(safe_detection_date(query.get("date", [None])[0])))
+            return
+        if parsed.path == "/api/candidate-label":
+            try:
+                length = int(self.headers.get("Content-Length", "0"))
+                payload = json.loads(self.rfile.read(length) or b"{}")
+                self.send_json(save_candidate_label(payload))
+            except Exception as exc:
+                self.send_json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
             return
         if parsed.path != "/api/notes":
             self.send_json({"error": "Not found"}, HTTPStatus.NOT_FOUND)
@@ -446,7 +674,8 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def run(open_browser: bool = True) -> None:
-    pipeline.run_all()
+    if not pipeline.DB_PATH.exists():
+        pipeline.run_all()
     server = ThreadingHTTPServer((HOST, PORT), Handler)
     if open_browser:
         threading.Timer(0.7, lambda: webbrowser.open(f"http://{HOST}:{PORT}")).start()

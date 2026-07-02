@@ -1,55 +1,128 @@
-# Cassini Jupiter Lightning Workflow
+# Jupiter Lightning Detector Workbench
 
-This project reproduces the published Cassini ISS detections of lightning on
-Jupiter and provides a foundation for cataloging and screening additional
-images from the OPUS archive.
+This project inspects Cassini ISS Jupiter images for possible lightning. It is a
+careful review workbench for extracting new science from Cassini data, not an
+automatic discovery engine.
+
+Clear rule: this is not confirmed lightning. The detector saves candidates for
+human review.
+
+Scientific objective: build a validated pipeline that identifies candidate
+lightning events in Cassini Jupiter images, minimizes false detections, and
+supports the discovery and characterization of previously overlooked events.
 
 The initial ground-truth set comes from Dyudina et al. (2004), *Lightning on
 Jupiter observed in the H-alpha line by the Cassini imaging science
 subsystem*. It contains six detections in three Cassini NAC/HAL images.
 
-## Quick start
+## Quick Start
 
 From PowerShell:
 
 ```powershell
 .\run.ps1 all
+.\run.ps1 app
 ```
 
-The command:
+The app opens at `http://127.0.0.1:8765`.
 
-1. Creates `jupiter_lightning.sqlite`.
-2. Retrieves OPUS metadata and calibrated VICAR/PDS products if missing.
-3. Reads the calibrated 1024 x 1024 I/F arrays.
-4. Measures the published lightning locations against local backgrounds.
-5. Generates enhanced full frames, annotated crops, CSV exports, and a report.
-
-Launch the interactive local workbench:
+Run the detector for the example dates:
 
 ```powershell
-.\run.ps1 app
-.\run.ps1 detect
+.\run.ps1 detect -Date 2001-01-01
+.\run.ps1 detect -Date 2001-01-10
+.\run.ps1 detect -Date 2001-01-11
+.\run.ps1 detect -Date 2001-01-13
+.\run.ps1 exports
 ```
 
-The app opens at `http://127.0.0.1:8765`. It provides:
+## What The App Provides
 
-- original versus calibrated/processed image comparison
-- output resizing to 75%, 50%, or 25%
-- 512, 256, and 128 pixel inspection crops
-- black point, white point, and midtone controls
-- click-to-place Cassini image coordinates
-- local candidate classifications and research notes
-- processed PNG export
-- browser-local IndexedDB image library and processing history
-- portable JSON library backup/import
-- storage quota monitoring with a backup warning before the browser fills
+- About page with the plain-English workflow.
+- Upload/select Cassini image support.
+- Manual crop and brightness controls for inspection.
+- Classical detector output for Jan 1, Jan 10, Jan 11, and Jan 13.
+- Candidate boxes/circles in crops and contact sheets.
+- Candidate review table with image ID, x/y coordinate, brightness, blob size,
+  SNR/local contrast, artifact flags, and candidate score.
+- Human labels: known lightning, possible lightning, artifact, cosmic ray/hot
+  pixel, and uncertain.
+- Exportable labels:
+  - `outputs/detection/candidate_labels.csv`
+  - `outputs/detection/candidate_labels.json`
+- Research-grade exports:
+  - `outputs/detection/dataset_manifest.csv`
+  - `outputs/detection/detection_summary.csv`
+  - `outputs/detection/candidate_labels_grouped.csv` when human labels exist
+- Separate false positive, false negative, and unmatched-candidate sections.
+- Known published detections as validation targets.
 
 Uploaded PNG, JPEG, WebP, and BMP images are processed locally in the browser.
 They are not sent to OPUS or another external service.
 
-The static meeting report remains at `outputs/report.html`.
+## Detector Pipeline
 
-## Important coordinate convention
+```text
+Cassini image
+-> brighten night side
+-> find bright spots
+-> remove obvious artifacts
+-> save candidates
+-> human review
+-> possible lightning
+```
+
+The current detector uses explainable classical computer vision:
+
+- subtract a smooth local background
+- detect bright connected regions above local background
+- flag single-pixel, too-small, sharp cosmic-ray-like, and streak-like events
+- keep uncertain detections for review
+- rank candidates with a review score
+
+The candidate score is not a probability unless calibrated later. Unmatched
+candidates are not automatically false.
+
+## Publishable Science Path
+
+The paper is not "we used AI." The paper has to be about Jupiter.
+
+1. Engineering: build a detector that saves reproducible candidate evidence.
+2. Validation: recover published lightning while measuring false positives and
+   false negatives.
+3. New candidates: manually validate overlooked detections from unpublished or
+   under-reviewed images.
+4. Science: use the larger candidate set to study lightning frequency,
+   latitude distribution, storm lifetime, temporal evolution, and color or
+   spectral behavior.
+
+Classical computer vision, YOLO, or other models are implementation choices.
+The project should optimize for scientifically credible lightning detections.
+
+## Current Safe Claim
+
+The current safe claim is:
+
+> The workbench builds a reproducible candidate-detection and review workflow for
+> Cassini Jupiter night-side images. It recovers the published validation
+> detections and saves candidate tables, thumbnails, and human-review labels for
+> unmatched detections.
+
+The current unsafe claim is:
+
+> The detector discovered new lightning.
+
+That claim requires human review, temporal checks, and scientific
+characterization first.
+
+## Validation Terms
+
+- True positive: the detector finds known published lightning.
+- False negative: the detector misses known published lightning.
+- False positive: the detector flags something later reviewed as not lightning.
+- Unmatched candidate: not in the paper, not automatically false.
+
+## Important Coordinate Convention
 
 Table 2 in the paper lists pairs that correspond to displayed image `(x, y)`
 coordinates. NumPy arrays are indexed in `(row, column)` order, so the code
@@ -72,59 +145,41 @@ missing image lines for these products.
 .\run.ps1 all
 .\run.ps1 test
 .\run.ps1 app
+.\run.ps1 detect -Date 2001-01-13
+.\run.ps1 exports
 ```
 
-## Project layout
+## Project Layout
 
 - `jupiter_pipeline.py`: archive, database, image, and reporting pipeline
 - `known_events.json`: published ground-truth detections
-- `meeting_walkthrough.ipynb`: concise notebook for the research meeting
 - `app_server.py` and `web/`: local research workbench
 - `detection_pipeline.py`: first-pass bright blob detection and tracking
-- `start_workbench.ps1`: desktop-launch entry point
+- `docs/jupiter_lightning_detector_one_page.md`: one-page explanation
+- `docs/research_grade_pipeline_plan.md`: science-first pipeline plan
+- `docs/research_log_2026-07-02.md`: dated engineering/research log
 - `data/calibrated`: calibrated I/F images and labels
 - `data/metadata`: OPUS metadata snapshots
 - `data/previews`: archive browse images
-- `outputs`: figures, measurements, and HTML report
+- `outputs/detection`: candidates, summaries, contact sheets, and labels
 
-## Scientific scope
+## Next Scientific Feature
 
-This first milestone verifies data access, calibration-product ingestion, and
-reproduction of known detections. It does not yet claim a new lightning
-detection. A defensible new-event search should add image navigation and
-temporal registration so repeated features can be tested against Jupiter's
-rotation; single bright pixels alone remain cosmic-ray candidates.
+The current detector works in x/y pixels. Future validation should map
+candidates to Jupiter latitude and longitude. If the same storm appears at the
+same planet location across multiple frames or days, that is stronger evidence
+than a single bright spot.
 
-## First Detection Milestone
-
-Run:
-
-```powershell
-.\run.ps1 detect
-```
-
-By default this queries the 23 Cassini ISS NAC/HAL Jupiter frames from
-January 1, 2001. You can also run the other published-lightning validation
-dates:
-
-```powershell
-.\run.ps1 detect -Date 2001-01-10
-.\run.ps1 detect -Date 2001-01-11
-```
-
-Each run downloads calibrated products if missing, performs high-pass
-enhancement, detects connected bright regions, links nearby detections across
-adjacent frames, and writes date-specific outputs under `outputs/detection`:
-
-- `outputs/detection/<date>/candidates.csv`
-- `outputs/detection/<date>/summary.json`
-- `outputs/detection/<date>/candidate_contact_sheet.png`
-
-This is an explainable first-pass candidate finder. It is meant to generate
-review targets, not final lightning claims.
+The next publishable-analysis path is to connect credible H-alpha candidates to
+nearby broadband/filter images. That is what would make color or spectrum work
+possible instead of just claiming a detector works.
 
 ## Sources
 
 - OPUS API guide: <https://opus.pds-rings.seti.org/apiguide.pdf>
 - OPUS archive: <https://opus.pds-rings.seti.org/>
-- Dyudina et al. (2004), Icarus 172, 24-36
+- OPUS Jupiter search example: <https://opus.pds-rings.seti.org/#/COISScamera=Narrow+Angle&instrument=Cassini+ISS&planet=Jupiter&qtype-SURFACEGEOjupiter_limbaltitude=any&unit-SURFACEGEOjupiter_limbaltitude=km&SURFACEGEOjupiter_planetographiclatitude1=-87&SURFACEGEOjupiter_planetographiclatitude2=88&qtype-SURFACEGEOjupiter_planetographiclatitude=any&unit-SURFACEGEOjupiter_planetographiclatitude=degrees&surfacegeometrytargetname=Jupiter&time1=2001-01-01T01:43:11.699&qtype-time=any&unit-time=ymdhms&cols=opusid,instrument,planet,target,time1,observationduration&widgets=SURFACEGEOjupiter_limbaltitude,SURFACEGEOjupiter_planetographiclatitude,surfacegeometrytargetname,time,planet,COISScamera,instrument&order=time1,opusid&view=browse&browse=gallery&cart_browse=gallery&startobs=29&cart_startobs=1&detail=co-iss-n1359382963>
+- Dyudina et al. (2004), Icarus 172, 24-36:
+  <https://ui.adsabs.harvard.edu/abs/2004Icar..172...24D/abstract>
+- Local copy of the published paper, if present:
+  `C:\Users\vedar\Downloads\lightning_cassini_published.pdf`

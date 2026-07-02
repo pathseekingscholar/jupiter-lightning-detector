@@ -18,3 +18,9 @@ co-iss-*-metadata.json
 co-iss-*-files.json
 research_notes.json
 library-backups/
+
+# Generated/local docs that should not be published as source
+docs/*.html
+docs/published_paper_extracted_notes.txt
+docs/cassini_jupiter_lightning_*.md
+docs/current_detector_explanation.md

@@ -9,6 +9,7 @@ from PIL import Image
 
 import jupiter_pipeline as pipeline
 import app_server
+import research_exports
 
 
 class PipelineTests(unittest.TestCase):
@@ -69,6 +70,52 @@ END_OBJECT = IMAGE
         self.assertEqual(len(payload["observations"]), 3)
         for observation in payload["observations"]:
             self.assertIn(observation["opus_id"], observation["opus_detail_url"])
+
+    def test_candidate_label_writes_json_and_csv(self):
+        original_json = app_server.LABELS_PATH
+        original_csv = app_server.LABELS_CSV_PATH
+        with tempfile.TemporaryDirectory() as directory:
+            app_server.LABELS_PATH = Path(directory) / "candidate_labels.json"
+            app_server.LABELS_CSV_PATH = Path(directory) / "candidate_labels.csv"
+            try:
+                payload = app_server.save_candidate_label({
+                    "run_date": "2001-01-01",
+                    "candidate_id": "1357029177-0001",
+                    "image_id": "N1357029177",
+                    "image_number": "1357029177",
+                    "x": "731.0",
+                    "y": "211.0",
+                    "brightness": "12.3",
+                    "blob_size": 4,
+                    "snr": "12.3",
+                    "artifact_flags": "",
+                    "candidate_score": "0.42",
+                    "human_label": "possible-lightning",
+                    "review_note": "multi-pixel bright spot",
+                    "updated_at": "2026-07-02T00:00:00Z",
+                })
+                self.assertTrue(payload["saved"])
+                self.assertTrue(app_server.LABELS_PATH.exists())
+                self.assertTrue(app_server.LABELS_CSV_PATH.exists())
+                saved = json.loads(app_server.LABELS_PATH.read_text(encoding="utf-8"))
+                self.assertEqual(saved["labels"]["1357029177-0001"]["human_label"], "possible-lightning")
+                self.assertIn("candidate_id", app_server.LABELS_CSV_PATH.read_text(encoding="utf-8"))
+            finally:
+                app_server.LABELS_PATH = original_json
+                app_server.LABELS_CSV_PATH = original_csv
+
+    def test_research_exports_have_expected_columns(self):
+        summary_path = research_exports.OUTPUT_DIR / "2001-01-01" / "summary.json"
+        if not summary_path.exists():
+            self.skipTest("Detector outputs have not been generated")
+        manifest = research_exports.build_dataset_manifest()
+        summary = research_exports.build_detection_summary()
+        self.assertTrue(manifest)
+        self.assertTrue(summary)
+        self.assertIn("opus_id", manifest[0])
+        self.assertIn("candidate_count", manifest[0])
+        self.assertIn("images_processed", summary[0])
+        self.assertIn("unmatched_review_candidates", summary[0])
 
 
 if __name__ == "__main__":

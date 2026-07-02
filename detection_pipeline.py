@@ -37,6 +37,11 @@ DETECTION_RUNS = {
         "time1": "2001-01-11T00:00:00",
         "time2": "2001-01-11T23:59:59",
     },
+    "2001-01-13": {
+        "label": "January 13, 2001 NAC/H-alpha",
+        "time1": "2001-01-13T00:00:00",
+        "time2": "2001-01-13T23:59:59",
+    },
 }
 DEFAULT_RUN_DATE = "2001-01-01"
 
@@ -378,14 +383,31 @@ def explain_track(track: list[Candidate]) -> str:
     return "; ".join(bits)
 
 
+def artifact_score(candidate: Candidate) -> float:
+    score = 0.0
+    if "single_pixel" in candidate.flags:
+        score += 0.45
+    if "too_small" in candidate.flags:
+        score += 0.25
+    if "sharp_cosmic_ray_like" in candidate.flags:
+        score += 0.35
+    if "streak_like" in candidate.flags:
+        score += 0.35
+    if candidate.sharpness > 3.0:
+        score += 0.15
+    if candidate.elongation > 6.0:
+        score += 0.15
+    return float(min(1.0, score))
+
+
 def draw_candidate_sheet(sequence: list[dict[str, str]], candidates: list[Candidate], directory: Path) -> None:
     ranked = [candidate for candidate in sorted(candidates, key=lambda item: item.confidence, reverse=True) if is_reviewable(candidate)][:24]
     cards = []
     for candidate in ranked:
-        preview = jp.PREVIEWS / f"N{candidate.image_number}_2_full.png"
-        if not preview.exists():
+        previews = sorted(jp.PREVIEWS.glob(f"N{candidate.image_number}_*_full.png"))
+        if not previews:
             continue
-        image = Image.open(preview).convert("RGB")
+        image = Image.open(previews[0]).convert("RGB")
         radius = 42
         cx, cy = int(round(candidate.x)) - 1, int(round(candidate.y)) - 1
         crop = image.crop((max(0, cx - radius), max(0, cy - radius), min(1024, cx + radius), min(1024, cy + radius)))
@@ -421,6 +443,7 @@ def write_outputs(run_date: str, sequence: list[dict[str, str]], candidates: lis
     rows = []
     for candidate in sorted(candidates, key=lambda item: item.confidence, reverse=True):
         rows.append({
+            "image_id": f"N{candidate.image_number}",
             "track_id": candidate.track_id,
             "candidate_id": candidate.candidate_id,
             "confidence": f"{candidate.confidence:.4f}",
@@ -431,6 +454,9 @@ def write_outputs(run_date: str, sequence: list[dict[str, str]], candidates: lis
             "time": candidate.time,
             "x": f"{candidate.x:.2f}",
             "y": f"{candidate.y:.2f}",
+            "brightness": f"{candidate.peak_snr:.2f}",
+            "blob_size": candidate.area,
+            "artifact_score": f"{artifact_score(candidate):.2f}",
             "area_px": candidate.area,
             "peak_snr": f"{candidate.peak_snr:.2f}",
             "mean_snr": f"{candidate.mean_snr:.2f}",

@@ -4,6 +4,8 @@ const state = {
   detectionDate: "2001-01-01",
   detection: null,
   validation: null,
+  characteristics: null,
+  labels: {labels: {}, counts: {}},
   detectorStatusTimer: null,
   timer: null,
   historyTimer: null,
@@ -150,7 +152,7 @@ function selectObservation(observation) {
     <dt>Scale</dt><dd>${observation.center_resolution_km.toFixed(1)} km px⁻¹</dd>`;
   renderCandidates();
   const saved = state.data.notes[observation.opus_id] || {};
-  $("classification").value = saved.classification || "published";
+  $("classification").value = saved.classification || "known-lightning";
   $("note").value = saved.text || "";
   const first = observation.candidates[0];
   $("x").value = saved.x || first?.x || 512;
@@ -179,7 +181,7 @@ async function selectUpload(record) {
     <dt>History</dt><dd>${record.history?.length || 0} settings</dd>`;
   $("x").value = record.last_settings?.x || Math.round(record.width / 2);
   $("y").value = record.last_settings?.y || Math.round(record.height / 2);
-  $("classification").value = record.classification || "review";
+  $("classification").value = record.classification || "uncertain";
   $("note").value = record.note || "";
   renderCandidates();
   updateProcessed();
@@ -263,36 +265,61 @@ function renderDetectionReview() {
     $("detection-summary").textContent = state.detection?.message || "No detector output found yet.";
     $("track-list").innerHTML = "";
     $("contact-sheet").removeAttribute("src");
+    $("all-csv-link").href = `/outputs/detection/${state.detectionDate}/candidates.csv`;
+    $("contact-sheet-link").href = `/outputs/detection/${state.detectionDate}/candidate_contact_sheet.png`;
     return;
   }
   $("contact-sheet-link").href = state.detection.contact_sheet_url;
+  $("all-csv-link").href = state.detection.all_csv_url || `/outputs/detection/${state.detectionDate}/candidates.csv`;
   $("contact-sheet").src = `${state.detection.contact_sheet_url}?t=${Date.now()}`;
   $("detection-summary").textContent =
     `${state.detectionDate}: ${summary.frames || 0} long-exposure H-alpha frames scanned, ${summary.candidates || 0} bright regions found, ` +
-    `${summary.review_candidates || 0} review candidates after artifact filters. This is a review queue, not a confirmed lightning catalog.`;
+    `${summary.review_candidates || 0} review candidates after artifact filters, ` +
+    `${Math.max(0, (summary.candidates || 0) - (summary.review_candidates || 0))} rejected or artifact-flagged candidates. This is a review queue, not a confirmed lightning catalog.`;
+  if (!$("run-detector").disabled) {
+    $("detector-status").textContent =
+      `Loaded ${state.detectionDate}: ${summary.frames || 0} images processed, ${summary.candidates || 0} saved candidates.`;
+  }
 
-  const topTracks = tracks.slice(0, 18);
+  const topTracks = tracks.slice(0, 20);
+  const flatCandidates = topTracks.map((track) => track.items[0]).filter(Boolean);
+  renderCandidateTable(flatCandidates);
+  renderReviewBuckets(flatCandidates);
   $("track-list").innerHTML = topTracks.map((track) => {
     const lead = track.items[0];
     const cropUrl = `/api/detection-crop?image=${encodeURIComponent(lead.image_number)}&x=${Math.round(lead.x)}&y=${Math.round(lead.y)}&crop=128`;
     const frames = track.items.map((item) => `N${item.image_number}`).join(" -> ");
+    const savedLabel = lead.human_label || state.labels.labels?.[lead.candidate_id]?.human_label || "";
+    const savedNote = lead.review_note || state.labels.labels?.[lead.candidate_id]?.review_note || "";
     return `
       <article class="track-card" data-candidate-id="${lead.candidate_id}">
         <button type="button" class="track-open" data-candidate-id="${lead.candidate_id}">
           <img src="${cropUrl}" alt="">
           <span>
-            <b>Possible track ${track.track_id}</b>
-            <small>review priority ${track.confidence.toFixed(2)} / seen in ${track.track_length} frame(s)</small>
+            <b>Candidate ${lead.candidate_id}</b>
+            <small title="Candidate score is a review priority rank, not a calibrated probability.">score ${track.confidence.toFixed(2)} / seen in ${track.track_length} frame(s)</small>
           </span>
         </button>
         <dl>
-          <dt>Lead frame</dt><dd>N${lead.image_number}</dd>
-          <dt>Coordinate</dt><dd>${lead.x.toFixed(1)}, ${lead.y.toFixed(1)}</dd>
-          <dt>Peak SNR</dt><dd>${lead.peak_snr.toFixed(1)}</dd>
-          <dt>Area</dt><dd>${lead.area_px} px</dd>
+          <dt title="Cassini image identifier.">Image ID</dt><dd>N${lead.image_number}</dd>
+          <dt title="Pixel coordinate in the displayed image.">x/y</dt><dd>${lead.x.toFixed(1)}, ${lead.y.toFixed(1)}</dd>
+          <dt title="Peak local signal-to-noise ratio.">Brightness</dt><dd>${lead.peak_snr.toFixed(1)}</dd>
+          <dt title="Number of connected bright pixels.">Blob size</dt><dd>${lead.area_px} px</dd>
+          <dt title="Artifact warnings. Empty means no obvious artifact flag.">Flags</dt><dd>${escapeHtml(lead.flags || "none")}</dd>
         </dl>
         <p>${escapeHtml(track.reason)}</p>
         <p class="track-frames">Frames linked by detector: ${escapeHtml(frames)}</p>
+        <label>
+          Human label
+          <select data-label-for="${lead.candidate_id}">
+            ${labelOptions(savedLabel)}
+          </select>
+        </label>
+        <label>
+          Review note
+          <textarea data-note-for="${lead.candidate_id}" rows="3" placeholder="Why keep or reject this candidate?">${escapeHtml(savedNote)}</textarea>
+        </label>
+        <button type="button" data-save-label="${lead.candidate_id}">Save label</button>
       </article>`;
   }).join("");
   const candidatesById = new Map();
@@ -300,12 +327,131 @@ function renderDetectionReview() {
   document.querySelectorAll(".track-open").forEach((button) => {
     button.addEventListener("click", () => selectDetectionCandidate(candidatesById.get(button.dataset.candidateId)));
   });
+  document.querySelectorAll("[data-save-label]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      await saveCandidateLabel(candidatesById.get(button.dataset.saveLabel));
+    });
+  });
+}
+
+function labelOptions(selected = "") {
+  const labels = [
+    ["", "unlabeled"],
+    ["known-lightning", "known lightning"],
+    ["possible-lightning", "possible lightning"],
+    ["artifact", "artifact"],
+    ["cosmic-ray-hot-pixel", "cosmic ray/hot pixel"],
+    ["uncertain", "uncertain"],
+  ];
+  return labels.map(([value, text]) => `<option value="${value}" ${value === selected ? "selected" : ""}>${text}</option>`).join("");
+}
+
+function renderCandidateTable(candidates) {
+  const body = $("candidate-review-body");
+  if (!body) return;
+  if (!candidates.length) {
+    body.innerHTML = `<tr><td colspan="9">No review candidates loaded for this date yet.</td></tr>`;
+    return;
+  }
+  body.innerHTML = candidates.map((candidate) => {
+    const label = candidate.human_label || state.labels.labels?.[candidate.candidate_id]?.human_label || "unlabeled";
+    return `
+      <tr data-candidate-row="${candidate.candidate_id}">
+        <td>N${candidate.image_number}</td>
+        <td>${escapeHtml(candidate.candidate_id)}</td>
+        <td>${candidate.x.toFixed(1)}, ${candidate.y.toFixed(1)}</td>
+        <td>${candidate.peak_snr.toFixed(1)}</td>
+        <td>${candidate.area_px}</td>
+        <td>${candidate.mean_snr.toFixed(1)} / peak ${candidate.peak_snr.toFixed(1)}</td>
+        <td>${escapeHtml(candidate.flags || "none")}</td>
+        <td>${candidate.confidence.toFixed(2)}</td>
+        <td>${escapeHtml(label)}</td>
+      </tr>`;
+  }).join("");
+}
+
+function renderReviewBuckets(candidates = []) {
+  const labelRows = Object.values(state.labels.labels || {});
+  const falsePositives = labelRows.filter((row) => ["artifact", "cosmic-ray-hot-pixel"].includes(row.human_label));
+  const unmatched = candidates.filter((candidate) => {
+    const label = candidate.human_label || state.labels.labels?.[candidate.candidate_id]?.human_label || "";
+    return !label;
+  });
+  const falseNegatives = (state.validation?.results || []).filter((row) => !row.recovered);
+  $("false-positive-list").innerHTML = falsePositives.length
+    ? falsePositives.slice(0, 8).map((row) => `<p><b>${escapeHtml(row.candidate_id)}</b> N${escapeHtml(row.image_number)} ${escapeHtml(row.human_label)}</p>`).join("")
+    : "<p>No human-reviewed false positives saved yet.</p>";
+  $("false-negative-list").innerHTML = falseNegatives.length
+    ? falseNegatives.map((row) => `<p><b>N${row.image_number}</b> paper coordinate (${row.published_x}, ${row.published_y}) was not recovered.</p>`).join("")
+    : "<p>No false negatives in the generated validation outputs.</p>";
+  $("unmatched-list").innerHTML = unmatched.length
+    ? unmatched.slice(0, 8).map((candidate) => `<p><b>${escapeHtml(candidate.candidate_id)}</b> N${candidate.image_number} at ${candidate.x.toFixed(1)}, ${candidate.y.toFixed(1)} remains for review.</p>`).join("")
+    : "<p>Top review candidates shown here have labels or no candidates are loaded.</p>";
+}
+
+async function loadCandidateLabels() {
+  try {
+    const response = await fetch("/api/candidate-labels");
+    if (!response.ok) throw new Error(`Labels API returned ${response.status}`);
+    state.labels = await response.json();
+    $("labels-csv-link").href = state.labels.csv_url;
+    $("labels-json-link").href = state.labels.json_url;
+  } catch (error) {
+    state.labels = {labels: {}, counts: {}, error: error.message};
+  }
+}
+
+async function saveCandidateLabel(candidate) {
+  if (!candidate) return;
+  const humanLabel = document.querySelector(`[data-label-for="${candidate.candidate_id}"]`)?.value || "";
+  if (!humanLabel) {
+    alert("Choose a human label before saving.");
+    return;
+  }
+  const note = document.querySelector(`[data-note-for="${candidate.candidate_id}"]`)?.value || "";
+  const response = await fetch("/api/candidate-label", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      run_date: state.detectionDate,
+      candidate_id: candidate.candidate_id,
+      image_id: `N${candidate.image_number}`,
+      image_number: candidate.image_number,
+      x: candidate.x.toFixed(2),
+      y: candidate.y.toFixed(2),
+      brightness: candidate.peak_snr.toFixed(2),
+      blob_size: candidate.area_px,
+      snr: candidate.peak_snr.toFixed(2),
+      artifact_flags: candidate.flags || "",
+      candidate_score: candidate.confidence.toFixed(4),
+      human_label: humanLabel,
+      review_note: note,
+      updated_at: new Date().toISOString(),
+    }),
+  });
+  if (!response.ok) {
+    alert(`Could not save label: server returned ${response.status}`);
+    return;
+  }
+  state.labels = await response.json();
+  await loadDetectionReview();
 }
 
 async function loadDetectionReview() {
-  const response = await fetch(`/api/detection?date=${encodeURIComponent(state.detectionDate)}`);
-  state.detection = await response.json();
-  renderDetectionReview();
+  try {
+    const response = await fetch(`/api/detection?date=${encodeURIComponent(state.detectionDate)}`);
+    if (!response.ok) throw new Error(`Detector API returned ${response.status}`);
+    state.detection = await response.json();
+    renderDetectionReview();
+  } catch (error) {
+    state.detection = {
+      available: false,
+      message: `Detector output could not be loaded: ${error.message}`,
+      tracks: [],
+      summary: {},
+    };
+    renderDetectionReview();
+  }
 }
 
 function renderDetectionDateTabs() {
@@ -341,12 +487,80 @@ function renderValidation() {
         <td>${result}</td>
       </tr>`;
   }).join("");
+  renderReviewBuckets(state.detection?.tracks?.slice(0, 20).map((track) => track.items[0]).filter(Boolean) || []);
 }
 
 async function loadValidation() {
-  const response = await fetch("/api/validation");
-  state.validation = await response.json();
+  try {
+    const response = await fetch("/api/validation");
+    if (!response.ok) throw new Error(`Validation API returned ${response.status}`);
+    state.validation = await response.json();
+  } catch (error) {
+    state.validation = {
+      available: false,
+      message: `Validation could not be loaded: ${error.message}`,
+    };
+  }
   renderValidation();
+}
+
+function renderDetectorCharacteristics() {
+  if (!state.characteristics) return;
+  const classification = state.characteristics.classification || {};
+  const totals = state.characteristics.totals || {};
+  $("classification-copy").innerHTML = `
+    <b>Positive:</b> ${escapeHtml(classification.positive || "")}<br>
+    <b>Negative / uncertain:</b> ${escapeHtml(classification.negative_or_uncertain || "")}<br>
+    <b>Important limitation:</b> ${escapeHtml(classification.not_claimed || "")}`;
+
+  $("detector-rule-list").innerHTML = (state.characteristics.rules || [])
+    .map((rule) => `<li>${escapeHtml(rule)}</li>`)
+    .join("");
+
+  $("error-set-body").innerHTML = (state.characteristics.dates || []).map((row) => {
+    if (!row.available) {
+      return `<tr><td>${row.date}</td><td colspan="4">${escapeHtml(row.message)}</td></tr>`;
+    }
+    const rejected = Math.max(0, (row.raw_candidates || 0) - (row.review_candidates || 0));
+    return `
+      <tr>
+        <td>${row.date}</td>
+        <td>${row.known_recovered}</td>
+        <td>${row.raw_candidates}</td>
+        <td>${rejected}</td>
+        <td>${row.unmatched_review}</td>
+      </tr>`;
+  }).join("");
+
+  const flagText = (state.characteristics.flag_counts || [])
+    .slice(0, 4)
+    .map((item) => `${item.flag}: ${item.count}`)
+    .join("; ");
+  $("detector-warning").textContent =
+    `${totals.known_recovered || 0} of ${totals.known_total || 0} published marks recovered. ` +
+    `${totals.unmatched_review || 0} unmatched review candidates remain to classify. ` +
+    `Common artifact flags: ${flagText || "none yet"}.`;
+}
+
+async function loadDetectorCharacteristics() {
+  try {
+    const response = await fetch("/api/detector-characteristics");
+    if (!response.ok) throw new Error(`Detector characteristics API returned ${response.status}`);
+    state.characteristics = await response.json();
+  } catch (error) {
+    state.characteristics = {
+      classification: {
+        positive: "",
+        negative_or_uncertain: "",
+        not_claimed: `Detector characteristics could not be loaded: ${error.message}`,
+      },
+      rules: [],
+      dates: [],
+      totals: {},
+      flag_counts: [],
+    };
+  }
+  renderDetectorCharacteristics();
 }
 
 function renderDetectorStatus(status) {
@@ -355,8 +569,15 @@ function renderDetectorStatus(status) {
 }
 
 async function refreshDetectorStatus() {
-  const response = await fetch("/api/detection-status");
-  const status = await response.json();
+  let status;
+  try {
+    const response = await fetch("/api/detection-status");
+    if (!response.ok) throw new Error(`Status API returned ${response.status}`);
+    status = await response.json();
+  } catch (error) {
+    renderDetectorStatus({running: false, message: `Detector status could not be loaded: ${error.message}`});
+    return;
+  }
   renderDetectorStatus(status);
   if (status.running) {
     clearTimeout(state.detectorStatusTimer);
@@ -369,7 +590,11 @@ async function refreshDetectorStatus() {
 
 async function runDetectorAgain() {
   renderDetectorStatus({running: true, message: `Starting detector for ${state.detectionDate}...`});
-  await fetch(`/api/run-detection?date=${encodeURIComponent(state.detectionDate)}`, {method: "POST"});
+  const response = await fetch(`/api/run-detection?date=${encodeURIComponent(state.detectionDate)}`, {method: "POST"});
+  if (!response.ok) {
+    renderDetectorStatus({running: false, message: `Could not start detector: server returned ${response.status}`});
+    return;
+  }
   await refreshDetectorStatus();
 }
 
@@ -719,17 +944,26 @@ function exportProcessed() {
   anchor.click();
 }
 
+function selectTab(name) {
+  document.querySelectorAll("[data-tab-target]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.tabTarget === name);
+  });
+  document.querySelectorAll("[data-tab-panel]").forEach((panel) => {
+    panel.classList.toggle("active", panel.dataset.tabPanel === name);
+  });
+}
+
 async function init() {
   const response = await fetch("/api/observations");
   state.data = await response.json();
   renderStrip();
-  await loadDetectionReview();
-  await loadValidation();
-  await refreshDetectorStatus();
   controls.forEach((id) => $(id).addEventListener("input", scheduleUpdate));
   $("run-detector").addEventListener("click", runDetectorAgain);
   document.querySelectorAll("#detection-date-tabs button").forEach((button) => {
     button.addEventListener("click", () => selectDetectionDate(button.dataset.date));
+  });
+  document.querySelectorAll("[data-tab-target]").forEach((button) => {
+    button.addEventListener("click", () => selectTab(button.dataset.tabTarget));
   });
   $("notes-form").addEventListener("submit", saveNote);
   $("export").addEventListener("click", exportProcessed);
@@ -759,6 +993,13 @@ async function init() {
   await renderLibrary();
   await checkStorage();
   selectObservation(state.data.observations[0]);
+  await loadCandidateLabels();
+  await Promise.allSettled([
+    loadDetectionReview(),
+    loadValidation(),
+    loadDetectorCharacteristics(),
+    refreshDetectorStatus(),
+  ]);
 }
 
 init();
