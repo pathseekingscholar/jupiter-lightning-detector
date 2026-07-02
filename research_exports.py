@@ -429,6 +429,79 @@ def write_review_artifacts(review_rows: list[dict[str, object]]) -> dict[str, st
     return written
 
 
+def make_track_strip_card(track: dict[str, object], lookup: dict[str, dict[str, str]]) -> Image.Image | None:
+    candidate_ids = [item for item in str(track.get("candidate_ids", "")).split("|") if item]
+    candidate_rows = [lookup[item] for item in candidate_ids if item in lookup]
+    if not candidate_rows:
+        return None
+    thumb_size = 112
+    left_width = 260
+    width = left_width + thumb_size * len(candidate_rows)
+    height = 156
+    card = Image.new("RGB", (width, height), "white")
+    draw = ImageDraw.Draw(card)
+    font = ImageFont.load_default()
+    label_lines = [
+        f"{track.get('run_date', '')} {track.get('track_id', '')}",
+        f"frames: {track.get('frame_count', '')}",
+        f"score: {track.get('candidate_score', '')}",
+        f"motion: {track.get('net_dx_px', '')}, {track.get('net_dy_px', '')} px",
+    ]
+    y = 10
+    for line in label_lines:
+        draw.text((8, y), str(line), fill=(0, 0, 0), font=font)
+        y += 15
+    draw.text((8, 80), "review target, not confirmed lightning", fill=(160, 0, 0), font=font)
+
+    for index, row in enumerate(candidate_rows):
+        preview = preview_path_for_candidate(row)
+        x0 = left_width + index * thumb_size
+        if not preview:
+            draw.rectangle((x0, 0, x0 + thumb_size - 1, thumb_size - 1), outline=(0, 0, 0))
+            continue
+        image = Image.open(preview).convert("RGB")
+        x = int(round(float(row.get("x", 512) or 512))) - 1
+        yy = int(round(float(row.get("y", 512) or 512))) - 1
+        radius = 44
+        crop = image.crop((max(0, x - radius), max(0, yy - radius), min(1024, x + radius), min(1024, yy + radius)))
+        crop = crop.resize((thumb_size, thumb_size), Image.Resampling.NEAREST)
+        card.paste(crop, (x0, 0))
+        draw.ellipse((x0 + 52, 52, x0 + 60, 60), outline=(190, 0, 0), width=2)
+        draw.text((x0 + 4, 116), f"N{row.get('image_number', '')}", fill=(0, 0, 0), font=font)
+        draw.text((x0 + 4, 130), f"{float(row.get('peak_snr', 0) or 0):.1f} SNR", fill=(0, 0, 0), font=font)
+    return card
+
+
+def write_temporal_track_strips(tracks: list[dict[str, object]]) -> str:
+    candidates = all_candidate_rows()
+    lookup = candidate_lookup(candidates)
+    ranked_tracks = [
+        row for row in sorted(tracks, key=lambda item: float(item.get("candidate_score", 0) or 0), reverse=True)
+        if int(row_int(row.get("frame_count", 0))) >= 2
+    ][:16]
+    cards = [card for track in ranked_tracks if (card := make_track_strip_card(track, lookup))]
+    if not cards:
+        return ""
+    REVIEW_ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
+    width = max(card.width for card in cards)
+    height = sum(card.height for card in cards)
+    sheet = Image.new("RGB", (width, height), (235, 232, 222))
+    y = 0
+    for card in cards:
+        sheet.paste(card, (0, y))
+        y += card.height
+    path = REVIEW_ARTIFACTS_DIR / "temporal_track_strips.png"
+    sheet.save(path)
+    return str(path.relative_to(ROOT))
+
+
+def row_int(value: object) -> int:
+    try:
+        return int(float(str(value)))
+    except ValueError:
+        return 0
+
+
 def np_median(values: list[float]) -> float:
     values = sorted(values)
     if not values:
@@ -456,6 +529,7 @@ def write_review_packet(
     tracks: list[dict[str, object]],
     review_rows: list[dict[str, object]],
     artifact_sheets: dict[str, str],
+    track_strip_path: str,
 ) -> None:
     recovered = sum(1 for row in matches if row.get("recovered_within_8_px") == "yes")
     known_total = len(matches)
@@ -508,6 +582,8 @@ def write_review_packet(
     ])
     for category, path in sorted(artifact_sheets.items()):
         packet.append(f"- {category}: `{path}`")
+    if track_strip_path:
+        packet.append(f"- temporal_track_strips: `{track_strip_path}`")
     packet.extend([
         "",
         "## Known-Match Evidence",
@@ -697,6 +773,7 @@ def main() -> None:
         ],
     )
     artifact_sheets = write_review_artifacts(review_rows)
+    track_strip_path = write_temporal_track_strips(tracks)
 
     labels = build_label_summary()
     if labels:
@@ -728,7 +805,9 @@ def main() -> None:
     print(f"Wrote {OUTPUT_DIR / 'scientific_review_queue.csv'}")
     for path in artifact_sheets.values():
         print(f"Wrote {ROOT / path}")
-    write_review_packet(manifest, summary, sweep, matches, tracks, review_rows, artifact_sheets)
+    if track_strip_path:
+        print(f"Wrote {ROOT / track_strip_path}")
+    write_review_packet(manifest, summary, sweep, matches, tracks, review_rows, artifact_sheets, track_strip_path)
     print(f"Wrote {OUTPUT_DIR / 'review_packet.md'}")
     if labels:
         print(f"Wrote {OUTPUT_DIR / 'candidate_labels_grouped.csv'}")

@@ -223,7 +223,8 @@ start missing real published detections.
 - `review_packet.md`: a plain-English summary of the current evidence, safe
   claims, date counts, known-match table, and strongest temporal tracks.
 - `review_artifacts/*.png`: contact sheets for published matches, unmatched
-  temporal tracks, likely artifacts, and strong single-frame candidates.
+  temporal tracks, likely artifacts, strong single-frame candidates, and
+  frame-by-frame temporal track strips.
 
 These files are designed for research review. They make the detector behavior
 auditable instead of asking someone to trust a dashboard.

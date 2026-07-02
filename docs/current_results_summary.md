@@ -60,6 +60,7 @@ The generated contact sheets are local outputs:
 - `outputs/detection/review_artifacts/top_unmatched_temporal_track.png`
 - `outputs/detection/review_artifacts/strong_single_frame_candidate.png`
 - `outputs/detection/review_artifacts/likely_artifact.png`
+- `outputs/detection/review_artifacts/temporal_track_strips.png`
 
 ## What Still Has To Be Proved
 
