@@ -110,12 +110,16 @@ END_OBJECT = IMAGE
             self.skipTest("Detector outputs have not been generated")
         manifest = research_exports.build_dataset_manifest()
         summary = research_exports.build_detection_summary()
+        sweep = research_exports.build_threshold_sweep()
         self.assertTrue(manifest)
         self.assertTrue(summary)
+        self.assertTrue(sweep)
         self.assertIn("opus_id", manifest[0])
         self.assertIn("candidate_count", manifest[0])
         self.assertIn("images_processed", summary[0])
         self.assertIn("unmatched_review_candidates", summary[0])
+        self.assertIn("snr_threshold", sweep[0])
+        self.assertIn("published_matches", sweep[0])
 
 
 if __name__ == "__main__":

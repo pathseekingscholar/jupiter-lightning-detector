@@ -118,6 +118,37 @@ def build_detection_summary() -> list[dict[str, object]]:
     return rows
 
 
+def build_threshold_sweep() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    snr_thresholds = [7.0, 8.0, 10.0, 12.0, 15.0, 20.0]
+    min_blob_sizes = [1, 3, 5, 8]
+    for run_date in detector.DETECTION_RUNS:
+        candidates = read_csv(OUTPUT_DIR / run_date / "candidates.csv")
+        if not candidates:
+            continue
+        for snr_threshold in snr_thresholds:
+            for min_blob_size in min_blob_sizes:
+                passing = [
+                    row for row in candidates
+                    if float(row.get("peak_snr", row.get("brightness", 0)) or 0) >= snr_threshold
+                    and int(float(row.get("blob_size", row.get("area_px", 0)) or 0)) >= min_blob_size
+                ]
+                reviewable = [row for row in passing if not row.get("flags", "")]
+                recovered = known_recovery_ids(reviewable)
+                rows.append({
+                    "run_date": run_date,
+                    "run_label": detector.DETECTION_RUNS[run_date]["label"],
+                    "snr_threshold": snr_threshold,
+                    "min_blob_size": min_blob_size,
+                    "candidate_count": len(passing),
+                    "review_candidate_count": len(reviewable),
+                    "artifact_flagged_count": len(passing) - len(reviewable),
+                    "published_matches": len(recovered),
+                    "unmatched_review_candidates": max(0, len(reviewable) - len(recovered)),
+                })
+    return rows
+
+
 def build_label_summary() -> list[dict[str, object]]:
     if not LABELS_JSON.exists():
         return []
@@ -169,6 +200,23 @@ def main() -> None:
         ],
     )
 
+    sweep = build_threshold_sweep()
+    write_csv(
+        OUTPUT_DIR / "threshold_sweep.csv",
+        sweep,
+        [
+            "run_date",
+            "run_label",
+            "snr_threshold",
+            "min_blob_size",
+            "candidate_count",
+            "review_candidate_count",
+            "artifact_flagged_count",
+            "published_matches",
+            "unmatched_review_candidates",
+        ],
+    )
+
     labels = build_label_summary()
     if labels:
         write_csv(
@@ -193,6 +241,7 @@ def main() -> None:
         )
     print(f"Wrote {OUTPUT_DIR / 'dataset_manifest.csv'}")
     print(f"Wrote {OUTPUT_DIR / 'detection_summary.csv'}")
+    print(f"Wrote {OUTPUT_DIR / 'threshold_sweep.csv'}")
     if labels:
         print(f"Wrote {OUTPUT_DIR / 'candidate_labels_grouped.csv'}")
 

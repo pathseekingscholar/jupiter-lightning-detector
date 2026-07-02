@@ -59,6 +59,10 @@ Important wording:
 | Human label export | Which candidates were marked possible lightning, artifact, or uncertain |
 | Threshold sweep | How results change when SNR/blob-size cutoffs change |
 
+The threshold sweep is important because it turns "the detector has many false
+positives" into something measurable. It shows the tradeoff between reducing
+the review queue and possibly losing known lightning detections.
+
 ## Figures To Produce
 
 1. One-page detector diagram.

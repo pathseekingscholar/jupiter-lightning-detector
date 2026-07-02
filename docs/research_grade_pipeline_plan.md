@@ -97,6 +97,14 @@ Across reviewed candidates:
 - `outputs/detection/candidate_labels.csv`
 - `outputs/detection/candidate_labels.json`
 
+Across detector settings:
+
+- `outputs/detection/threshold_sweep.csv`
+
+The threshold sweep is a sensitivity check. It asks how many candidates remain
+when the SNR threshold or minimum blob size is made stricter, and whether the
+published lightning detections are still recovered.
+
 The all-candidates CSV is intentionally large because non-matches are not thrown
 away. They are useful for false-positive analysis and later model training.
 

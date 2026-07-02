@@ -53,6 +53,7 @@ Run the detector for the example dates:
 - Research-grade exports:
   - `outputs/detection/dataset_manifest.csv`
   - `outputs/detection/detection_summary.csv`
+  - `outputs/detection/threshold_sweep.csv`
   - `outputs/detection/candidate_labels_grouped.csv` when human labels exist
 - Separate false positive, false negative, and unmatched-candidate sections.
 - Known published detections as validation targets.
@@ -162,6 +163,17 @@ missing image lines for these products.
 - `data/metadata`: OPUS metadata snapshots
 - `data/previews`: archive browse images
 - `outputs/detection`: candidates, summaries, contact sheets, and labels
+
+## Sensitivity / Threshold Sweep
+
+`.\run.ps1 exports` also writes `outputs/detection/threshold_sweep.csv`. This
+does not claim a better detector by itself. It answers a practical review
+question: if the SNR threshold or minimum blob size is made stricter, how many
+candidates remain and how many published detections are still recovered?
+
+That table is useful for explaining false positives because it shows the cost of
+stricter rules. A stricter detector may reduce review workload, but it can also
+start missing real published detections.
 
 ## Next Scientific Feature
 
