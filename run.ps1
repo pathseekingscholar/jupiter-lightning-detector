@@ -1,7 +1,7 @@
 param(
-    [ValidateSet("init", "download", "analyze", "report", "all", "test", "app", "detect", "exports")]
+    [ValidateSet("init", "download", "analyze", "report", "all", "test", "app", "detect", "detect-all", "exports")]
     [string]$Command = "all",
-    [ValidateSet("2001-01-01", "2001-01-10", "2001-01-11", "2001-01-13")]
+    [ValidateSet("2000-12-31", "2001-01-01", "2001-01-04", "2001-01-05", "2001-01-08", "2001-01-09", "2001-01-10", "2001-01-11", "2001-01-13")]
     [string]$Date = "2001-01-01"
 )
 
@@ -24,6 +24,11 @@ if ($Command -eq "test") {
     & $python app_server.py
 } elseif ($Command -eq "detect") {
     & $python detection_pipeline.py detect --date $Date
+} elseif ($Command -eq "detect-all") {
+    foreach ($runDate in @("2000-12-31", "2001-01-01", "2001-01-04", "2001-01-05", "2001-01-08", "2001-01-09", "2001-01-10", "2001-01-11", "2001-01-13")) {
+        Write-Host "Running detector for $runDate"
+        & $python detection_pipeline.py detect --date $runDate
+    }
 } elseif ($Command -eq "exports") {
     & $python research_exports.py
 } else {

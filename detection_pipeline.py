@@ -22,10 +22,35 @@ import jupiter_pipeline as jp
 DETECTION_DIR = jp.OUTPUTS / "detection"
 SEQUENCES_DIR = jp.DATA / "sequences"
 DETECTION_RUNS = {
+    "2000-12-31": {
+        "label": "December 31, 2000 NAC/H-alpha",
+        "time1": "2000-12-31T00:00:00",
+        "time2": "2000-12-31T23:59:59",
+    },
     "2001-01-01": {
         "label": "January 1, 2001 NAC/H-alpha",
         "time1": "2001-01-01T00:00:00",
         "time2": "2001-01-01T23:59:59",
+    },
+    "2001-01-04": {
+        "label": "January 4, 2001 NAC/H-alpha",
+        "time1": "2001-01-04T00:00:00",
+        "time2": "2001-01-04T23:59:59",
+    },
+    "2001-01-05": {
+        "label": "January 5, 2001 NAC/H-alpha",
+        "time1": "2001-01-05T00:00:00",
+        "time2": "2001-01-05T23:59:59",
+    },
+    "2001-01-08": {
+        "label": "January 8, 2001 NAC/H-alpha",
+        "time1": "2001-01-08T00:00:00",
+        "time2": "2001-01-08T23:59:59",
+    },
+    "2001-01-09": {
+        "label": "January 9, 2001 NAC/H-alpha",
+        "time1": "2001-01-09T00:00:00",
+        "time2": "2001-01-09T23:59:59",
     },
     "2001-01-10": {
         "label": "January 10, 2001 NAC/H-alpha",

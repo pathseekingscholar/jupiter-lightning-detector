@@ -7,6 +7,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 import detection_pipeline as detector
+from PIL import Image, ImageDraw, ImageFont
 
 
 ROOT = Path(__file__).resolve().parent
@@ -14,6 +15,7 @@ OUTPUT_DIR = ROOT / "outputs" / "detection"
 KNOWN_EVENTS = ROOT / "known_events.json"
 LABELS_JSON = OUTPUT_DIR / "candidate_labels.json"
 KNOWN_MATCH_RADIUS_PX = 8.0
+REVIEW_ARTIFACTS_DIR = OUTPUT_DIR / "review_artifacts"
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
@@ -138,6 +140,20 @@ def build_detection_summary() -> list[dict[str, object]]:
     return rows
 
 
+def all_candidate_rows() -> list[dict[str, str]]:
+    rows: list[dict[str, str]] = []
+    for run_date in detector.DETECTION_RUNS:
+        for row in read_csv(OUTPUT_DIR / run_date / "candidates.csv"):
+            row = dict(row)
+            row["run_date"] = run_date
+            rows.append(row)
+    return rows
+
+
+def candidate_lookup(rows: list[dict[str, str]]) -> dict[str, dict[str, str]]:
+    return {row["candidate_id"]: row for row in rows}
+
+
 def build_threshold_sweep() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     snr_thresholds = [7.0, 8.0, 10.0, 12.0, 15.0, 20.0]
@@ -172,11 +188,7 @@ def build_threshold_sweep() -> list[dict[str, object]]:
 def build_known_match_report() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     known_rows = load_known_events()
-    all_candidates: list[dict[str, str]] = []
-    for run_date in detector.DETECTION_RUNS:
-        for row in read_csv(OUTPUT_DIR / run_date / "candidates.csv"):
-            row["run_date"] = run_date
-            all_candidates.append(row)
+    all_candidates = all_candidate_rows()
 
     by_image: dict[str, list[dict[str, str]]] = defaultdict(list)
     for row in all_candidates:
@@ -261,6 +273,162 @@ def build_temporal_track_summary() -> list[dict[str, object]]:
     return rows
 
 
+def first_candidate_id(value: object) -> str:
+    text = str(value or "")
+    return text.split("|", 1)[0] if text else ""
+
+
+def build_scientific_review_queue(
+    matches: list[dict[str, object]],
+    tracks: list[dict[str, object]],
+) -> list[dict[str, object]]:
+    candidates = all_candidate_rows()
+    lookup = candidate_lookup(candidates)
+    known_ids = {str(row["nearest_candidate_id"]) for row in matches if row.get("recovered_within_8_px") == "yes"}
+    review_rows: list[dict[str, object]] = []
+    seen: set[tuple[str, str]] = set()
+
+    def append_row(category: str, row: dict[str, str], category_reason: str) -> None:
+        key = (category, row["candidate_id"])
+        if key in seen:
+            return
+        seen.add(key)
+        review_rows.append({
+            "review_category": category,
+            "candidate_id": row.get("candidate_id", ""),
+            "image_id": row.get("image_id", f"N{row.get('image_number', '')}"),
+            "image_number": row.get("image_number", ""),
+            "run_date": row.get("run_date", ""),
+            "track_id": row.get("track_id", ""),
+            "track_length": row.get("track_length", ""),
+            "x": row.get("x", ""),
+            "y": row.get("y", ""),
+            "snr": row.get("peak_snr", row.get("brightness", "")),
+            "blob_size": row.get("blob_size", row.get("area_px", "")),
+            "artifact_score": row.get("artifact_score", ""),
+            "artifact_flags": row.get("flags", ""),
+            "candidate_score": row.get("confidence", ""),
+            "time": row.get("time", ""),
+            "review_reason": category_reason,
+        })
+
+    for match in matches:
+        candidate = lookup.get(str(match.get("nearest_candidate_id", "")))
+        if candidate:
+            append_row(
+                "published_match",
+                candidate,
+                f"Nearest detector candidate to published mark; offset {match.get('offset_px')} px.",
+            )
+
+    for track in tracks:
+        if int(track.get("frame_count", 0) or 0) < 2:
+            continue
+        candidate = lookup.get(first_candidate_id(track.get("candidate_ids")))
+        if not candidate or candidate["candidate_id"] in known_ids:
+            continue
+        append_row(
+            "top_unmatched_temporal_track",
+            candidate,
+            f"{track.get('frame_count')} linked frames; net motion {track.get('net_dx_px')}, {track.get('net_dy_px')} px.",
+        )
+        if sum(1 for row in review_rows if row["review_category"] == "top_unmatched_temporal_track") >= 30:
+            break
+
+    artifact_candidates = sorted(
+        [row for row in candidates if row.get("flags", "")],
+        key=lambda row: (float(row.get("artifact_score", 0) or 0), float(row.get("peak_snr", 0) or 0)),
+        reverse=True,
+    )
+    for row in artifact_candidates[:40]:
+        append_row("likely_artifact", row, f"Artifact flags: {row.get('flags', '')}.")
+
+    single_frame = sorted(
+        [
+            row for row in candidates
+            if row.get("candidate_id") not in known_ids
+            and not row.get("flags", "")
+            and int(float(row.get("track_length", 1) or 1)) <= 1
+        ],
+        key=lambda row: float(row.get("peak_snr", 0) or 0),
+        reverse=True,
+    )
+    for row in single_frame[:30]:
+        append_row("strong_single_frame_candidate", row, "Bright and reviewable, but not temporally linked yet.")
+
+    category_order = {
+        "published_match": 0,
+        "top_unmatched_temporal_track": 1,
+        "strong_single_frame_candidate": 2,
+        "likely_artifact": 3,
+    }
+    review_rows.sort(key=lambda row: (category_order.get(str(row["review_category"]), 99), -float(row.get("candidate_score", 0) or 0), -float(row.get("snr", 0) or 0)))
+    return review_rows
+
+
+def preview_path_for_candidate(row: dict[str, object]) -> Path | None:
+    image_number = str(row.get("image_number", ""))
+    matches = sorted(detector.jp.PREVIEWS.glob(f"N{image_number}_*_full.png"))
+    return matches[0] if matches else None
+
+
+def make_candidate_card(row: dict[str, object], title: str) -> Image.Image | None:
+    preview = preview_path_for_candidate(row)
+    if not preview:
+        return None
+    image = Image.open(preview).convert("RGB")
+    x = int(round(float(row.get("x", 512) or 512))) - 1
+    y = int(round(float(row.get("y", 512) or 512))) - 1
+    radius = 52
+    crop = image.crop((max(0, x - radius), max(0, y - radius), min(1024, x + radius), min(1024, y + radius)))
+    crop = crop.resize((176, 176), Image.Resampling.NEAREST)
+    card = Image.new("RGB", (310, 254), "white")
+    card.paste(crop, (0, 0))
+    draw = ImageDraw.Draw(card)
+    draw.ellipse((83, 83, 93, 93), outline=(190, 0, 0), width=2)
+    font = ImageFont.load_default()
+    lines = [
+        title[:42],
+        f"{row.get('candidate_id', '')}",
+        f"{row.get('image_id', '')} {row.get('run_date', '')}",
+        f"x={float(row.get('x', 0) or 0):.1f} y={float(row.get('y', 0) or 0):.1f}",
+        f"snr={float(row.get('snr', 0) or 0):.1f} size={row.get('blob_size', '')}",
+        f"score={row.get('candidate_score', '')} flags={str(row.get('artifact_flags', '') or 'none')[:20]}",
+    ]
+    text_y = 181
+    for line in lines:
+        draw.text((6, text_y), str(line), fill=(0, 0, 0), font=font)
+        text_y += 11
+    return card
+
+
+def write_contact_sheet(name: str, rows: list[dict[str, object]], limit: int = 20) -> Path | None:
+    cards = []
+    for row in rows[:limit]:
+        card = make_candidate_card(row, str(row.get("review_category", name)))
+        if card:
+            cards.append(card)
+    if not cards:
+        return None
+    REVIEW_ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
+    cols = 4
+    sheet = Image.new("RGB", (cols * 310, math.ceil(len(cards) / cols) * 254), (235, 232, 222))
+    for index, card in enumerate(cards):
+        sheet.paste(card, ((index % cols) * 310, (index // cols) * 254))
+    path = REVIEW_ARTIFACTS_DIR / f"{name}.png"
+    sheet.save(path)
+    return path
+
+
+def write_review_artifacts(review_rows: list[dict[str, object]]) -> dict[str, str]:
+    written = {}
+    for category in sorted({str(row["review_category"]) for row in review_rows}):
+        path = write_contact_sheet(category, [row for row in review_rows if row["review_category"] == category])
+        if path:
+            written[category] = str(path.relative_to(ROOT))
+    return written
+
+
 def np_median(values: list[float]) -> float:
     values = sorted(values)
     if not values:
@@ -286,6 +454,8 @@ def write_review_packet(
     sweep: list[dict[str, object]],
     matches: list[dict[str, object]],
     tracks: list[dict[str, object]],
+    review_rows: list[dict[str, object]],
+    artifact_sheets: dict[str, str],
 ) -> None:
     recovered = sum(1 for row in matches if row.get("recovered_within_8_px") == "yes")
     known_total = len(matches)
@@ -293,6 +463,7 @@ def write_review_packet(
     total_candidates = sum(int(row.get("candidates_found", 0) or 0) for row in summary)
     total_review = sum(int(row.get("review_candidates", 0) or 0) for row in summary)
     strongest_tracks = sorted(tracks, key=lambda row: float(row["candidate_score"]), reverse=True)[:10]
+    category_counts = Counter(str(row["review_category"]) for row in review_rows)
     packet = [
         "# Cassini Jupiter Lightning Review Packet",
         "",
@@ -309,6 +480,7 @@ def write_review_packet(
         f"- Review candidates after artifact filters: {total_review}",
         f"- Published marks recovered: {recovered} of {known_total}",
         f"- Dataset manifest rows: {len(manifest)}",
+        f"- Scientific review queue rows: {len(review_rows)}",
         "",
         "## Date Summary",
         "",
@@ -320,6 +492,22 @@ def write_review_packet(
             f"| {row['run_date']} | {row['images_processed']} | {row['candidates_found']} | "
             f"{row['review_candidates']} | {row['published_matches']} | {row['unmatched_review_candidates']} |"
         )
+    packet.extend([
+        "",
+        "## Review Categories",
+        "",
+        "| Category | Count | Meaning |",
+        "|---|---:|---|",
+        f"| published_match | {category_counts.get('published_match', 0)} | Detector candidates nearest to the published lightning marks. |",
+        f"| top_unmatched_temporal_track | {category_counts.get('top_unmatched_temporal_track', 0)} | Repeated candidate tracks that do not match the published answer key. |",
+        f"| strong_single_frame_candidate | {category_counts.get('strong_single_frame_candidate', 0)} | Bright candidates without temporal confirmation yet. |",
+        f"| likely_artifact | {category_counts.get('likely_artifact', 0)} | Candidates with artifact flags such as single-pixel, too-small, sharp, or streak-like. |",
+        "",
+        "## Contact Sheets",
+        "",
+    ])
+    for category, path in sorted(artifact_sheets.items()):
+        packet.append(f"- {category}: `{path}`")
     packet.extend([
         "",
         "## Known-Match Evidence",
@@ -361,8 +549,10 @@ def write_review_packet(
         "- `outputs/detection/dataset_manifest.csv`",
         "- `outputs/detection/detection_summary.csv`",
         "- `outputs/detection/known_match_report.csv`",
+        "- `outputs/detection/scientific_review_queue.csv`",
         "- `outputs/detection/temporal_track_summary.csv`",
         "- `outputs/detection/threshold_sweep.csv`",
+        "- `outputs/detection/review_artifacts/*.png`",
         "- `outputs/detection/<date>/candidate_contact_sheet.png`",
         "",
     ])
@@ -483,6 +673,31 @@ def main() -> None:
         ],
     )
 
+    review_rows = build_scientific_review_queue(matches, tracks)
+    write_csv(
+        OUTPUT_DIR / "scientific_review_queue.csv",
+        review_rows,
+        [
+            "review_category",
+            "candidate_id",
+            "image_id",
+            "image_number",
+            "run_date",
+            "track_id",
+            "track_length",
+            "x",
+            "y",
+            "snr",
+            "blob_size",
+            "artifact_score",
+            "artifact_flags",
+            "candidate_score",
+            "time",
+            "review_reason",
+        ],
+    )
+    artifact_sheets = write_review_artifacts(review_rows)
+
     labels = build_label_summary()
     if labels:
         write_csv(
@@ -510,7 +725,10 @@ def main() -> None:
     print(f"Wrote {OUTPUT_DIR / 'threshold_sweep.csv'}")
     print(f"Wrote {OUTPUT_DIR / 'known_match_report.csv'}")
     print(f"Wrote {OUTPUT_DIR / 'temporal_track_summary.csv'}")
-    write_review_packet(manifest, summary, sweep, matches, tracks)
+    print(f"Wrote {OUTPUT_DIR / 'scientific_review_queue.csv'}")
+    for path in artifact_sheets.values():
+        print(f"Wrote {ROOT / path}")
+    write_review_packet(manifest, summary, sweep, matches, tracks, review_rows, artifact_sheets)
     print(f"Wrote {OUTPUT_DIR / 'review_packet.md'}")
     if labels:
         print(f"Wrote {OUTPUT_DIR / 'candidate_labels_grouped.csv'}")

@@ -113,11 +113,13 @@ END_OBJECT = IMAGE
         sweep = research_exports.build_threshold_sweep()
         matches = research_exports.build_known_match_report()
         tracks = research_exports.build_temporal_track_summary()
+        review_queue = research_exports.build_scientific_review_queue(matches, tracks)
         self.assertTrue(manifest)
         self.assertTrue(summary)
         self.assertTrue(sweep)
         self.assertTrue(matches)
         self.assertTrue(tracks)
+        self.assertTrue(review_queue)
         self.assertIn("opus_id", manifest[0])
         self.assertIn("candidate_count", manifest[0])
         self.assertIn("images_processed", summary[0])
@@ -126,6 +128,7 @@ END_OBJECT = IMAGE
         self.assertIn("published_matches", sweep[0])
         self.assertIn("offset_px", matches[0])
         self.assertIn("frame_count", tracks[0])
+        self.assertIn("review_category", review_queue[0])
 
 
 if __name__ == "__main__":
