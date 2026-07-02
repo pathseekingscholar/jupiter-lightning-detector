@@ -111,15 +111,21 @@ END_OBJECT = IMAGE
         manifest = research_exports.build_dataset_manifest()
         summary = research_exports.build_detection_summary()
         sweep = research_exports.build_threshold_sweep()
+        matches = research_exports.build_known_match_report()
+        tracks = research_exports.build_temporal_track_summary()
         self.assertTrue(manifest)
         self.assertTrue(summary)
         self.assertTrue(sweep)
+        self.assertTrue(matches)
+        self.assertTrue(tracks)
         self.assertIn("opus_id", manifest[0])
         self.assertIn("candidate_count", manifest[0])
         self.assertIn("images_processed", summary[0])
         self.assertIn("unmatched_review_candidates", summary[0])
         self.assertIn("snr_threshold", sweep[0])
         self.assertIn("published_matches", sweep[0])
+        self.assertIn("offset_px", matches[0])
+        self.assertIn("frame_count", tracks[0])
 
 
 if __name__ == "__main__":

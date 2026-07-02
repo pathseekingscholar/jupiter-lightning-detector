@@ -108,7 +108,7 @@ function renderStrip() {
   state.data.observations.forEach((observation) => {
     const button = document.createElement("button");
     button.className = "observation-tab";
-    button.innerHTML = `N${observation.image_number}<span>${observation.start_time.slice(0, 10)} · ${observation.filter_name} · ${observation.exposure_seconds}s</span>`;
+    button.innerHTML = `N${observation.image_number}<span>${observation.start_time.slice(0, 10)} - ${observation.filter_name} - ${observation.exposure_seconds}s</span>`;
     button.addEventListener("click", () => selectObservation(observation));
     button.dataset.opus = observation.opus_id;
     strip.appendChild(button);
@@ -149,7 +149,7 @@ function selectObservation(observation) {
     <dt>UTC</dt><dd>${observation.start_time.replace("T", " ")}</dd>
     <dt>Exposure</dt><dd>${observation.exposure_seconds}s</dd>
     <dt>Camera/filter</dt><dd>NAC / ${observation.filter_name}</dd>
-    <dt>Scale</dt><dd>${observation.center_resolution_km.toFixed(1)} km px⁻¹</dd>`;
+    <dt>Scale</dt><dd>${observation.center_resolution_km.toFixed(1)} km/px</dd>`;
   renderCandidates();
   const saved = state.data.notes[observation.opus_id] || {};
   $("classification").value = saved.classification || "known-lightning";
@@ -176,7 +176,7 @@ async function selectUpload(record) {
   $("metadata").innerHTML = `
     <dt>Source</dt><dd>Local upload</dd>
     <dt>Added</dt><dd>${new Date(record.created_at).toLocaleString()}</dd>
-    <dt>Dimensions</dt><dd>${record.width} × ${record.height}</dd>
+    <dt>Dimensions</dt><dd>${record.width} x ${record.height}</dd>
     <dt>File type</dt><dd>${record.type || "image"}</dd>
     <dt>History</dt><dd>${record.history?.length || 0} settings</dd>`;
   $("x").value = record.last_settings?.x || Math.round(record.width / 2);
@@ -746,7 +746,7 @@ function placeCoordinate(event, imageElement, fullFrame = false) {
 
 async function saveNote(event) {
   event.preventDefault();
-  $("save-state").textContent = "saving…";
+  $("save-state").textContent = "saving...";
   if (state.current.source_type === "upload") {
     const record = await libraryGet(state.current.id);
     record.classification = $("classification").value;
@@ -821,10 +821,10 @@ async function renderLibrary() {
     const historyHtml = recentHistory.length
       ? recentHistory.map((entry) => `
           <li>
-            ${new Date(entry.saved_at).toLocaleString()} ·
-            crop ${entry.settings.crop}px ·
-            output ${Math.round(entry.settings.scale * 100)}% ·
-            stretch ${entry.settings.low}–${entry.settings.high}% ·
+            ${new Date(entry.saved_at).toLocaleString()} -
+            crop ${entry.settings.crop}px -
+            output ${Math.round(entry.settings.scale * 100)}% -
+            stretch ${entry.settings.low}-${entry.settings.high}% -
             gamma ${entry.settings.gamma}
           </li>`).join("")
       : "<li>No processing changes saved yet.</li>";
@@ -832,7 +832,7 @@ async function renderLibrary() {
       <img src="${imageUrl}" alt="">
       <div>
         <h3>${escapeHtml(record.name)}</h3>
-        <p>${record.width} × ${record.height} · ${formatBytes(record.size)} · ${record.history?.length || 0} history entries · ${escapeHtml(record.classification || "review")}</p>
+        <p>${record.width} x ${record.height} - ${formatBytes(record.size)} - ${record.history?.length || 0} history entries - ${escapeHtml(record.classification || "review")}</p>
         <details>
           <summary>Recent processing history</summary>
           <ol>${historyHtml}</ol>

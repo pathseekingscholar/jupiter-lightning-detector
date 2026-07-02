@@ -54,6 +54,9 @@ Run the detector for the example dates:
   - `outputs/detection/dataset_manifest.csv`
   - `outputs/detection/detection_summary.csv`
   - `outputs/detection/threshold_sweep.csv`
+  - `outputs/detection/known_match_report.csv`
+  - `outputs/detection/temporal_track_summary.csv`
+  - `outputs/detection/review_packet.md`
   - `outputs/detection/candidate_labels_grouped.csv` when human labels exist
 - Separate false positive, false negative, and unmatched-candidate sections.
 - Known published detections as validation targets.
@@ -174,6 +177,20 @@ candidates remain and how many published detections are still recovered?
 That table is useful for explaining false positives because it shows the cost of
 stricter rules. A stricter detector may reduce review workload, but it can also
 start missing real published detections.
+
+## Review Evidence Exports
+
+`.\run.ps1 exports` also writes:
+
+- `known_match_report.csv`: nearest detector candidate to every published mark,
+  including pixel offset and whether it is recovered within 8 pixels.
+- `temporal_track_summary.csv`: candidate tracks across frames with start/end
+  image, net motion, median brightness, score, and linked candidate IDs.
+- `review_packet.md`: a plain-English summary of the current evidence, safe
+  claims, date counts, known-match table, and strongest temporal tracks.
+
+These files are designed for research review. They make the detector behavior
+auditable instead of asking someone to trust a dashboard.
 
 ## Next Scientific Feature
 

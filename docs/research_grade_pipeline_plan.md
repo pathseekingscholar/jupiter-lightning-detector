@@ -100,10 +100,21 @@ Across reviewed candidates:
 Across detector settings:
 
 - `outputs/detection/threshold_sweep.csv`
+- `outputs/detection/known_match_report.csv`
+- `outputs/detection/temporal_track_summary.csv`
+- `outputs/detection/review_packet.md`
 
 The threshold sweep is a sensitivity check. It asks how many candidates remain
 when the SNR threshold or minimum blob size is made stricter, and whether the
 published lightning detections are still recovered.
+
+The known-match report is the validation table. It records the nearest detector
+candidate to each published lightning mark, the pixel offset, and whether that
+offset is within the current 8-pixel recovery radius.
+
+The temporal-track summary is the next scientific bridge. It records candidates
+that appear in linked frames, because repeated detections are more useful than a
+single bright spot when separating possible storms from cosmic rays.
 
 The all-candidates CSV is intentionally large because non-matches are not thrown
 away. They are useful for false-positive analysis and later model training.

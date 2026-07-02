@@ -58,10 +58,19 @@ Important wording:
 | Candidate summary | Number of raw candidates, review candidates, and artifact flags |
 | Human label export | Which candidates were marked possible lightning, artifact, or uncertain |
 | Threshold sweep | How results change when SNR/blob-size cutoffs change |
+| Known-match report | Nearest detector candidate to every published mark |
+| Temporal-track summary | Candidate persistence and motion across linked frames |
+| Review packet | Human-readable evidence summary for a meeting or paper draft |
 
 The threshold sweep is important because it turns "the detector has many false
 positives" into something measurable. It shows the tradeoff between reducing
 the review queue and possibly losing known lightning detections.
+
+The known-match report is the strongest validation table because it avoids vague
+language like "close." It gives the actual offset in pixels.
+
+The temporal-track summary is important because it starts testing the physical
+idea that a storm can repeat while a cosmic ray usually appears once.
 
 ## Figures To Produce
 
