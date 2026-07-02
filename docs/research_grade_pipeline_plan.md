@@ -101,8 +101,10 @@ Across detector settings:
 
 - `outputs/detection/threshold_sweep.csv`
 - `outputs/detection/known_match_report.csv`
+- `outputs/detection/scientific_review_queue.csv`
 - `outputs/detection/temporal_track_summary.csv`
 - `outputs/detection/review_packet.md`
+- `outputs/detection/review_artifacts/*.png`
 
 The threshold sweep is a sensitivity check. It asks how many candidates remain
 when the SNR threshold or minimum blob size is made stricter, and whether the
@@ -116,6 +118,10 @@ The temporal-track summary is the next scientific bridge. It records candidates
 that appear in linked frames, because repeated detections are more useful than a
 single bright spot when separating possible storms from cosmic rays.
 
+The scientific review queue is the human-review starting point. It intentionally
+contains examples from four buckets: published matches, top unmatched temporal
+tracks, strong single-frame candidates, and likely artifacts.
+
 The all-candidates CSV is intentionally large because non-matches are not thrown
 away. They are useful for false-positive analysis and later model training.
 
@@ -123,15 +129,21 @@ away. They are useful for false-positive analysis and later model training.
 
 | Date | Role |
 |---|---|
+| 2000-12-31 | Expanded near-flyby search date |
 | 2001-01-01 | Published validation date |
+| 2001-01-04 | Expanded near-flyby search date |
+| 2001-01-05 | Expanded near-flyby search date |
+| 2001-01-08 | Expanded near-flyby search date |
+| 2001-01-09 | Expanded near-flyby search date |
 | 2001-01-10 | Published validation date |
 | 2001-01-11 | Published validation date |
 | 2001-01-13 | Broader review/search date |
 
 The current validation result is that the generated detector outputs recover the
-six published marks from the known validation dates. That is not the same as
-discovering new lightning. It only means the detector can reproduce the known
-answer key.
+six published marks from the known validation dates. The current expanded run
+processed 221 images and produced 12,611 review candidates. That is not the
+same as discovering new lightning; it means the detector can reproduce the known
+answer key and create a much larger review pool.
 
 ## Definitions
 

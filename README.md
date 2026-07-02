@@ -29,7 +29,15 @@ The app opens at `http://127.0.0.1:8765`.
 Run the detector for the example dates:
 
 ```powershell
+.\run.ps1 detect-all
+
+# Or run one date at a time:
+.\run.ps1 detect -Date 2000-12-31
 .\run.ps1 detect -Date 2001-01-01
+.\run.ps1 detect -Date 2001-01-04
+.\run.ps1 detect -Date 2001-01-05
+.\run.ps1 detect -Date 2001-01-08
+.\run.ps1 detect -Date 2001-01-09
 .\run.ps1 detect -Date 2001-01-10
 .\run.ps1 detect -Date 2001-01-11
 .\run.ps1 detect -Date 2001-01-13
@@ -41,7 +49,8 @@ Run the detector for the example dates:
 - About page with the plain-English workflow.
 - Upload/select Cassini image support.
 - Manual crop and brightness controls for inspection.
-- Classical detector output for Jan 1, Jan 10, Jan 11, and Jan 13.
+- Classical detector output for Dec 31, Jan 1, Jan 4, Jan 5, Jan 8,
+  Jan 9, Jan 10, Jan 11, and Jan 13.
 - Candidate boxes/circles in crops and contact sheets.
 - Candidate review table with image ID, x/y coordinate, brightness, blob size,
   SNR/local contrast, artifact flags, and candidate score.
@@ -55,8 +64,10 @@ Run the detector for the example dates:
   - `outputs/detection/detection_summary.csv`
   - `outputs/detection/threshold_sweep.csv`
   - `outputs/detection/known_match_report.csv`
+  - `outputs/detection/scientific_review_queue.csv`
   - `outputs/detection/temporal_track_summary.csv`
   - `outputs/detection/review_packet.md`
+  - `outputs/detection/review_artifacts/*.png`
   - `outputs/detection/candidate_labels_grouped.csv` when human labels exist
 - Separate false positive, false negative, and unmatched-candidate sections.
 - Known published detections as validation targets.
@@ -149,6 +160,7 @@ missing image lines for these products.
 .\run.ps1 all
 .\run.ps1 test
 .\run.ps1 app
+.\run.ps1 detect-all
 .\run.ps1 detect -Date 2001-01-13
 .\run.ps1 exports
 ```
@@ -162,10 +174,29 @@ missing image lines for these products.
 - `docs/jupiter_lightning_detector_one_page.md`: one-page explanation
 - `docs/research_grade_pipeline_plan.md`: science-first pipeline plan
 - `docs/research_log_2026-07-02.md`: dated engineering/research log
+- `docs/current_results_summary.md`: current processed-date evidence summary
+- `docs/reproducibility_checklist.md`: clean-room reproduction steps
+- `docs/roadmap.md`: GitHub-facing scientific roadmap
 - `data/calibrated`: calibrated I/F images and labels
 - `data/metadata`: OPUS metadata snapshots
 - `data/previews`: archive browse images
 - `outputs/detection`: candidates, summaries, contact sheets, and labels
+
+## Current Results Snapshot
+
+As of the July 2, 2026 export run:
+
+- Processed dates: 2000-12-31, 2001-01-01, 2001-01-04, 2001-01-05,
+  2001-01-08, 2001-01-09, 2001-01-10, 2001-01-11, 2001-01-13.
+- Images processed: 221 Cassini ISS NAC/H-alpha frames.
+- Raw bright regions saved: 196,233.
+- Review candidates after artifact filters: 12,611.
+- Published lightning marks recovered: 6 of 6.
+- Scientific review queue rows: 106.
+
+This is not a discovery claim. The expanded dataset increases the review pool
+and gives stronger validation artifacts, but unmatched candidates still need
+manual review plus temporal/geometric checks.
 
 ## Sensitivity / Threshold Sweep
 
@@ -184,10 +215,15 @@ start missing real published detections.
 
 - `known_match_report.csv`: nearest detector candidate to every published mark,
   including pixel offset and whether it is recovered within 8 pixels.
+- `scientific_review_queue.csv`: curated rows for published matches, top
+  unmatched temporal tracks, strong single-frame candidates, and likely
+  artifacts.
 - `temporal_track_summary.csv`: candidate tracks across frames with start/end
   image, net motion, median brightness, score, and linked candidate IDs.
 - `review_packet.md`: a plain-English summary of the current evidence, safe
   claims, date counts, known-match table, and strongest temporal tracks.
+- `review_artifacts/*.png`: contact sheets for published matches, unmatched
+  temporal tracks, likely artifacts, and strong single-frame candidates.
 
 These files are designed for research review. They make the detector behavior
 auditable instead of asking someone to trust a dashboard.

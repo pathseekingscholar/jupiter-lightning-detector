@@ -25,6 +25,36 @@ The working scientific objective is:
 - The roadmap now points toward spectrum/color analysis after candidate
   validation.
 
+## Expanded Data Pass
+
+I expanded the detector beyond the original four date windows. The current run
+now includes:
+
+- 2000-12-31
+- 2001-01-01
+- 2001-01-04
+- 2001-01-05
+- 2001-01-08
+- 2001-01-09
+- 2001-01-10
+- 2001-01-11
+- 2001-01-13
+
+The expanded pass processed 221 images, saved 196,233 raw bright regions, and
+reduced them to 12,611 review candidates after first-pass artifact filters.
+
+## Review Evidence Added
+
+I added a scientific review queue and contact sheets for:
+
+- published matches
+- top unmatched temporal tracks
+- strong single-frame candidates
+- likely artifacts
+
+This is meant to answer the scientific review question: what did the detector
+select, what did it reject, and what remains uncertain?
+
 ## Why This Matters
 
 The detector itself is only useful if it enables credible science. A simple

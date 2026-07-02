@@ -59,6 +59,7 @@ Important wording:
 | Human label export | Which candidates were marked possible lightning, artifact, or uncertain |
 | Threshold sweep | How results change when SNR/blob-size cutoffs change |
 | Known-match report | Nearest detector candidate to every published mark |
+| Scientific review queue | Curated examples of matches, unmatched tracks, single-frame candidates, and artifacts |
 | Temporal-track summary | Candidate persistence and motion across linked frames |
 | Review packet | Human-readable evidence summary for a meeting or paper draft |
 
@@ -71,6 +72,10 @@ language like "close." It gives the actual offset in pixels.
 
 The temporal-track summary is important because it starts testing the physical
 idea that a storm can repeat while a cosmic ray usually appears once.
+
+The scientific review queue is important because it gives the human reviewer a
+manageable first pass through the strongest positives, negatives, and uncertain
+cases instead of handing over 196,233 raw bright regions.
 
 ## Figures To Produce
 
