@@ -10,6 +10,7 @@ from PIL import Image
 import jupiter_pipeline as pipeline
 import app_server
 import research_exports
+import review_metrics
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -146,6 +147,21 @@ END_OBJECT = IMAGE
         allowed_splits = set(schema["properties"]["training_split"]["enum"])
         produced_splits = {row["training_split"] for row in training_manifest}
         self.assertTrue(produced_splits.issubset(allowed_splits))
+
+    def test_review_metrics_build_decision_matrix(self):
+        summary_path = review_metrics.OUTPUT_DIR / "detection_summary.csv"
+        if not summary_path.exists():
+            self.skipTest("Research exports have not been generated")
+        metrics = review_metrics.build_review_metrics()
+        matrix = review_metrics.build_decision_matrix()
+        self.assertTrue(metrics)
+        self.assertTrue(matrix)
+        metric_names = {row["metric"] for row in metrics}
+        self.assertIn("images_processed", metric_names)
+        self.assertIn("published_matches_recovered", metric_names)
+        self.assertIn("next_action", matrix[0])
+        self.assertIn("review_rank", matrix[0])
+        self.assertTrue(any(row["next_action"] == "confirm_known_validation_mark" for row in matrix))
 
 
 if __name__ == "__main__":

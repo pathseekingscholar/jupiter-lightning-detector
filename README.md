@@ -42,6 +42,7 @@ Run the detector for the example dates:
 .\run.ps1 detect -Date 2001-01-11
 .\run.ps1 detect -Date 2001-01-13
 .\run.ps1 exports
+.\run.ps1 review
 ```
 
 ## What The App Provides
@@ -66,6 +67,12 @@ Run the detector for the example dates:
   - `outputs/detection/known_match_report.csv`
   - `outputs/detection/scientific_review_queue.csv`
   - `outputs/detection/temporal_track_summary.csv`
+  - `outputs/detection/training_manifest.csv`
+  - `outputs/detection/active_learning_queue.csv`
+  - `outputs/detection/review_metrics_summary.csv`
+  - `outputs/detection/review_decision_matrix.csv`
+  - `outputs/detection/review_metrics_report.md`
+  - `outputs/detection/review_metrics_report.html`
   - `outputs/detection/review_packet.md`
   - `outputs/detection/review_artifacts/*.png`
   - `outputs/detection/candidate_labels_grouped.csv` when human labels exist
@@ -164,6 +171,7 @@ missing image lines for these products.
 .\run.ps1 detect-all
 .\run.ps1 detect -Date 2001-01-13
 .\run.ps1 exports
+.\run.ps1 review
 ```
 
 ## Project Layout
@@ -241,6 +249,11 @@ start missing real published detections.
 - `training_manifest.csv`: candidate measurements joined to human label status
   for later model training.
 - `active_learning_queue.csv`: prioritized unlabeled candidates for human
+  review.
+- `review_decision_matrix.csv`: candidate-by-candidate next action such as
+  confirm known mark, priority temporal review, review as negative example, or
+  single-frame visual review.
+- `review_metrics_report.html`: browser-friendly summary for a meeting or lab
   review.
 - `review_packet.md`: a plain-English summary of the current evidence, safe
   claims, date counts, known-match table, and strongest temporal tracks.
