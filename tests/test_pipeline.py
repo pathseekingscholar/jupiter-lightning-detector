@@ -158,10 +158,12 @@ END_OBJECT = IMAGE
         matrix = review_metrics.build_decision_matrix()
         track_quality = review_metrics.build_track_quality()
         recommendations = review_metrics.build_threshold_recommendations()
+        dossier = review_metrics.build_candidate_dossier(matrix)
         self.assertTrue(metrics)
         self.assertTrue(matrix)
         self.assertTrue(track_quality)
         self.assertTrue(recommendations)
+        self.assertTrue(dossier)
         metric_names = {row["metric"] for row in metrics}
         self.assertIn("images_processed", metric_names)
         self.assertIn("published_matches_recovered", metric_names)
@@ -169,6 +171,8 @@ END_OBJECT = IMAGE
         self.assertIn("review_rank", matrix[0])
         self.assertIn("temporal_quality", track_quality[0])
         self.assertIn("published_recall", recommendations[0])
+        self.assertIn("crop_url", dossier[0])
+        self.assertIn("next_action", dossier[0])
         self.assertTrue(any(row["next_action"] == "confirm_known_validation_mark" for row in matrix))
         self.assertTrue(any(row["temporal_quality"] == "strong_temporal_review" for row in track_quality))
 

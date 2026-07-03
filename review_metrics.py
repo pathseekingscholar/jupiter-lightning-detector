@@ -13,6 +13,8 @@ REVIEW_METRICS_CSV = OUTPUT_DIR / "review_metrics_summary.csv"
 REVIEW_DECISION_CSV = OUTPUT_DIR / "review_decision_matrix.csv"
 TRACK_QUALITY_CSV = OUTPUT_DIR / "temporal_track_quality.csv"
 THRESHOLD_RECOMMENDATIONS_CSV = OUTPUT_DIR / "threshold_recommendations.csv"
+CANDIDATE_DOSSIER_CSV = OUTPUT_DIR / "candidate_review_dossier.csv"
+CANDIDATE_DOSSIER_HTML = OUTPUT_DIR / "candidate_review_dossier.html"
 REVIEW_REPORT_MD = OUTPUT_DIR / "review_metrics_report.md"
 REVIEW_REPORT_HTML = OUTPUT_DIR / "review_metrics_report.html"
 
@@ -294,6 +296,97 @@ def build_threshold_recommendations() -> list[dict[str, object]]:
     return rows
 
 
+def crop_url(row: dict[str, object]) -> str:
+    image_number = str(row.get("image_id", "")).lstrip("N")
+    x = int(round(numeric(row.get("x"), 512)))
+    y = int(round(numeric(row.get("y"), 512)))
+    return f"/api/detection-crop?image={image_number}&x={x}&y={y}&crop=128"
+
+
+def build_candidate_dossier(matrix: list[dict[str, object]]) -> list[dict[str, object]]:
+    labels = load_labels()
+    rows = []
+    for row in matrix:
+        candidate_id = str(row.get("candidate_id", ""))
+        label = labels.get(candidate_id, {})
+        rows.append({
+            "review_rank": row.get("review_rank", ""),
+            "candidate_id": candidate_id,
+            "image_id": row.get("image_id", ""),
+            "run_date": row.get("run_date", ""),
+            "x": row.get("x", ""),
+            "y": row.get("y", ""),
+            "crop_url": crop_url(row),
+            "review_category": row.get("review_category", ""),
+            "next_action": row.get("next_action", ""),
+            "suggested_label": row.get("suggested_label", ""),
+            "human_label": label.get("human_label", row.get("human_label", "")),
+            "confidence": label.get("confidence", ""),
+            "reviewer": label.get("reviewer", ""),
+            "review_note": label.get("review_note", ""),
+            "snr": row.get("snr", ""),
+            "blob_size": row.get("blob_size", ""),
+            "artifact_flags": row.get("artifact_flags", ""),
+            "frame_count": row.get("frame_count", ""),
+            "motion_consistency": row.get("motion_consistency", ""),
+            "candidate_score": row.get("candidate_score", ""),
+            "reason": row.get("reason", ""),
+        })
+    return rows
+
+
+def write_candidate_dossier_html(rows: list[dict[str, object]]) -> None:
+    table_rows = "\n".join(
+        "<tr>"
+        f"<td>{html.escape(str(row['review_rank']))}</td>"
+        f"<td><a href=\"{html.escape(str(row['crop_url']))}\">{html.escape(str(row['candidate_id']))}</a></td>"
+        f"<td>{html.escape(str(row['image_id']))}</td>"
+        f"<td>{html.escape(str(row['run_date']))}</td>"
+        f"<td>{html.escape(str(row['x']))}, {html.escape(str(row['y']))}</td>"
+        f"<td><img src=\"{html.escape(str(row['crop_url']))}\" alt=\"crop for {html.escape(str(row['candidate_id']))}\"></td>"
+        f"<td>{html.escape(str(row['next_action']))}</td>"
+        f"<td>{html.escape(str(row['suggested_label']))}</td>"
+        f"<td>{html.escape(str(row['human_label']))}</td>"
+        f"<td>{html.escape(str(row['confidence']))}</td>"
+        f"<td>{html.escape(str(row['snr']))}</td>"
+        f"<td>{html.escape(str(row['blob_size']))}</td>"
+        f"<td>{html.escape(str(row['artifact_flags'] or 'none'))}</td>"
+        f"<td>{html.escape(str(row['frame_count']))}</td>"
+        f"<td>{html.escape(str(row['motion_consistency']))}</td>"
+        f"<td>{html.escape(str(row['reason']))}</td>"
+        "</tr>"
+        for row in rows
+    )
+    document = f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Candidate Review Dossier</title>
+  <style>
+    body {{ font-family: Arial, sans-serif; margin: 28px; line-height: 1.4; color: #1d1b16; background: #f7f4ec; }}
+    h1 {{ font-family: Georgia, serif; }}
+    table {{ border-collapse: collapse; width: 100%; background: white; }}
+    th, td {{ border: 1px solid #d8d0c0; padding: 6px 8px; text-align: left; font-size: 13px; vertical-align: top; }}
+    th {{ background: #eee5d4; position: sticky; top: 0; }}
+    img {{ width: 96px; height: 96px; object-fit: cover; background: #111; image-rendering: pixelated; }}
+    .warning {{ background: #fff2c7; border: 1px solid #e2c15c; padding: 12px; margin-bottom: 16px; }}
+  </style>
+</head>
+<body>
+  <h1>Candidate Review Dossier</h1>
+  <p class="warning">This dossier is a review aid. It shows candidate evidence and label fields; it does not confirm new lightning.</p>
+  <table>
+    <thead>
+      <tr><th>Rank</th><th>Candidate</th><th>Image</th><th>Date</th><th>x/y</th><th>Crop</th><th>Next action</th><th>Suggested</th><th>Human label</th><th>Confidence</th><th>SNR</th><th>Blob</th><th>Flags</th><th>Frames</th><th>Motion</th><th>Reason</th></tr>
+    </thead>
+    <tbody>{table_rows}</tbody>
+  </table>
+</body>
+</html>
+"""
+    CANDIDATE_DOSSIER_HTML.write_text(document, encoding="utf-8")
+
+
 def reason_for_action(action: str) -> str:
     return {
         "use_human_label": "Already labeled; preserve as training or validation evidence.",
@@ -473,6 +566,7 @@ def main() -> None:
     matrix = build_decision_matrix()
     track_quality = build_track_quality()
     threshold_recommendations = build_threshold_recommendations()
+    dossier = build_candidate_dossier(matrix)
     write_csv(REVIEW_METRICS_CSV, metrics, ["metric", "value", "meaning"])
     write_csv(
         REVIEW_DECISION_CSV,
@@ -533,12 +627,42 @@ def main() -> None:
             "interpretation",
         ],
     )
+    write_csv(
+        CANDIDATE_DOSSIER_CSV,
+        dossier,
+        [
+            "review_rank",
+            "candidate_id",
+            "image_id",
+            "run_date",
+            "x",
+            "y",
+            "crop_url",
+            "review_category",
+            "next_action",
+            "suggested_label",
+            "human_label",
+            "confidence",
+            "reviewer",
+            "review_note",
+            "snr",
+            "blob_size",
+            "artifact_flags",
+            "frame_count",
+            "motion_consistency",
+            "candidate_score",
+            "reason",
+        ],
+    )
+    write_candidate_dossier_html(dossier)
     write_markdown_report(metrics, matrix, track_quality, threshold_recommendations)
     write_html_report(metrics, matrix, track_quality, threshold_recommendations)
     print(f"Wrote {REVIEW_METRICS_CSV}")
     print(f"Wrote {REVIEW_DECISION_CSV}")
     print(f"Wrote {TRACK_QUALITY_CSV}")
     print(f"Wrote {THRESHOLD_RECOMMENDATIONS_CSV}")
+    print(f"Wrote {CANDIDATE_DOSSIER_CSV}")
+    print(f"Wrote {CANDIDATE_DOSSIER_HTML}")
     print(f"Wrote {REVIEW_REPORT_MD}")
     print(f"Wrote {REVIEW_REPORT_HTML}")
 
