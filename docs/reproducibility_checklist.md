@@ -16,6 +16,7 @@ available, then falls back to `py` or `python`.
 
 ```powershell
 .\run.ps1 all
+.\run.ps1 coverage
 .\run.ps1 detect-all
 .\run.ps1 exports
 .\run.ps1 test
@@ -50,6 +51,7 @@ After `.\run.ps1 exports`, inspect:
 - `outputs/detection/scientific_review_queue.csv`
 - `outputs/detection/temporal_track_summary.csv`
 - `outputs/detection/threshold_sweep.csv`
+- `outputs/detection/opus_nearby_date_coverage.csv`
 - `outputs/detection/review_packet.md`
 - `outputs/detection/review_artifacts/*.png`
 

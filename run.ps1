@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("init", "download", "analyze", "report", "all", "test", "app", "detect", "detect-all", "exports")]
+    [ValidateSet("init", "download", "analyze", "report", "all", "test", "app", "detect", "detect-all", "exports", "coverage")]
     [string]$Command = "all",
     [ValidateSet("2000-12-31", "2001-01-01", "2001-01-04", "2001-01-05", "2001-01-08", "2001-01-09", "2001-01-10", "2001-01-11", "2001-01-13")]
     [string]$Date = "2001-01-01"
@@ -31,6 +31,8 @@ if ($Command -eq "test") {
     }
 } elseif ($Command -eq "exports") {
     & $python research_exports.py
+} elseif ($Command -eq "coverage") {
+    & $python opus_coverage.py
 } else {
     & $python jupiter_pipeline.py $Command
 }

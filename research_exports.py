@@ -246,6 +246,20 @@ def build_temporal_track_summary() -> list[dict[str, object]]:
             x_values = [float(row["x"]) for row in track_rows]
             y_values = [float(row["y"]) for row in track_rows]
             snr_values = [float(row["peak_snr"]) for row in track_rows]
+            step_lengths = [
+                math.hypot(
+                    float(track_rows[index]["x"]) - float(track_rows[index - 1]["x"]),
+                    float(track_rows[index]["y"]) - float(track_rows[index - 1]["y"]),
+                )
+                for index in range(1, len(track_rows))
+            ]
+            mean_step = sum(step_lengths) / len(step_lengths) if step_lengths else 0.0
+            if len(step_lengths) >= 2 and mean_step > 0:
+                variance = sum((value - mean_step) ** 2 for value in step_lengths) / len(step_lengths)
+                step_cv = math.sqrt(variance) / mean_step
+            else:
+                step_cv = 0.0
+            motion_consistency = max(0.0, min(1.0, 1.0 - step_cv))
             rows.append({
                 "run_date": run_date,
                 "track_id": track_id,
@@ -265,6 +279,9 @@ def build_temporal_track_summary() -> list[dict[str, object]]:
                 "median_x": f"{float(np_median(x_values)):.2f}",
                 "median_y": f"{float(np_median(y_values)):.2f}",
                 "median_peak_snr": f"{float(np_median(snr_values)):.2f}",
+                "mean_step_px": f"{mean_step:.2f}",
+                "step_cv": f"{step_cv:.3f}",
+                "motion_consistency": f"{motion_consistency:.3f}",
                 "candidate_score": first["confidence"],
                 "reason": first["reason"],
                 "candidate_ids": "|".join(row["candidate_id"] for row in track_rows),
@@ -521,6 +538,70 @@ def build_label_summary() -> list[dict[str, object]]:
     return rows
 
 
+def labels_by_id() -> dict[str, dict[str, object]]:
+    if not LABELS_JSON.exists():
+        return {}
+    payload = json.loads(LABELS_JSON.read_text(encoding="utf-8"))
+    return payload.get("labels", {})
+
+
+def build_training_manifest(review_rows: list[dict[str, object]]) -> list[dict[str, object]]:
+    labels = labels_by_id()
+    rows = []
+    for row in review_rows:
+        label = labels.get(str(row["candidate_id"]), {})
+        review_category = str(row["review_category"])
+        if review_category == "published_match":
+            suggested_label = "known-lightning"
+            split = "validation"
+        elif review_category == "likely_artifact":
+            suggested_label = "artifact"
+            split = "negative-review"
+        else:
+            suggested_label = "uncertain"
+            split = "active-learning"
+        rows.append({
+            "candidate_id": row["candidate_id"],
+            "image_id": row["image_id"],
+            "image_number": row["image_number"],
+            "run_date": row["run_date"],
+            "review_category": review_category,
+            "suggested_label": suggested_label,
+            "human_label": label.get("human_label", ""),
+            "label_status": "labeled" if label.get("human_label") else "unlabeled",
+            "training_split": split,
+            "x": row["x"],
+            "y": row["y"],
+            "snr": row["snr"],
+            "blob_size": row["blob_size"],
+            "artifact_flags": row["artifact_flags"],
+            "candidate_score": row["candidate_score"],
+            "review_reason": row["review_reason"],
+            "review_note": label.get("review_note", ""),
+        })
+    return rows
+
+
+def build_active_learning_queue(training_rows: list[dict[str, object]]) -> list[dict[str, object]]:
+    priority = {
+        "top_unmatched_temporal_track": 0,
+        "strong_single_frame_candidate": 1,
+        "likely_artifact": 2,
+        "published_match": 3,
+    }
+    rows = [row for row in training_rows if row["label_status"] == "unlabeled"]
+    rows.sort(
+        key=lambda row: (
+            priority.get(str(row["review_category"]), 99),
+            -float(row.get("candidate_score", 0) or 0),
+            -float(row.get("snr", 0) or 0),
+        )
+    )
+    for index, row in enumerate(rows, start=1):
+        row["review_priority"] = index
+    return rows
+
+
 def write_review_packet(
     manifest: list[dict[str, object]],
     summary: list[dict[str, object]],
@@ -743,6 +824,9 @@ def main() -> None:
             "median_x",
             "median_y",
             "median_peak_snr",
+            "mean_step_px",
+            "step_cv",
+            "motion_consistency",
             "candidate_score",
             "reason",
             "candidate_ids",
@@ -775,6 +859,56 @@ def main() -> None:
     artifact_sheets = write_review_artifacts(review_rows)
     track_strip_path = write_temporal_track_strips(tracks)
 
+    training_rows = build_training_manifest(review_rows)
+    write_csv(
+        OUTPUT_DIR / "training_manifest.csv",
+        training_rows,
+        [
+            "candidate_id",
+            "image_id",
+            "image_number",
+            "run_date",
+            "review_category",
+            "suggested_label",
+            "human_label",
+            "label_status",
+            "training_split",
+            "x",
+            "y",
+            "snr",
+            "blob_size",
+            "artifact_flags",
+            "candidate_score",
+            "review_reason",
+            "review_note",
+        ],
+    )
+    active_rows = build_active_learning_queue(training_rows)
+    write_csv(
+        OUTPUT_DIR / "active_learning_queue.csv",
+        active_rows,
+        [
+            "review_priority",
+            "candidate_id",
+            "image_id",
+            "image_number",
+            "run_date",
+            "review_category",
+            "suggested_label",
+            "human_label",
+            "label_status",
+            "training_split",
+            "x",
+            "y",
+            "snr",
+            "blob_size",
+            "artifact_flags",
+            "candidate_score",
+            "review_reason",
+            "review_note",
+        ],
+    )
+
     labels = build_label_summary()
     if labels:
         write_csv(
@@ -803,6 +937,8 @@ def main() -> None:
     print(f"Wrote {OUTPUT_DIR / 'known_match_report.csv'}")
     print(f"Wrote {OUTPUT_DIR / 'temporal_track_summary.csv'}")
     print(f"Wrote {OUTPUT_DIR / 'scientific_review_queue.csv'}")
+    print(f"Wrote {OUTPUT_DIR / 'training_manifest.csv'}")
+    print(f"Wrote {OUTPUT_DIR / 'active_learning_queue.csv'}")
     for path in artifact_sheets.values():
         print(f"Wrote {ROOT / path}")
     if track_strip_path:

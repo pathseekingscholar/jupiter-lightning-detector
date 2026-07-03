@@ -10,6 +10,7 @@ import sys
 import traceback
 import threading
 import webbrowser
+from datetime import datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -75,7 +76,10 @@ def write_candidate_labels(payload: dict) -> None:
         "artifact_flags",
         "candidate_score",
         "human_label",
+        "confidence",
+        "reviewer",
         "review_note",
+        "reviewed_at",
         "updated_at",
     ]
     with LABELS_CSV_PATH.open("w", newline="", encoding="utf-8") as handle:
@@ -438,6 +442,7 @@ def save_candidate_label(payload: dict) -> dict:
     human_label = str(payload.get("human_label", "uncertain"))
     if human_label not in LABEL_VALUES:
         raise ValueError(f"Unknown label: {human_label}")
+    reviewed_at = str(payload.get("reviewed_at") or payload.get("updated_at") or datetime.now(timezone.utc).isoformat())
     labels = read_candidate_labels()
     labels.setdefault("labels", {})[candidate_id] = {
         "run_date": str(payload.get("run_date", "")),
@@ -452,8 +457,12 @@ def save_candidate_label(payload: dict) -> dict:
         "artifact_flags": str(payload.get("artifact_flags", payload.get("flags", ""))),
         "candidate_score": payload.get("candidate_score", payload.get("confidence", "")),
         "human_label": human_label,
+        "label": human_label,
+        "confidence": str(payload.get("confidence", "medium")),
+        "reviewer": str(payload.get("reviewer", "local-reviewer")),
         "review_note": str(payload.get("review_note", ""))[:2000],
-        "updated_at": str(payload.get("updated_at", "")),
+        "reviewed_at": reviewed_at,
+        "updated_at": reviewed_at,
     }
     write_candidate_labels(labels)
     return {"saved": True, "candidate_id": candidate_id, **candidate_labels_payload()}

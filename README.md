@@ -160,6 +160,7 @@ missing image lines for these products.
 .\run.ps1 all
 .\run.ps1 test
 .\run.ps1 app
+.\run.ps1 coverage
 .\run.ps1 detect-all
 .\run.ps1 detect -Date 2001-01-13
 .\run.ps1 exports
@@ -177,6 +178,16 @@ missing image lines for these products.
 - `docs/current_results_summary.md`: current processed-date evidence summary
 - `docs/reproducibility_checklist.md`: clean-room reproduction steps
 - `docs/roadmap.md`: GitHub-facing scientific roadmap
+- `docs/opus_nearby_date_coverage.md`: OPUS availability scan for nearby
+  Cassini ISS NAC/HAL Jupiter dates
+- `docs/dataset_card.md`: scope, labels, limitations, and safe use of the
+  generated candidate review set
+- `docs/model_card_baseline_detector.md`: plain-language model card for the
+  classical detector baseline
+- `docs/data_management_plan.md`: what belongs in Git, what stays local, and
+  how human labels should be recorded
+- `docs/human_in_the_loop_training.md`: detector-to-review-to-training loop
+- `schemas/`: JSON schemas for labels and training manifest rows
 - `data/calibrated`: calibrated I/F images and labels
 - `data/metadata`: OPUS metadata snapshots
 - `data/previews`: archive browse images
@@ -219,7 +230,12 @@ start missing real published detections.
   unmatched temporal tracks, strong single-frame candidates, and likely
   artifacts.
 - `temporal_track_summary.csv`: candidate tracks across frames with start/end
-  image, net motion, median brightness, score, and linked candidate IDs.
+  image, net motion, median brightness, motion consistency, score, and linked
+  candidate IDs.
+- `training_manifest.csv`: candidate measurements joined to human label status
+  for later model training.
+- `active_learning_queue.csv`: prioritized unlabeled candidates for human
+  review.
 - `review_packet.md`: a plain-English summary of the current evidence, safe
   claims, date counts, known-match table, and strongest temporal tracks.
 - `review_artifacts/*.png`: contact sheets for published matches, unmatched
@@ -228,6 +244,47 @@ start missing real published detections.
 
 These files are designed for research review. They make the detector behavior
 auditable instead of asking someone to trust a dashboard.
+
+## OPUS Coverage Scan
+
+`.\run.ps1 coverage` queries OPUS for nearby Cassini ISS NAC/HAL Jupiter dates
+from 2000-12-28 through 2001-01-16. It writes:
+
+- `outputs/detection/opus_nearby_date_coverage.csv`
+- `docs/opus_nearby_date_coverage.md`
+
+The current scan found 9 dates with NAC/HAL results, and all 9 are included in
+the detector run list.
+
+## Human-In-The-Loop Training
+
+The detector is not the final scientific judge. The intended research loop is:
+
+```text
+detector proposes candidates
+-> human reviewer labels them
+-> labels are exported
+-> training/validation manifest is updated
+-> future models are compared against the classical baseline
+```
+
+The current training foundation is documented in
+`docs/human_in_the_loop_training.md`. The important generated files are
+`training_manifest.csv`, `active_learning_queue.csv`, `candidate_labels.csv`,
+and `candidate_labels.json`.
+
+The review loop is deliberately simple:
+
+1. The detector proposes candidate bright blobs.
+2. A human marks each candidate as known lightning, possible lightning,
+   artifact, cosmic-ray/hot-pixel, or uncertain.
+3. The label is saved with reviewer notes and confidence.
+4. The label table becomes training and validation data for later models.
+5. Any future YOLO or neural model must beat the explainable baseline without
+   hiding false positives or false negatives.
+
+The schema for saved labels is `schemas/candidate_label.schema.json`. The
+schema for the training manifest is `schemas/training_manifest.schema.json`.
 
 ## Next Scientific Feature
 

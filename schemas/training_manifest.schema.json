@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/pathseekingscholar/jupiter-lightning-detector/schemas/training_manifest.schema.json",
+  "title": "Jupiter Lightning Training Manifest Row",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "candidate_id",
+    "image_id",
+    "run_date",
+    "suggested_label",
+    "label_status",
+    "training_split",
+    "x",
+    "y",
+    "snr",
+    "blob_size",
+    "candidate_score"
+  ],
+  "properties": {
+    "candidate_id": {
+      "type": "string"
+    },
+    "image_id": {
+      "type": "string",
+      "pattern": "^N[0-9]+$"
+    },
+    "run_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "review_category": {
+      "type": "string"
+    },
+    "suggested_label": {
+      "type": "string",
+      "enum": [
+        "known-lightning",
+        "possible-lightning",
+        "artifact",
+        "cosmic-ray-hot-pixel",
+        "uncertain"
+      ]
+    },
+    "human_label": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "label_status": {
+      "type": "string",
+      "enum": [
+        "unlabeled",
+        "labeled"
+      ]
+    },
+    "training_split": {
+      "type": "string",
+      "enum": [
+        "validation",
+        "active-learning",
+        "candidate-training",
+        "negative-review"
+      ]
+    },
+    "x": {
+      "type": "number"
+    },
+    "y": {
+      "type": "number"
+    },
+    "snr": {
+      "type": "number"
+    },
+    "blob_size": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "artifact_flags": {
+      "type": "string"
+    },
+    "candidate_score": {
+      "type": "number"
+    },
+    "review_reason": {
+      "type": "string"
+    },
+    "review_note": {
+      "type": "string"
+    }
+  }
+}

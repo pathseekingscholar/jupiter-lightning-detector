@@ -10,6 +10,10 @@ I am not claiming new lightning yet.
 
 ## Processed Date Windows
 
+The nearby-date OPUS coverage scan checked 2000-12-28 through 2001-01-16 for
+Cassini ISS NAC/HAL Jupiter results. It found 9 available dates, and all 9 are
+processed below.
+
 | Date | Images | Raw candidates | Review candidates | Published matches | Unmatched review |
 |---|---:|---:|---:|---:|---:|
 | 2000-12-31 | 12 | 5,035 | 565 | 0 | 565 |
@@ -29,6 +33,28 @@ Totals:
 - Review candidates after artifact filters: 12,611
 - Published marks recovered: 6 of 6
 - Scientific review queue rows: 106
+- Training manifest rows: 106
+- Active-learning queue rows: 106 unlabeled review rows, ordered by review
+  priority. This includes validation marks and likely artifacts, not only
+  possible new lightning.
+
+## Why The Candidate Count Is High
+
+The detector intentionally starts broad. It first saves every bright region that
+passes a local contrast test, then it flags obvious artifacts and creates a
+smaller review queue.
+
+That means:
+
+- `raw bright regions` are the detector's first-pass search hits,
+- `review candidates` are the smaller set that survived artifact filters,
+- `scientific review queue` is the curated set a person should inspect first,
+- a high raw count is expected for faint lightning work because the detector is
+trying not to miss weak diffuse events,
+- false positives are useful because they become negative training examples.
+
+The current goal is not to make the candidate count look small. The goal is to
+make every stage measurable and reviewable.
 
 ## Known-Match Evidence
 
@@ -67,3 +93,18 @@ The generated contact sheets are local outputs:
 The unmatched candidates are not discoveries. To become scientifically credible,
 they need manual review, repeated-frame validation, and eventually geometry that
 maps x/y pixels to Jupiter latitude/longitude.
+
+## Human-In-The-Loop Status
+
+The current exports now support the future training loop:
+
+- `training_manifest.csv` joins detector measurements to label status,
+- `active_learning_queue.csv` ranks unlabeled candidates for human review,
+- `candidate_labels.csv/json` store reviewer decisions from the workbench,
+- the JSON schemas in `schemas/` define how labels and training rows should
+  look.
+
+The first human review pass should label the published matches, the strongest
+unmatched tracks, the strongest single-frame candidates, and likely artifacts.
+Only after that should a YOLO or other trained model be compared against the
+baseline detector.

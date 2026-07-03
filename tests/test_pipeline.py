@@ -12,6 +12,9 @@ import app_server
 import research_exports
 
 
+ROOT = Path(__file__).resolve().parents[1]
+
+
 class PipelineTests(unittest.TestCase):
     def test_parse_pds_label(self):
         text = """
@@ -99,6 +102,9 @@ END_OBJECT = IMAGE
                 self.assertTrue(app_server.LABELS_CSV_PATH.exists())
                 saved = json.loads(app_server.LABELS_PATH.read_text(encoding="utf-8"))
                 self.assertEqual(saved["labels"]["1357029177-0001"]["human_label"], "possible-lightning")
+                self.assertEqual(saved["labels"]["1357029177-0001"]["label"], "possible-lightning")
+                self.assertIn("reviewer", saved["labels"]["1357029177-0001"])
+                self.assertIn("reviewed_at", saved["labels"]["1357029177-0001"])
                 self.assertIn("candidate_id", app_server.LABELS_CSV_PATH.read_text(encoding="utf-8"))
             finally:
                 app_server.LABELS_PATH = original_json
@@ -114,12 +120,16 @@ END_OBJECT = IMAGE
         matches = research_exports.build_known_match_report()
         tracks = research_exports.build_temporal_track_summary()
         review_queue = research_exports.build_scientific_review_queue(matches, tracks)
+        training_manifest = research_exports.build_training_manifest(review_queue)
+        active_learning = research_exports.build_active_learning_queue(training_manifest)
         self.assertTrue(manifest)
         self.assertTrue(summary)
         self.assertTrue(sweep)
         self.assertTrue(matches)
         self.assertTrue(tracks)
         self.assertTrue(review_queue)
+        self.assertTrue(training_manifest)
+        self.assertTrue(active_learning)
         self.assertIn("opus_id", manifest[0])
         self.assertIn("candidate_count", manifest[0])
         self.assertIn("images_processed", summary[0])
@@ -128,7 +138,14 @@ END_OBJECT = IMAGE
         self.assertIn("published_matches", sweep[0])
         self.assertIn("offset_px", matches[0])
         self.assertIn("frame_count", tracks[0])
+        self.assertIn("motion_consistency", tracks[0])
         self.assertIn("review_category", review_queue[0])
+        self.assertIn("training_split", training_manifest[0])
+        self.assertIn("review_priority", active_learning[0])
+        schema = json.loads((ROOT / "schemas" / "training_manifest.schema.json").read_text(encoding="utf-8"))
+        allowed_splits = set(schema["properties"]["training_split"]["enum"])
+        produced_splits = {row["training_split"] for row in training_manifest}
+        self.assertTrue(produced_splits.issubset(allowed_splits))
 
 
 if __name__ == "__main__":

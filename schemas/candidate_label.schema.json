@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/pathseekingscholar/jupiter-lightning-detector/schemas/candidate_label.schema.json",
+  "title": "Jupiter Lightning Candidate Human Label",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "candidate_id",
+    "image_id",
+    "label",
+    "reviewer",
+    "reviewed_at"
+  ],
+  "properties": {
+    "candidate_id": {
+      "type": "string",
+      "description": "Stable detector candidate identifier, usually image-number plus candidate index."
+    },
+    "image_id": {
+      "type": "string",
+      "pattern": "^N[0-9]+$",
+      "description": "Cassini ISS image ID, for example N1357029177."
+    },
+    "label": {
+      "type": "string",
+      "enum": [
+        "known-lightning",
+        "possible-lightning",
+        "artifact",
+        "cosmic-ray-hot-pixel",
+        "uncertain"
+      ],
+      "description": "Human review label. A possible-lightning label is still not a confirmed discovery."
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "description": "Reviewer confidence in the label, not detector probability."
+    },
+    "reviewer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Short reason for the label, including visual or temporal evidence."
+    },
+    "needs_second_review": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

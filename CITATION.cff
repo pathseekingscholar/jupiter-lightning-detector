@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+title: "Jupiter Lightning Detector Workbench"
+message: "If you use this research workbench, cite the repository and the original Cassini lightning publication."
+type: software
+authors:
+  - name: "Vedar"
+repository-code: "https://github.com/pathseekingscholar/jupiter-lightning-detector"
+abstract: "Explainable Cassini ISS pipeline for candidate Jovian lightning detection, validation, human review, and training-data preparation."
+keywords:
+  - Cassini
+  - Jupiter
+  - lightning
+  - planetary science
+  - computer vision
+  - PDS
+references:
+  - type: article
+    title: "Lightning on Jupiter observed in the H-alpha line by the Cassini imaging science subsystem"
+    authors:
+      - name: "Dyudina, U. A."
+    journal: "Icarus"
+    year: 2004
+    volume: 172
+    start: 24
+    end: 36
