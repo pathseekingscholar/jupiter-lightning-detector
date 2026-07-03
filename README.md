@@ -74,6 +74,7 @@ Run the detector for the example dates:
   - `outputs/detection/review_metrics_summary.csv`
   - `outputs/detection/review_decision_matrix.csv`
   - `outputs/detection/temporal_track_quality.csv`
+  - `outputs/detection/threshold_recommendations.csv`
   - `outputs/detection/review_metrics_report.md`
   - `outputs/detection/review_metrics_report.html`
   - `outputs/detection/candidate_label_template.csv`
@@ -266,6 +267,8 @@ start missing real published detections.
 - `temporal_track_quality.csv`: track-level quality labels that separate
   strong temporal-review targets from single-frame candidates that are not
   temporal evidence.
+- `threshold_recommendations.csv`: sweep summary showing how stricter SNR and
+  blob-size rules affect review workload and published-mark recovery.
 - `review_metrics_report.html`: browser-friendly summary for a meeting or lab
   review.
 - `review_packet.md`: a plain-English summary of the current evidence, safe

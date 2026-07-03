@@ -12,6 +12,7 @@ OUTPUT_DIR = ROOT / "outputs" / "detection"
 REVIEW_METRICS_CSV = OUTPUT_DIR / "review_metrics_summary.csv"
 REVIEW_DECISION_CSV = OUTPUT_DIR / "review_decision_matrix.csv"
 TRACK_QUALITY_CSV = OUTPUT_DIR / "temporal_track_quality.csv"
+THRESHOLD_RECOMMENDATIONS_CSV = OUTPUT_DIR / "threshold_recommendations.csv"
 REVIEW_REPORT_MD = OUTPUT_DIR / "review_metrics_report.md"
 REVIEW_REPORT_HTML = OUTPUT_DIR / "review_metrics_report.html"
 
@@ -247,6 +248,52 @@ def build_track_quality() -> list[dict[str, object]]:
     return rows
 
 
+def build_threshold_recommendations() -> list[dict[str, object]]:
+    sweep = read_csv(OUTPUT_DIR / "threshold_sweep.csv")
+    by_threshold: dict[tuple[str, str], list[dict[str, str]]] = defaultdict(list)
+    for row in sweep:
+        by_threshold[(row.get("snr_threshold", ""), row.get("min_blob_size", ""))].append(row)
+
+    rows = []
+    for (snr_threshold, min_blob_size), items in by_threshold.items():
+        total_candidates = sum(int(numeric(row.get("candidate_count"))) for row in items)
+        total_review = sum(int(numeric(row.get("review_candidate_count"))) for row in items)
+        total_artifacts = sum(int(numeric(row.get("artifact_flagged_count"))) for row in items)
+        total_matches = sum(int(numeric(row.get("published_matches"))) for row in items)
+        total_unmatched = sum(int(numeric(row.get("unmatched_review_candidates"))) for row in items)
+        recall = total_matches / 6.0 if total_matches <= 6 else 1.0
+        review_fraction = total_review / total_candidates if total_candidates else 0.0
+        if total_matches == 6:
+            interpretation = "keeps all published marks in this validation set"
+        elif total_matches >= 4:
+            interpretation = "misses at least one published mark; risky without review"
+        else:
+            interpretation = "too strict for current validation set"
+        rows.append({
+            "snr_threshold": snr_threshold,
+            "min_blob_size": min_blob_size,
+            "candidate_count": total_candidates,
+            "review_candidate_count": total_review,
+            "artifact_flagged_count": total_artifacts,
+            "published_matches": total_matches,
+            "published_recall": f"{recall:.3f}",
+            "unmatched_review_candidates": total_unmatched,
+            "review_fraction": f"{review_fraction:.4f}",
+            "interpretation": interpretation,
+        })
+    rows.sort(
+        key=lambda row: (
+            -int(numeric(row.get("published_matches"))),
+            int(numeric(row.get("review_candidate_count"))),
+            -float(row.get("snr_threshold", 0) or 0),
+            -float(row.get("min_blob_size", 0) or 0),
+        )
+    )
+    for index, row in enumerate(rows, start=1):
+        row["rank"] = index
+    return rows
+
+
 def reason_for_action(action: str) -> str:
     return {
         "use_human_label": "Already labeled; preserve as training or validation evidence.",
@@ -263,6 +310,7 @@ def write_markdown_report(
     metrics: list[dict[str, object]],
     matrix: list[dict[str, object]],
     track_quality: list[dict[str, object]],
+    threshold_recommendations: list[dict[str, object]],
 ) -> None:
     metric_lookup = {row["metric"]: row["value"] for row in metrics}
     action_counts = Counter(str(row["next_action"]) for row in matrix)
@@ -306,6 +354,21 @@ def write_markdown_report(
         lines.append(f"| {quality} | {count} | {quality_meanings.get(quality, '')} |")
     lines.extend([
         "",
+        "## Threshold Tradeoff",
+        "",
+        "These rows summarize stricter detector settings after artifact filtering. The current sweep shows an important warning: the stricter reviewable-only filters do not keep all six published marks. That means strict automatic rejection can create false negatives and must not replace human review.",
+        "",
+        "| Rank | SNR threshold | Min blob | Review candidates | Published matches | Recall | Interpretation |",
+        "|---:|---:|---:|---:|---:|---:|---|",
+    ])
+    for row in threshold_recommendations[:10]:
+        lines.append(
+            f"| {row['rank']} | {row['snr_threshold']} | {row['min_blob_size']} | "
+            f"{row['review_candidate_count']} | {row['published_matches']} | {row['published_recall']} | "
+            f"{row['interpretation']} |"
+        )
+    lines.extend([
+        "",
         "## Top Review Rows",
         "",
         "| Rank | Candidate | Image | Date | Action | x/y | SNR | Blob | Score |",
@@ -330,6 +393,7 @@ def write_html_report(
     metrics: list[dict[str, object]],
     matrix: list[dict[str, object]],
     track_quality: list[dict[str, object]],
+    threshold_recommendations: list[dict[str, object]],
 ) -> None:
     metric_rows = "\n".join(
         f"<tr><td>{html.escape(str(row['metric']))}</td><td>{html.escape(str(row['value']))}</td><td>{html.escape(str(row['meaning']))}</td></tr>"
@@ -361,6 +425,18 @@ def write_html_report(
         "</tr>"
         for row in track_quality[:100]
     )
+    threshold_rows = "\n".join(
+        "<tr>"
+        f"<td>{html.escape(str(row['rank']))}</td>"
+        f"<td>{html.escape(str(row['snr_threshold']))}</td>"
+        f"<td>{html.escape(str(row['min_blob_size']))}</td>"
+        f"<td>{html.escape(str(row['review_candidate_count']))}</td>"
+        f"<td>{html.escape(str(row['published_matches']))}</td>"
+        f"<td>{html.escape(str(row['published_recall']))}</td>"
+        f"<td>{html.escape(str(row['interpretation']))}</td>"
+        "</tr>"
+        for row in threshold_recommendations[:25]
+    )
     document = f"""<!doctype html>
 <html lang="en">
 <head>
@@ -377,13 +453,15 @@ def write_html_report(
 </head>
 <body>
   <h1>Jupiter Lightning Review Metrics</h1>
-  <p class="warning">This report summarizes detector evidence and review priority. It does not confirm new lightning.</p>
+  <p class="warning">This report summarizes detector evidence and review priority. It does not confirm new lightning. Strict artifact-filtered thresholds can miss published validation marks, so stricter is not automatically better.</p>
   <h2>Metrics</h2>
   <table><thead><tr><th>Metric</th><th>Value</th><th>Meaning</th></tr></thead><tbody>{metric_rows}</tbody></table>
   <h2>Top Review Queue</h2>
   <table><thead><tr><th>Rank</th><th>Candidate</th><th>Image</th><th>Date</th><th>Next action</th><th>x/y</th><th>SNR</th><th>Blob</th><th>Score</th></tr></thead><tbody>{matrix_rows}</tbody></table>
   <h2>Temporal Track Quality</h2>
   <table><thead><tr><th>Quality</th><th>Date</th><th>Track</th><th>Frames</th><th>Motion consistency</th><th>Median SNR</th><th>Reason</th></tr></thead><tbody>{quality_rows}</tbody></table>
+  <h2>Threshold Tradeoff</h2>
+  <table><thead><tr><th>Rank</th><th>SNR threshold</th><th>Min blob</th><th>Review candidates</th><th>Published matches</th><th>Recall</th><th>Interpretation</th></tr></thead><tbody>{threshold_rows}</tbody></table>
 </body>
 </html>
 """
@@ -394,6 +472,7 @@ def main() -> None:
     metrics = build_review_metrics()
     matrix = build_decision_matrix()
     track_quality = build_track_quality()
+    threshold_recommendations = build_threshold_recommendations()
     write_csv(REVIEW_METRICS_CSV, metrics, ["metric", "value", "meaning"])
     write_csv(
         REVIEW_DECISION_CSV,
@@ -437,11 +516,29 @@ def main() -> None:
             "candidate_ids",
         ],
     )
-    write_markdown_report(metrics, matrix, track_quality)
-    write_html_report(metrics, matrix, track_quality)
+    write_csv(
+        THRESHOLD_RECOMMENDATIONS_CSV,
+        threshold_recommendations,
+        [
+            "rank",
+            "snr_threshold",
+            "min_blob_size",
+            "candidate_count",
+            "review_candidate_count",
+            "artifact_flagged_count",
+            "published_matches",
+            "published_recall",
+            "unmatched_review_candidates",
+            "review_fraction",
+            "interpretation",
+        ],
+    )
+    write_markdown_report(metrics, matrix, track_quality, threshold_recommendations)
+    write_html_report(metrics, matrix, track_quality, threshold_recommendations)
     print(f"Wrote {REVIEW_METRICS_CSV}")
     print(f"Wrote {REVIEW_DECISION_CSV}")
     print(f"Wrote {TRACK_QUALITY_CSV}")
+    print(f"Wrote {THRESHOLD_RECOMMENDATIONS_CSV}")
     print(f"Wrote {REVIEW_REPORT_MD}")
     print(f"Wrote {REVIEW_REPORT_HTML}")
 
