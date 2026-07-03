@@ -143,6 +143,8 @@ def build_decision_matrix() -> list[dict[str, object]]:
             "suggested_label": row.get("suggested_label", ""),
             "human_label": human.get("human_label", ""),
             "label_status": "labeled" if human.get("human_label") else "unlabeled",
+            "x": row.get("x", ""),
+            "y": row.get("y", ""),
             "snr": row.get("snr", ""),
             "blob_size": row.get("blob_size", ""),
             "artifact_flags": artifact_flags,
@@ -306,13 +308,13 @@ def write_markdown_report(
         "",
         "## Top Review Rows",
         "",
-        "| Rank | Candidate | Image | Date | Action | SNR | Blob | Score |",
-        "|---:|---|---|---|---|---:|---:|---:|",
+        "| Rank | Candidate | Image | Date | Action | x/y | SNR | Blob | Score |",
+        "|---:|---|---|---|---|---|---:|---:|---:|",
     ])
     for row in matrix[:25]:
         lines.append(
             f"| {row['review_rank']} | {row['candidate_id']} | {row['image_id']} | {row['run_date']} | "
-            f"{row['next_action']} | {row['snr']} | {row['blob_size']} | {row['candidate_score']} |"
+            f"{row['next_action']} | {row['x']}, {row['y']} | {row['snr']} | {row['blob_size']} | {row['candidate_score']} |"
         )
     lines.extend([
         "",
@@ -340,6 +342,7 @@ def write_html_report(
         f"<td>{html.escape(str(row['image_id']))}</td>"
         f"<td>{html.escape(str(row['run_date']))}</td>"
         f"<td>{html.escape(str(row['next_action']))}</td>"
+        f"<td>{html.escape(str(row['x']))}, {html.escape(str(row['y']))}</td>"
         f"<td>{html.escape(str(row['snr']))}</td>"
         f"<td>{html.escape(str(row['blob_size']))}</td>"
         f"<td>{html.escape(str(row['candidate_score']))}</td>"
@@ -378,7 +381,7 @@ def write_html_report(
   <h2>Metrics</h2>
   <table><thead><tr><th>Metric</th><th>Value</th><th>Meaning</th></tr></thead><tbody>{metric_rows}</tbody></table>
   <h2>Top Review Queue</h2>
-  <table><thead><tr><th>Rank</th><th>Candidate</th><th>Image</th><th>Date</th><th>Next action</th><th>SNR</th><th>Blob</th><th>Score</th></tr></thead><tbody>{matrix_rows}</tbody></table>
+  <table><thead><tr><th>Rank</th><th>Candidate</th><th>Image</th><th>Date</th><th>Next action</th><th>x/y</th><th>SNR</th><th>Blob</th><th>Score</th></tr></thead><tbody>{matrix_rows}</tbody></table>
   <h2>Temporal Track Quality</h2>
   <table><thead><tr><th>Quality</th><th>Date</th><th>Track</th><th>Frames</th><th>Motion consistency</th><th>Median SNR</th><th>Reason</th></tr></thead><tbody>{quality_rows}</tbody></table>
 </body>
@@ -404,6 +407,8 @@ def main() -> None:
             "suggested_label",
             "human_label",
             "label_status",
+            "x",
+            "y",
             "snr",
             "blob_size",
             "artifact_flags",

@@ -9,6 +9,7 @@ from PIL import Image
 
 import jupiter_pipeline as pipeline
 import app_server
+import label_tools
 import research_exports
 import review_metrics
 
@@ -166,6 +167,38 @@ END_OBJECT = IMAGE
         self.assertIn("temporal_quality", track_quality[0])
         self.assertTrue(any(row["next_action"] == "confirm_known_validation_mark" for row in matrix))
         self.assertTrue(any(row["temporal_quality"] == "strong_temporal_review" for row in track_quality))
+
+    def test_label_template_and_import(self):
+        matrix_path = label_tools.OUTPUT_DIR / "review_decision_matrix.csv"
+        if not matrix_path.exists():
+            self.skipTest("Review decision matrix has not been generated")
+        template = label_tools.build_template()
+        self.assertTrue(template)
+        self.assertIn("candidate_id", template[0])
+        self.assertIn("suggested_label", template[0])
+
+        original_json = label_tools.LABELS_JSON
+        original_csv = label_tools.LABELS_CSV
+        with tempfile.TemporaryDirectory() as directory:
+            label_tools.LABELS_JSON = Path(directory) / "candidate_labels.json"
+            label_tools.LABELS_CSV = Path(directory) / "candidate_labels.csv"
+            import_path = Path(directory) / "labels.csv"
+            row = dict(template[0])
+            row["human_label"] = "known-lightning"
+            row["confidence"] = "high"
+            row["reviewer"] = "unit-test"
+            row["review_note"] = "known validation mark"
+            label_tools.write_csv(import_path, [row], list(row.keys()))
+            try:
+                label_tools.import_labels(import_path)
+                payload = json.loads(label_tools.LABELS_JSON.read_text(encoding="utf-8"))
+                saved = payload["labels"][row["candidate_id"]]
+                self.assertEqual(saved["human_label"], "known-lightning")
+                self.assertEqual(saved["confidence"], "high")
+                self.assertEqual(saved["reviewer"], "unit-test")
+            finally:
+                label_tools.LABELS_JSON = original_json
+                label_tools.LABELS_CSV = original_csv
 
 
 if __name__ == "__main__":

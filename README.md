@@ -43,6 +43,7 @@ Run the detector for the example dates:
 .\run.ps1 detect -Date 2001-01-13
 .\run.ps1 exports
 .\run.ps1 review
+.\run.ps1 label-template
 ```
 
 ## What The App Provides
@@ -74,6 +75,7 @@ Run the detector for the example dates:
   - `outputs/detection/temporal_track_quality.csv`
   - `outputs/detection/review_metrics_report.md`
   - `outputs/detection/review_metrics_report.html`
+  - `outputs/detection/candidate_label_template.csv`
   - `outputs/detection/review_packet.md`
   - `outputs/detection/review_artifacts/*.png`
   - `outputs/detection/candidate_labels_grouped.csv` when human labels exist
@@ -173,6 +175,9 @@ missing image lines for these products.
 .\run.ps1 detect -Date 2001-01-13
 .\run.ps1 exports
 .\run.ps1 review
+.\run.ps1 label-template
+# After a reviewer fills the template:
+.\run.ps1 label-import -LabelCsv outputs\detection\candidate_label_template.csv
 ```
 
 ## Project Layout
@@ -308,6 +313,22 @@ The review loop is deliberately simple:
 
 The schema for saved labels is `schemas/candidate_label.schema.json`. The
 schema for the training manifest is `schemas/training_manifest.schema.json`.
+
+For batch review:
+
+```powershell
+.\run.ps1 label-template
+```
+
+This writes `outputs/detection/candidate_label_template.csv`. A reviewer can
+fill `human_label`, `confidence`, `reviewer`, and `review_note`, then import it:
+
+```powershell
+.\run.ps1 label-import -LabelCsv outputs\detection\candidate_label_template.csv
+```
+
+The importer validates labels and writes `candidate_labels.json` plus
+`candidate_labels.csv`.
 
 ## Next Scientific Feature
 
