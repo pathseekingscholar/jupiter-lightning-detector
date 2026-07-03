@@ -187,6 +187,12 @@ missing image lines for these products.
 - `docs/data_management_plan.md`: what belongs in Git, what stays local, and
   how human labels should be recorded
 - `docs/human_in_the_loop_training.md`: detector-to-review-to-training loop
+- `docs/reviewer_quickstart.md`: short guide for labeling candidates without
+  overclaiming
+- `docs/glossary.md`: plain definitions of candidate, false positive, false
+  negative, artifact, temporal track, and YOLO
+- `docs/paper_readiness_matrix.md`: what is ready for a paper claim and what
+  is not ready yet
 - `schemas/`: JSON schemas for labels and training manifest rows
 - `data/calibrated`: calibrated I/F images and labels
 - `data/metadata`: OPUS metadata snapshots
