@@ -44,6 +44,7 @@ Run the detector for the example dates:
 .\run.ps1 exports
 .\run.ps1 review
 .\run.ps1 label-template
+.\run.ps1 provenance
 ```
 
 ## What The App Provides
@@ -76,6 +77,8 @@ Run the detector for the example dates:
   - `outputs/detection/review_metrics_report.md`
   - `outputs/detection/review_metrics_report.html`
   - `outputs/detection/candidate_label_template.csv`
+  - `outputs/detection/provenance_manifest.json`
+  - `outputs/detection/provenance_manifest.md`
   - `outputs/detection/review_packet.md`
   - `outputs/detection/review_artifacts/*.png`
   - `outputs/detection/candidate_labels_grouped.csv` when human labels exist
@@ -176,6 +179,7 @@ missing image lines for these products.
 .\run.ps1 exports
 .\run.ps1 review
 .\run.ps1 label-template
+.\run.ps1 provenance
 # After a reviewer fills the template:
 .\run.ps1 label-import -LabelCsv outputs\detection\candidate_label_template.csv
 ```

@@ -10,6 +10,7 @@ from PIL import Image
 import jupiter_pipeline as pipeline
 import app_server
 import label_tools
+import provenance_manifest
 import research_exports
 import review_metrics
 
@@ -199,6 +200,16 @@ END_OBJECT = IMAGE
             finally:
                 label_tools.LABELS_JSON = original_json
                 label_tools.LABELS_CSV = original_csv
+
+    def test_provenance_manifest_lists_artifacts(self):
+        summary_path = provenance_manifest.OUTPUT_DIR / "detection_summary.csv"
+        if not summary_path.exists():
+            self.skipTest("Research exports have not been generated")
+        manifest = provenance_manifest.build_manifest()
+        self.assertIn("git_commit", manifest)
+        self.assertTrue(manifest["artifacts"])
+        artifact_paths = {row["path"] for row in manifest["artifacts"]}
+        self.assertIn("outputs/detection/detection_summary.csv", artifact_paths)
 
 
 if __name__ == "__main__":
