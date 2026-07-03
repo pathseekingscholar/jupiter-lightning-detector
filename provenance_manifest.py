@@ -26,6 +26,7 @@ TRACKED_OUTPUTS = [
     "review_metrics_summary.csv",
     "review_decision_matrix.csv",
     "temporal_track_quality.csv",
+    "threshold_recommendations.csv",
     "candidate_label_template.csv",
     "review_packet.md",
     "review_metrics_report.md",
