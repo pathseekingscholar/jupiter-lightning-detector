@@ -291,6 +291,8 @@ function renderDetectionReview() {
     const frames = track.items.map((item) => `N${item.image_number}`).join(" -> ");
     const savedLabel = lead.human_label || state.labels.labels?.[lead.candidate_id]?.human_label || "";
     const savedNote = lead.review_note || state.labels.labels?.[lead.candidate_id]?.review_note || "";
+    const savedConfidence = state.labels.labels?.[lead.candidate_id]?.confidence || "medium";
+    const savedReviewer = state.labels.labels?.[lead.candidate_id]?.reviewer || localStorage.getItem("jupiterReviewerName") || "local-reviewer";
     return `
       <article class="track-card" data-candidate-id="${lead.candidate_id}">
         <button type="button" class="track-open" data-candidate-id="${lead.candidate_id}">
@@ -314,6 +316,16 @@ function renderDetectionReview() {
           <select data-label-for="${lead.candidate_id}">
             ${labelOptions(savedLabel)}
           </select>
+        </label>
+        <label>
+          Confidence
+          <select data-confidence-for="${lead.candidate_id}">
+            ${confidenceOptions(savedConfidence)}
+          </select>
+        </label>
+        <label>
+          Reviewer
+          <input data-reviewer-for="${lead.candidate_id}" type="text" value="${escapeHtml(savedReviewer)}" placeholder="reviewer name or initials">
         </label>
         <label>
           Review note
@@ -344,6 +356,15 @@ function labelOptions(selected = "") {
     ["uncertain", "uncertain"],
   ];
   return labels.map(([value, text]) => `<option value="${value}" ${value === selected ? "selected" : ""}>${text}</option>`).join("");
+}
+
+function confidenceOptions(selected = "medium") {
+  const values = [
+    ["low", "low"],
+    ["medium", "medium"],
+    ["high", "high"],
+  ];
+  return values.map(([value, text]) => `<option value="${value}" ${value === selected ? "selected" : ""}>${text}</option>`).join("");
 }
 
 function renderCandidateTable(candidates) {
@@ -409,6 +430,9 @@ async function saveCandidateLabel(candidate) {
     return;
   }
   const note = document.querySelector(`[data-note-for="${candidate.candidate_id}"]`)?.value || "";
+  const confidence = document.querySelector(`[data-confidence-for="${candidate.candidate_id}"]`)?.value || "medium";
+  const reviewer = document.querySelector(`[data-reviewer-for="${candidate.candidate_id}"]`)?.value || "local-reviewer";
+  localStorage.setItem("jupiterReviewerName", reviewer);
   const response = await fetch("/api/candidate-label", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
@@ -425,6 +449,8 @@ async function saveCandidateLabel(candidate) {
       artifact_flags: candidate.flags || "",
       candidate_score: candidate.confidence.toFixed(4),
       human_label: humanLabel,
+      confidence,
+      reviewer,
       review_note: note,
       updated_at: new Date().toISOString(),
     }),
