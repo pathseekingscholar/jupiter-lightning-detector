@@ -154,14 +154,18 @@ END_OBJECT = IMAGE
             self.skipTest("Research exports have not been generated")
         metrics = review_metrics.build_review_metrics()
         matrix = review_metrics.build_decision_matrix()
+        track_quality = review_metrics.build_track_quality()
         self.assertTrue(metrics)
         self.assertTrue(matrix)
+        self.assertTrue(track_quality)
         metric_names = {row["metric"] for row in metrics}
         self.assertIn("images_processed", metric_names)
         self.assertIn("published_matches_recovered", metric_names)
         self.assertIn("next_action", matrix[0])
         self.assertIn("review_rank", matrix[0])
+        self.assertIn("temporal_quality", track_quality[0])
         self.assertTrue(any(row["next_action"] == "confirm_known_validation_mark" for row in matrix))
+        self.assertTrue(any(row["temporal_quality"] == "strong_temporal_review" for row in track_quality))
 
 
 if __name__ == "__main__":

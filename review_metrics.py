@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parent
 OUTPUT_DIR = ROOT / "outputs" / "detection"
 REVIEW_METRICS_CSV = OUTPUT_DIR / "review_metrics_summary.csv"
 REVIEW_DECISION_CSV = OUTPUT_DIR / "review_decision_matrix.csv"
+TRACK_QUALITY_CSV = OUTPUT_DIR / "temporal_track_quality.csv"
 REVIEW_REPORT_MD = OUTPUT_DIR / "review_metrics_report.md"
 REVIEW_REPORT_HTML = OUTPUT_DIR / "review_metrics_report.html"
 
@@ -167,6 +168,83 @@ def build_decision_matrix() -> list[dict[str, object]]:
     return rows
 
 
+def classify_track(row: dict[str, str]) -> tuple[str, str]:
+    frame_count = int(numeric(row.get("frame_count")))
+    snr = numeric(row.get("median_peak_snr"))
+    motion = numeric(row.get("motion_consistency"))
+    mean_step = numeric(row.get("mean_step_px"))
+    score = numeric(row.get("candidate_score"))
+    reason_parts = []
+
+    if frame_count <= 1:
+        return "single_frame_not_temporal", "Only one frame; cannot support temporal persistence."
+    if frame_count >= 3:
+        reason_parts.append("appears in 3+ frames")
+    else:
+        reason_parts.append("appears in 2 frames")
+    if motion >= 0.8:
+        reason_parts.append("consistent step size")
+    elif motion >= 0.5:
+        reason_parts.append("moderate step consistency")
+    else:
+        reason_parts.append("irregular step size")
+    if snr >= 20:
+        reason_parts.append("high SNR")
+    elif snr >= 10:
+        reason_parts.append("moderate SNR")
+    else:
+        reason_parts.append("low SNR")
+
+    if frame_count >= 3 and motion >= 0.75 and snr >= 10 and 5 <= mean_step <= 160:
+        label = "strong_temporal_review"
+    elif frame_count >= 2 and motion >= 0.5 and snr >= 7:
+        label = "moderate_temporal_review"
+    elif frame_count >= 2:
+        label = "weak_temporal_review"
+    else:
+        label = "single_frame_not_temporal"
+
+    if score <= 0:
+        reason_parts.append("low detector score")
+    return label, "; ".join(reason_parts)
+
+
+def build_track_quality() -> list[dict[str, object]]:
+    tracks = read_csv(OUTPUT_DIR / "temporal_track_summary.csv")
+    rows = []
+    for track in tracks:
+        quality, reason = classify_track(track)
+        rows.append({
+            "run_date": track.get("run_date", ""),
+            "track_id": track.get("track_id", ""),
+            "frame_count": track.get("frame_count", ""),
+            "first_image_id": track.get("first_image_id", ""),
+            "last_image_id": track.get("last_image_id", ""),
+            "median_peak_snr": track.get("median_peak_snr", ""),
+            "mean_step_px": track.get("mean_step_px", ""),
+            "motion_consistency": track.get("motion_consistency", ""),
+            "candidate_score": track.get("candidate_score", ""),
+            "temporal_quality": quality,
+            "quality_reason": reason,
+            "candidate_ids": track.get("candidate_ids", ""),
+        })
+    quality_order = {
+        "strong_temporal_review": 0,
+        "moderate_temporal_review": 1,
+        "weak_temporal_review": 2,
+        "single_frame_not_temporal": 3,
+    }
+    rows.sort(
+        key=lambda row: (
+            quality_order.get(str(row["temporal_quality"]), 99),
+            -int(numeric(row.get("frame_count"))),
+            -numeric(row.get("candidate_score")),
+            -numeric(row.get("median_peak_snr")),
+        )
+    )
+    return rows
+
+
 def reason_for_action(action: str) -> str:
     return {
         "use_human_label": "Already labeled; preserve as training or validation evidence.",
@@ -179,9 +257,14 @@ def reason_for_action(action: str) -> str:
     }.get(action, "")
 
 
-def write_markdown_report(metrics: list[dict[str, object]], matrix: list[dict[str, object]]) -> None:
+def write_markdown_report(
+    metrics: list[dict[str, object]],
+    matrix: list[dict[str, object]],
+    track_quality: list[dict[str, object]],
+) -> None:
     metric_lookup = {row["metric"]: row["value"] for row in metrics}
     action_counts = Counter(str(row["next_action"]) for row in matrix)
+    quality_counts = Counter(str(row["temporal_quality"]) for row in track_quality)
     lines = [
         "# Review Metrics Report",
         "",
@@ -206,6 +289,21 @@ def write_markdown_report(metrics: list[dict[str, object]], matrix: list[dict[st
         lines.append(f"| {action} | {count} | {reason_for_action(action)} |")
     lines.extend([
         "",
+        "## Temporal Track Quality",
+        "",
+        "| Temporal quality | Count | Meaning |",
+        "|---|---:|---|",
+    ])
+    quality_meanings = {
+        "strong_temporal_review": "Best temporal-review targets, still not confirmed lightning.",
+        "moderate_temporal_review": "Repeated candidates that may be useful after visual inspection.",
+        "weak_temporal_review": "Repeated candidates with weak or irregular evidence.",
+        "single_frame_not_temporal": "Single-frame candidates; useful visually but not temporal evidence.",
+    }
+    for quality, count in sorted(quality_counts.items()):
+        lines.append(f"| {quality} | {count} | {quality_meanings.get(quality, '')} |")
+    lines.extend([
+        "",
         "## Top Review Rows",
         "",
         "| Rank | Candidate | Image | Date | Action | SNR | Blob | Score |",
@@ -226,7 +324,11 @@ def write_markdown_report(metrics: list[dict[str, object]], matrix: list[dict[st
     REVIEW_REPORT_MD.write_text("\n".join(lines), encoding="utf-8")
 
 
-def write_html_report(metrics: list[dict[str, object]], matrix: list[dict[str, object]]) -> None:
+def write_html_report(
+    metrics: list[dict[str, object]],
+    matrix: list[dict[str, object]],
+    track_quality: list[dict[str, object]],
+) -> None:
     metric_rows = "\n".join(
         f"<tr><td>{html.escape(str(row['metric']))}</td><td>{html.escape(str(row['value']))}</td><td>{html.escape(str(row['meaning']))}</td></tr>"
         for row in metrics
@@ -243,6 +345,18 @@ def write_html_report(metrics: list[dict[str, object]], matrix: list[dict[str, o
         f"<td>{html.escape(str(row['candidate_score']))}</td>"
         "</tr>"
         for row in matrix[:100]
+    )
+    quality_rows = "\n".join(
+        "<tr>"
+        f"<td>{html.escape(str(row['temporal_quality']))}</td>"
+        f"<td>{html.escape(str(row['run_date']))}</td>"
+        f"<td>{html.escape(str(row['track_id']))}</td>"
+        f"<td>{html.escape(str(row['frame_count']))}</td>"
+        f"<td>{html.escape(str(row['motion_consistency']))}</td>"
+        f"<td>{html.escape(str(row['median_peak_snr']))}</td>"
+        f"<td>{html.escape(str(row['quality_reason']))}</td>"
+        "</tr>"
+        for row in track_quality[:100]
     )
     document = f"""<!doctype html>
 <html lang="en">
@@ -265,6 +379,8 @@ def write_html_report(metrics: list[dict[str, object]], matrix: list[dict[str, o
   <table><thead><tr><th>Metric</th><th>Value</th><th>Meaning</th></tr></thead><tbody>{metric_rows}</tbody></table>
   <h2>Top Review Queue</h2>
   <table><thead><tr><th>Rank</th><th>Candidate</th><th>Image</th><th>Date</th><th>Next action</th><th>SNR</th><th>Blob</th><th>Score</th></tr></thead><tbody>{matrix_rows}</tbody></table>
+  <h2>Temporal Track Quality</h2>
+  <table><thead><tr><th>Quality</th><th>Date</th><th>Track</th><th>Frames</th><th>Motion consistency</th><th>Median SNR</th><th>Reason</th></tr></thead><tbody>{quality_rows}</tbody></table>
 </body>
 </html>
 """
@@ -274,6 +390,7 @@ def write_html_report(metrics: list[dict[str, object]], matrix: list[dict[str, o
 def main() -> None:
     metrics = build_review_metrics()
     matrix = build_decision_matrix()
+    track_quality = build_track_quality()
     write_csv(REVIEW_METRICS_CSV, metrics, ["metric", "value", "meaning"])
     write_csv(
         REVIEW_DECISION_CSV,
@@ -297,10 +414,29 @@ def main() -> None:
             "reason",
         ],
     )
-    write_markdown_report(metrics, matrix)
-    write_html_report(metrics, matrix)
+    write_csv(
+        TRACK_QUALITY_CSV,
+        track_quality,
+        [
+            "run_date",
+            "track_id",
+            "frame_count",
+            "first_image_id",
+            "last_image_id",
+            "median_peak_snr",
+            "mean_step_px",
+            "motion_consistency",
+            "candidate_score",
+            "temporal_quality",
+            "quality_reason",
+            "candidate_ids",
+        ],
+    )
+    write_markdown_report(metrics, matrix, track_quality)
+    write_html_report(metrics, matrix, track_quality)
     print(f"Wrote {REVIEW_METRICS_CSV}")
     print(f"Wrote {REVIEW_DECISION_CSV}")
+    print(f"Wrote {TRACK_QUALITY_CSV}")
     print(f"Wrote {REVIEW_REPORT_MD}")
     print(f"Wrote {REVIEW_REPORT_HTML}")
 

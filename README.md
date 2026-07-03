@@ -71,6 +71,7 @@ Run the detector for the example dates:
   - `outputs/detection/active_learning_queue.csv`
   - `outputs/detection/review_metrics_summary.csv`
   - `outputs/detection/review_decision_matrix.csv`
+  - `outputs/detection/temporal_track_quality.csv`
   - `outputs/detection/review_metrics_report.md`
   - `outputs/detection/review_metrics_report.html`
   - `outputs/detection/review_packet.md`
@@ -253,6 +254,9 @@ start missing real published detections.
 - `review_decision_matrix.csv`: candidate-by-candidate next action such as
   confirm known mark, priority temporal review, review as negative example, or
   single-frame visual review.
+- `temporal_track_quality.csv`: track-level quality labels that separate
+  strong temporal-review targets from single-frame candidates that are not
+  temporal evidence.
 - `review_metrics_report.html`: browser-friendly summary for a meeting or lab
   review.
 - `review_packet.md`: a plain-English summary of the current evidence, safe
