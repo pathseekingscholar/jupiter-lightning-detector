@@ -45,6 +45,7 @@ Run the detector for the example dates:
 .\run.ps1 review
 .\run.ps1 label-template
 .\run.ps1 provenance
+.\run.ps1 validate-outputs
 ```
 
 ## What The App Provides
@@ -183,6 +184,7 @@ missing image lines for these products.
 .\run.ps1 review
 .\run.ps1 label-template
 .\run.ps1 provenance
+.\run.ps1 validate-outputs
 # After a reviewer fills the template:
 .\run.ps1 label-import -LabelCsv outputs\detection\candidate_label_template.csv
 ```

@@ -13,6 +13,7 @@ import label_tools
 import provenance_manifest
 import research_exports
 import review_metrics
+import validate_outputs
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -217,6 +218,13 @@ END_OBJECT = IMAGE
         self.assertTrue(manifest["artifacts"])
         artifact_paths = {row["path"] for row in manifest["artifacts"]}
         self.assertIn("outputs/detection/detection_summary.csv", artifact_paths)
+
+    def test_generated_outputs_validate(self):
+        summary_path = validate_outputs.OUTPUT_DIR / "detection_summary.csv"
+        if not summary_path.exists():
+            self.skipTest("Generated outputs have not been produced")
+        errors = validate_outputs.validate()
+        self.assertEqual(errors, [])
 
 
 if __name__ == "__main__":
