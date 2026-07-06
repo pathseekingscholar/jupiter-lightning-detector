@@ -69,6 +69,7 @@ def iter_text_files() -> list[Path]:
             files.append(path)
         elif path.is_dir():
             files.extend(sorted(path.rglob("*.md")))
+            files.extend(sorted(path.rglob("*.html")))
     return sorted(set(files))
 
 
@@ -145,7 +146,7 @@ def write_report(rows: list[dict[str, object]]) -> None:
     lines = [
         "# Documentation Claim Audit",
         "",
-        "This audit scans project-facing Markdown for stale or unsafe wording. It is not a proof of scientific correctness; it is a guardrail against accidentally saying more than the evidence supports.",
+        "This audit scans project-facing Markdown and HTML for stale or unsafe wording. It is not a proof of scientific correctness; it is a guardrail against accidentally saying more than the evidence supports.",
         "",
         "## Summary",
         "",
