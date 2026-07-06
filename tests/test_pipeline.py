@@ -23,6 +23,7 @@ import human_review_audit
 import candidate_geometry_plan
 import date_coverage_summary
 import label_tools
+import manuscript_claim_matrix
 import nearby_filter_context
 import provenance_manifest
 import research_exports
@@ -443,6 +444,18 @@ END_OBJECT = IMAGE
         self.assertEqual(gates["evidence_integrity"]["evidence_file"], "outputs/detection/evidence_integrity_audit.csv")
         self.assertEqual(gates["candidate_geometry"]["evidence_file"], "outputs/detection/geometry_input_inventory.csv")
         self.assertIn("evidence_file", rows[0])
+
+    def test_manuscript_claim_matrix_outputs(self):
+        if not (manuscript_claim_matrix.OUTPUT_DIR / "research_gate_audit.csv").exists():
+            self.skipTest("Research gate audit has not been generated")
+        rows = manuscript_claim_matrix.build_claim_rows()
+        self.assertTrue(rows)
+        claims = {row["claim_id"]: row for row in rows}
+        self.assertEqual(claims["C02"]["status"], "supported")
+        self.assertEqual(claims["C08"]["status"], "supported")
+        self.assertIn("The pipeline discovered new lightning", claims["C08"]["unsafe_wording"])
+        self.assertTrue(all(row["proof_command"] for row in rows))
+        self.assertTrue(any(row["status"] == "not_supported" for row in rows))
 
     def test_github_issue_backlog_outputs(self):
         if not (github_issue_backlog.OUTPUT_DIR / "research_gate_audit.csv").exists():

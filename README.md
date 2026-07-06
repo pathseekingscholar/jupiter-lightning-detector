@@ -59,6 +59,7 @@ Run the detector for the example dates:
 .\run.ps1 training-readiness
 .\run.ps1 claim-audit
 .\run.ps1 research-gates
+.\run.ps1 manuscript-claims
 .\run.ps1 issue-backlog
 .\run.ps1 project-board
 .\run.ps1 agreement-audit
@@ -135,6 +136,8 @@ Run the detector for the example dates:
   - `outputs/detection/doc_claim_audit.md`
   - `outputs/detection/research_gate_audit.csv`
   - `outputs/detection/research_gate_audit.md`
+  - `outputs/detection/manuscript_claim_matrix.csv`
+  - `outputs/detection/manuscript_claim_matrix.md`
   - `outputs/detection/github_issue_backlog.csv`
   - `outputs/detection/github_issue_backlog.md`
   - `outputs/detection/github_project_board.csv`
@@ -467,6 +470,11 @@ new-lightning language.
 `.\run.ps1 research-gates` writes `research_gate_audit.csv` and
 `research_gate_audit.md`. It summarizes which research gates are ready, in
 progress, or not ready, using current output files as evidence.
+
+`.\run.ps1 manuscript-claims` writes `manuscript_claim_matrix.csv` and
+`manuscript_claim_matrix.md`. It turns current evidence into paper-facing claim
+language: what is supported, what is limited, what is not supported, and what
+wording should be avoided until more evidence exists.
 
 `.\run.ps1 issue-backlog` writes `github_issue_backlog.csv`,
 `github_issue_backlog.md`, and `.github/issue_backlog/*.md`. It turns current

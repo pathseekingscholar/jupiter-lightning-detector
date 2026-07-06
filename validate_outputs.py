@@ -214,6 +214,18 @@ REQUIRED_COLUMNS = {
         "interpretation",
         "next_action",
     },
+    "manuscript_claim_matrix.csv": {
+        "claim_id",
+        "paper_section",
+        "claim",
+        "status",
+        "safe_wording",
+        "unsafe_wording",
+        "evidence_file",
+        "proof_command",
+        "current_value",
+        "remaining_work",
+    },
     "github_issue_backlog.csv": {
         "issue_id",
         "priority",
@@ -274,6 +286,7 @@ REQUIRED_FILES = [
     "training_readiness.md",
     "doc_claim_audit.md",
     "research_gate_audit.md",
+    "manuscript_claim_matrix.md",
     "github_issue_backlog.md",
     "github_project_board.md",
     "review_agreement_audit.md",
@@ -408,6 +421,7 @@ def validate() -> list[str]:
         assert_true("outputs/detection/training_readiness.csv" in artifact_paths, "Provenance missing training readiness CSV", errors)
         assert_true("outputs/detection/doc_claim_audit.csv" in artifact_paths, "Provenance missing documentation claim audit CSV", errors)
         assert_true("outputs/detection/research_gate_audit.csv" in artifact_paths, "Provenance missing research gate audit CSV", errors)
+        assert_true("outputs/detection/manuscript_claim_matrix.csv" in artifact_paths, "Provenance missing manuscript claim matrix CSV", errors)
         assert_true("outputs/detection/github_issue_backlog.csv" in artifact_paths, "Provenance missing GitHub issue backlog CSV", errors)
         assert_true("outputs/detection/github_project_board.csv" in artifact_paths, "Provenance missing GitHub project board CSV", errors)
         assert_true("outputs/detection/review_agreement_audit.csv" in artifact_paths, "Provenance missing review agreement audit CSV", errors)
