@@ -20,6 +20,7 @@ import nearby_filter_context
 import provenance_manifest
 import research_exports
 import research_gate_audit
+import review_labeling_protocol
 import review_agreement_audit
 import review_metrics
 import validate_outputs
@@ -311,6 +312,17 @@ END_OBJECT = IMAGE
             self.assertEqual(first_pass_review_plan.PLAN_HTML.name, "first_pass_review_plan.html")
         with self.subTest("batch_dir_constant"):
             self.assertEqual(first_pass_review_plan.BATCH_DIR.name, "review_batches")
+
+    def test_review_labeling_protocol_outputs(self):
+        review_plan_path = review_labeling_protocol.OUTPUT_DIR / "first_pass_review_plan.csv"
+        if not review_plan_path.exists():
+            self.skipTest("First-pass review plan has not been generated")
+        rows = review_labeling_protocol.build_checklist_rows()
+        self.assertTrue(rows)
+        self.assertIn("preferred_labels", rows[0])
+        batches = {row["review_batch"] for row in rows}
+        self.assertIn("01_known_validation_positive", batches)
+        self.assertIn("03_negative_artifact_examples", batches)
 
     def test_doc_claim_audit_outputs(self):
         rows = doc_claim_audit.audit_docs()

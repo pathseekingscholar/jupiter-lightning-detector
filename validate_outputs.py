@@ -113,6 +113,15 @@ REQUIRED_COLUMNS = {
         "reviewer_task",
         "review_note_prompt",
     },
+    "review_labeling_checklist.csv": {
+        "review_batch",
+        "candidate_count",
+        "review_goal",
+        "preferred_labels",
+        "required_fields",
+        "training_use",
+        "pass_condition",
+    },
     "doc_claim_audit.csv": {
         "file",
         "line",
@@ -159,6 +168,7 @@ REQUIRED_FILES = [
     "human_review_audit.md",
     "first_pass_review_plan.md",
     "first_pass_review_plan.html",
+    "review_labeling_protocol.md",
     "doc_claim_audit.md",
     "research_gate_audit.md",
     "github_issue_backlog.md",
@@ -265,6 +275,7 @@ def validate() -> list[str]:
         assert_true("outputs/detection/nearby_filter_context.csv" in artifact_paths, "Provenance missing nearby filter context CSV", errors)
         assert_true("outputs/detection/human_review_audit.csv" in artifact_paths, "Provenance missing human review audit CSV", errors)
         assert_true("outputs/detection/first_pass_review_plan.csv" in artifact_paths, "Provenance missing first-pass review plan CSV", errors)
+        assert_true("outputs/detection/review_labeling_checklist.csv" in artifact_paths, "Provenance missing review labeling checklist CSV", errors)
         assert_true("outputs/detection/doc_claim_audit.csv" in artifact_paths, "Provenance missing documentation claim audit CSV", errors)
         assert_true("outputs/detection/research_gate_audit.csv" in artifact_paths, "Provenance missing research gate audit CSV", errors)
         assert_true("outputs/detection/github_issue_backlog.csv" in artifact_paths, "Provenance missing GitHub issue backlog CSV", errors)

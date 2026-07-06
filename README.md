@@ -48,6 +48,7 @@ Run the detector for the example dates:
 .\run.ps1 filters
 .\run.ps1 label-audit
 .\run.ps1 review-plan
+.\run.ps1 label-protocol
 .\run.ps1 claim-audit
 .\run.ps1 research-gates
 .\run.ps1 issue-backlog
@@ -99,6 +100,8 @@ Run the detector for the example dates:
   - `outputs/detection/first_pass_review_plan.csv`
   - `outputs/detection/first_pass_review_plan.md`
   - `outputs/detection/first_pass_review_plan.html`
+  - `outputs/detection/review_labeling_checklist.csv`
+  - `outputs/detection/review_labeling_protocol.md`
   - `outputs/detection/review_batches/*.csv`
 	  - `outputs/detection/doc_claim_audit.csv`
 	  - `outputs/detection/doc_claim_audit.md`
@@ -218,6 +221,7 @@ missing image lines for these products.
 .\run.ps1 filters
 .\run.ps1 label-audit
 .\run.ps1 review-plan
+.\run.ps1 label-protocol
 .\run.ps1 claim-audit
 .\run.ps1 research-gates
 .\run.ps1 issue-backlog
@@ -378,6 +382,11 @@ labeling order: known validation positives first, temporal candidates second,
 negative artifact examples third, and strong single-frame candidates after that.
 It also writes per-batch CSVs under `outputs/detection/review_batches/` so a
 reviewer can open only the batch they are labeling.
+
+`.\run.ps1 label-protocol` writes `review_labeling_protocol.md` and
+`review_labeling_checklist.csv`. These files define positive, negative,
+uncertain, and second-review rules so human labels can become training and
+validation evidence later without accidentally becoming discovery claims.
 
 `.\run.ps1 claim-audit` writes `doc_claim_audit.csv` and
 `doc_claim_audit.md`. It scans project-facing Markdown for stale or unsafe
