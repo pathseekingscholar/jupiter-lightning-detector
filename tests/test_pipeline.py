@@ -10,6 +10,7 @@ from PIL import Image
 import jupiter_pipeline as pipeline
 import app_server
 import blind_review_packet
+import blind_review_reconcile
 import doc_claim_audit
 import first_pass_review_plan
 import github_issue_backlog
@@ -336,6 +337,16 @@ END_OBJECT = IMAGE
         self.assertIn("blind_id", packet_rows[0])
         self.assertNotIn("suggested_human_label", packet_rows[0])
         self.assertIn("suggested_human_label", key_rows[0])
+
+    def test_blind_review_reconciliation_outputs(self):
+        packet_path = blind_review_reconcile.PACKET_CSV
+        if not packet_path.exists():
+            self.skipTest("Blind review packet has not been generated")
+        rows, import_rows = blind_review_reconcile.build_reconciliation_rows()
+        self.assertTrue(rows)
+        self.assertIn("agreement", rows[0])
+        self.assertTrue(all("candidate_id" in row for row in rows))
+        self.assertIsInstance(import_rows, list)
 
     def test_review_labeling_protocol_outputs(self):
         review_plan_path = review_labeling_protocol.OUTPUT_DIR / "first_pass_review_plan.csv"

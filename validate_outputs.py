@@ -139,6 +139,15 @@ REQUIRED_COLUMNS = {
         "next_action",
         "suggested_human_label",
     },
+    "blind_review_reconciliation.csv": {
+        "blind_id",
+        "candidate_id",
+        "reviewer_label",
+        "suggested_human_label",
+        "agreement",
+        "label_valid",
+        "confidence_valid",
+    },
     "training_readiness.csv": {
         "gate",
         "status",
@@ -203,6 +212,7 @@ REQUIRED_FILES = [
     "first_pass_review_plan.md",
     "first_pass_review_plan.html",
     "blind_review_packet.md",
+    "blind_review_reconciliation.md",
     "review_labeling_protocol.md",
     "training_readiness.md",
     "doc_claim_audit.md",
@@ -313,6 +323,7 @@ def validate() -> list[str]:
         assert_true("outputs/detection/human_review_audit.csv" in artifact_paths, "Provenance missing human review audit CSV", errors)
         assert_true("outputs/detection/first_pass_review_plan.csv" in artifact_paths, "Provenance missing first-pass review plan CSV", errors)
         assert_true("outputs/detection/blind_review_packet.csv" in artifact_paths, "Provenance missing blind review packet CSV", errors)
+        assert_true("outputs/detection/blind_review_reconciliation.csv" in artifact_paths, "Provenance missing blind review reconciliation CSV", errors)
         assert_true("outputs/detection/review_labeling_checklist.csv" in artifact_paths, "Provenance missing review labeling checklist CSV", errors)
         assert_true("outputs/detection/training_readiness.csv" in artifact_paths, "Provenance missing training readiness CSV", errors)
         assert_true("outputs/detection/doc_claim_audit.csv" in artifact_paths, "Provenance missing documentation claim audit CSV", errors)

@@ -50,6 +50,7 @@ Run the detector for the example dates:
 .\run.ps1 label-audit
 .\run.ps1 review-plan
 .\run.ps1 blind-review
+.\run.ps1 blind-reconcile
 .\run.ps1 label-protocol
 .\run.ps1 training-readiness
 .\run.ps1 claim-audit
@@ -108,6 +109,9 @@ Run the detector for the example dates:
   - `outputs/detection/blind_review_packet.csv`
   - `outputs/detection/blind_review_key.csv`
   - `outputs/detection/blind_review_packet.md`
+  - `outputs/detection/blind_review_reconciliation.csv`
+  - `outputs/detection/blind_review_label_import.csv`
+  - `outputs/detection/blind_review_reconciliation.md`
   - `outputs/detection/review_labeling_checklist.csv`
   - `outputs/detection/review_labeling_protocol.md`
   - `outputs/detection/training_readiness.csv`
@@ -233,6 +237,7 @@ missing image lines for these products.
 .\run.ps1 label-audit
 .\run.ps1 review-plan
 .\run.ps1 blind-review
+.\run.ps1 blind-reconcile
 .\run.ps1 label-protocol
 .\run.ps1 training-readiness
 .\run.ps1 claim-audit
@@ -405,6 +410,11 @@ reviewer can open only the batch they are labeling.
 `blind_review_key.csv`, and `blind_review_packet.md`. The reviewer file hides
 the detector's suggested label, review batch, and next action; the key file can
 be opened later to compare reviewer labels against the detector's categories.
+
+`.\run.ps1 blind-reconcile` writes `blind_review_reconciliation.csv`,
+`blind_review_label_import.csv`, and `blind_review_reconciliation.md`. It joins
+filled blind labels back to candidate IDs and produces an import-ready CSV for
+`.\run.ps1 label-import` after the reconciliation has been checked.
 
 `.\run.ps1 label-protocol` writes `review_labeling_protocol.md` and
 `review_labeling_checklist.csv`. These files define positive, negative,
