@@ -9,6 +9,7 @@ from PIL import Image
 
 import jupiter_pipeline as pipeline
 import app_server
+import doc_claim_audit
 import first_pass_review_plan
 import geometry_audit
 import human_review_audit
@@ -271,6 +272,16 @@ END_OBJECT = IMAGE
         self.assertIn("01_known_validation_positive", batches)
         self.assertIn("03_negative_artifact_examples", batches)
         self.assertTrue(all(row["review_note_prompt"] for row in rows))
+
+    def test_doc_claim_audit_outputs(self):
+        rows = doc_claim_audit.audit_docs()
+        self.assertTrue(rows)
+        self.assertIn("status", rows[0])
+        stale_temporal = [
+            row for row in rows
+            if row.get("pattern") == "temporal tracking planned" and row.get("status") == "needs_attention"
+        ]
+        self.assertEqual(stale_temporal, [])
 
 
 if __name__ == "__main__":

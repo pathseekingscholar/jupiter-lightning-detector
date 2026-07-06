@@ -47,6 +47,7 @@ Run the detector for the example dates:
 .\run.ps1 filters
 .\run.ps1 label-audit
 .\run.ps1 review-plan
+.\run.ps1 claim-audit
 .\run.ps1 label-template
 .\run.ps1 provenance
 .\run.ps1 validate-outputs
@@ -90,6 +91,8 @@ Run the detector for the example dates:
   - `outputs/detection/human_review_audit.md`
   - `outputs/detection/first_pass_review_plan.csv`
   - `outputs/detection/first_pass_review_plan.md`
+  - `outputs/detection/doc_claim_audit.csv`
+  - `outputs/detection/doc_claim_audit.md`
   - `outputs/detection/review_metrics_report.md`
   - `outputs/detection/review_metrics_report.html`
   - `outputs/detection/candidate_label_template.csv`
@@ -198,6 +201,7 @@ missing image lines for these products.
 .\run.ps1 filters
 .\run.ps1 label-audit
 .\run.ps1 review-plan
+.\run.ps1 claim-audit
 .\run.ps1 label-template
 .\run.ps1 provenance
 .\run.ps1 validate-outputs
@@ -351,6 +355,11 @@ are still only detector outputs.
 labeling order: known validation positives first, temporal candidates second,
 negative artifact examples third, and strong single-frame candidates after
 that.
+
+`.\run.ps1 claim-audit` writes `doc_claim_audit.csv` and
+`doc_claim_audit.md`. It scans project-facing Markdown for stale or unsafe
+claim wording, such as outdated temporal-tracking statements or unsupported
+new-lightning language.
 5. Any future YOLO or neural model must beat the explainable baseline without
    hiding false positives or false negatives.
 

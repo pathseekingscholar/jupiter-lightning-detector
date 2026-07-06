@@ -66,4 +66,4 @@ Simplified trace using image **N1357029177**. The real full-frame run produces m
 - **Published detections validated:** Known January 1, January 10, and January 11 marks are recovered in detector outputs.
 - **Candidate generation working:** The pipeline now produces review queues instead of only manual inspection images.
 - **False-positive analysis in progress:** Many candidates are expected to be artifacts, so the review queue is not a confirmed lightning catalog.
-- **Temporal tracking planned:** The next scientific upgrade is checking whether candidates persist and move consistently across consecutive frames.
+- **Temporal review started:** The pipeline now exports temporal-track summaries and a first-pass review plan. The remaining scientific upgrade is validating those tracks with human review and geometry.

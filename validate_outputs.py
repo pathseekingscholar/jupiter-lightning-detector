@@ -97,6 +97,15 @@ REQUIRED_COLUMNS = {
         "reviewer_task",
         "review_note_prompt",
     },
+    "doc_claim_audit.csv": {
+        "file",
+        "line",
+        "pattern",
+        "severity",
+        "status",
+        "context",
+        "meaning",
+    },
 }
 
 
@@ -107,6 +116,7 @@ REQUIRED_FILES = [
     "nearby_filter_context_report.md",
     "human_review_audit.md",
     "first_pass_review_plan.md",
+    "doc_claim_audit.md",
     "provenance_manifest.json",
     "provenance_manifest.md",
     "review_artifacts/published_match.png",
@@ -169,6 +179,20 @@ def validate() -> list[str]:
         assert_true("confirm_known_validation_mark" in actions, "Decision matrix lacks known validation action", errors)
         assert_true("review_as_negative_example" in actions, "Decision matrix lacks negative-review action", errors)
 
+    claim_audit_path = OUTPUT_DIR / "doc_claim_audit.csv"
+    if claim_audit_path.exists():
+        claim_rows = read_csv(claim_audit_path)
+        unsafe_review = [
+            row for row in claim_rows
+            if row.get("severity") == "unsafe" and row.get("status") == "review"
+        ]
+        stale_temporal = [
+            row for row in claim_rows
+            if row.get("pattern") == "temporal tracking planned" and row.get("status") == "needs_attention"
+        ]
+        assert_true(not unsafe_review, f"Documentation claim audit has unsafe review rows: {len(unsafe_review)}", errors)
+        assert_true(not stale_temporal, "Documentation still says temporal tracking is only planned", errors)
+
     provenance_path = OUTPUT_DIR / "provenance_manifest.json"
     if provenance_path.exists():
         payload = json.loads(provenance_path.read_text(encoding="utf-8"))
@@ -179,6 +203,7 @@ def validate() -> list[str]:
         assert_true("outputs/detection/nearby_filter_context.csv" in artifact_paths, "Provenance missing nearby filter context CSV", errors)
         assert_true("outputs/detection/human_review_audit.csv" in artifact_paths, "Provenance missing human review audit CSV", errors)
         assert_true("outputs/detection/first_pass_review_plan.csv" in artifact_paths, "Provenance missing first-pass review plan CSV", errors)
+        assert_true("outputs/detection/doc_claim_audit.csv" in artifact_paths, "Provenance missing documentation claim audit CSV", errors)
 
     return errors
 
