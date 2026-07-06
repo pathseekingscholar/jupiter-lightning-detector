@@ -156,6 +156,14 @@ REQUIRED_COLUMNS = {
         "meaning",
         "next_action",
     },
+    "processed_date_coverage_summary.csv": {
+        "run_date",
+        "images_processed",
+        "review_candidates",
+        "published_matches",
+        "unmatched_review_candidates",
+        "interpretation",
+    },
 }
 
 
@@ -173,6 +181,7 @@ REQUIRED_FILES = [
     "research_gate_audit.md",
     "github_issue_backlog.md",
     "review_agreement_audit.md",
+    "processed_date_coverage_summary.md",
     "provenance_manifest.json",
     "provenance_manifest.md",
     "review_artifacts/published_match.png",
@@ -281,6 +290,7 @@ def validate() -> list[str]:
         assert_true("outputs/detection/github_issue_backlog.csv" in artifact_paths, "Provenance missing GitHub issue backlog CSV", errors)
         assert_true("outputs/detection/review_agreement_audit.csv" in artifact_paths, "Provenance missing review agreement audit CSV", errors)
         assert_true("outputs/detection/candidate_label_summary.csv" in artifact_paths, "Provenance missing candidate label summary CSV", errors)
+        assert_true("outputs/detection/processed_date_coverage_summary.csv" in artifact_paths, "Provenance missing processed date coverage summary CSV", errors)
 
     return errors
 

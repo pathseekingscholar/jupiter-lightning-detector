@@ -42,6 +42,7 @@ Run the detector for the example dates:
 .\run.ps1 detect -Date 2001-01-11
 .\run.ps1 detect -Date 2001-01-13
 .\run.ps1 exports
+.\run.ps1 coverage-summary
 .\run.ps1 review
 .\run.ps1 geometry
 .\run.ps1 geometry-plan
@@ -77,6 +78,8 @@ Run the detector for the example dates:
 - Research-grade exports:
   - `outputs/detection/dataset_manifest.csv`
   - `outputs/detection/detection_summary.csv`
+  - `outputs/detection/processed_date_coverage_summary.csv`
+  - `outputs/detection/processed_date_coverage_summary.md`
   - `outputs/detection/threshold_sweep.csv`
   - `outputs/detection/known_match_report.csv`
   - `outputs/detection/scientific_review_queue.csv`
@@ -212,6 +215,7 @@ missing image lines for these products.
 .\run.ps1 test
 .\run.ps1 app
 .\run.ps1 coverage
+.\run.ps1 coverage-summary
 .\run.ps1 detect-all
 .\run.ps1 detect -Date 2001-01-13
 .\run.ps1 exports
@@ -312,6 +316,11 @@ start missing real published detections.
   for later model training.
 - `active_learning_queue.csv`: prioritized unlabeled candidates for human
   review.
+
+`.\run.ps1 coverage-summary` writes `processed_date_coverage_summary.csv` and
+`processed_date_coverage_summary.md`. This is the short answer to "what dates
+did we process?" and separates published validation dates from unmatched review
+candidates.
 - `review_decision_matrix.csv`: candidate-by-candidate next action such as
   confirm known mark, priority temporal review, review as negative example, or
   single-frame visual review.

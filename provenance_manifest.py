@@ -57,6 +57,8 @@ TRACKED_OUTPUTS = [
     "review_metrics_report.md",
     "review_metrics_report.html",
     "opus_nearby_date_coverage.csv",
+    "processed_date_coverage_summary.csv",
+    "processed_date_coverage_summary.md",
 ]
 
 
@@ -118,6 +120,7 @@ def build_manifest() -> dict[str, object]:
             ".\\run.ps1 detect-all",
             ".\\run.ps1 exports",
             ".\\run.ps1 coverage",
+            ".\\run.ps1 coverage-summary",
             ".\\run.ps1 review",
             ".\\run.ps1 label-audit",
             ".\\run.ps1 review-plan",

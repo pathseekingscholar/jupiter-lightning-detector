@@ -15,6 +15,7 @@ import github_issue_backlog
 import geometry_audit
 import human_review_audit
 import candidate_geometry_plan
+import date_coverage_summary
 import label_tools
 import nearby_filter_context
 import provenance_manifest
@@ -170,6 +171,16 @@ END_OBJECT = IMAGE
         allowed_splits = set(schema["properties"]["training_split"]["enum"])
         produced_splits = {row["training_split"] for row in training_manifest}
         self.assertTrue(produced_splits.issubset(allowed_splits))
+
+    def test_date_coverage_summary_outputs(self):
+        summary_path = date_coverage_summary.OUTPUT_DIR / "detection_summary.csv"
+        if not summary_path.exists():
+            self.skipTest("Detection summary has not been generated")
+        rows = date_coverage_summary.build_summary_rows()
+        self.assertTrue(rows)
+        self.assertIn("interpretation", rows[0])
+        self.assertEqual(sum(int(float(row["images_processed"])) for row in rows), 221)
+        self.assertEqual(sum(int(row["published_matches"]) for row in rows), 6)
 
     def test_review_metrics_build_decision_matrix(self):
         summary_path = review_metrics.OUTPUT_DIR / "detection_summary.csv"
