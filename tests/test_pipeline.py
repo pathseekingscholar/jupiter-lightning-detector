@@ -86,9 +86,13 @@ END_OBJECT = IMAGE
     def test_candidate_label_writes_json_and_csv(self):
         original_json = app_server.LABELS_PATH
         original_csv = app_server.LABELS_CSV_PATH
+        original_grouped = app_server.LABELS_GROUPED_CSV_PATH
+        original_summary = app_server.LABEL_SUMMARY_CSV_PATH
         with tempfile.TemporaryDirectory() as directory:
             app_server.LABELS_PATH = Path(directory) / "candidate_labels.json"
             app_server.LABELS_CSV_PATH = Path(directory) / "candidate_labels.csv"
+            app_server.LABELS_GROUPED_CSV_PATH = Path(directory) / "candidate_labels_grouped.csv"
+            app_server.LABEL_SUMMARY_CSV_PATH = Path(directory) / "candidate_label_summary.csv"
             try:
                 payload = app_server.save_candidate_label({
                     "run_date": "2001-01-01",
@@ -115,9 +119,13 @@ END_OBJECT = IMAGE
                 self.assertIn("reviewer", saved["labels"]["1357029177-0001"])
                 self.assertIn("reviewed_at", saved["labels"]["1357029177-0001"])
                 self.assertIn("candidate_id", app_server.LABELS_CSV_PATH.read_text(encoding="utf-8"))
+                self.assertIn("positive", app_server.LABELS_GROUPED_CSV_PATH.read_text(encoding="utf-8"))
+                self.assertIn("group_positive", app_server.LABEL_SUMMARY_CSV_PATH.read_text(encoding="utf-8"))
             finally:
                 app_server.LABELS_PATH = original_json
                 app_server.LABELS_CSV_PATH = original_csv
+                app_server.LABELS_GROUPED_CSV_PATH = original_grouped
+                app_server.LABEL_SUMMARY_CSV_PATH = original_summary
 
     def test_research_exports_have_expected_columns(self):
         summary_path = research_exports.OUTPUT_DIR / "2001-01-01" / "summary.json"
@@ -193,9 +201,13 @@ END_OBJECT = IMAGE
 
         original_json = label_tools.LABELS_JSON
         original_csv = label_tools.LABELS_CSV
+        original_grouped = label_tools.LABELS_GROUPED_CSV
+        original_summary = label_tools.LABEL_SUMMARY_CSV
         with tempfile.TemporaryDirectory() as directory:
             label_tools.LABELS_JSON = Path(directory) / "candidate_labels.json"
             label_tools.LABELS_CSV = Path(directory) / "candidate_labels.csv"
+            label_tools.LABELS_GROUPED_CSV = Path(directory) / "candidate_labels_grouped.csv"
+            label_tools.LABEL_SUMMARY_CSV = Path(directory) / "candidate_label_summary.csv"
             import_path = Path(directory) / "labels.csv"
             row = dict(template[0])
             row["human_label"] = "known-lightning"
@@ -210,9 +222,13 @@ END_OBJECT = IMAGE
                 self.assertEqual(saved["human_label"], "known-lightning")
                 self.assertEqual(saved["confidence"], "high")
                 self.assertEqual(saved["reviewer"], "unit-test")
+                self.assertIn("positive", label_tools.LABELS_GROUPED_CSV.read_text(encoding="utf-8"))
+                self.assertIn("label_known-lightning", label_tools.LABEL_SUMMARY_CSV.read_text(encoding="utf-8"))
             finally:
                 label_tools.LABELS_JSON = original_json
                 label_tools.LABELS_CSV = original_csv
+                label_tools.LABELS_GROUPED_CSV = original_grouped
+                label_tools.LABEL_SUMMARY_CSV = original_summary
 
     def test_provenance_manifest_lists_artifacts(self):
         summary_path = provenance_manifest.OUTPUT_DIR / "detection_summary.csv"

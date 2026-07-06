@@ -49,6 +49,7 @@ Run the detector for the example dates:
 .\run.ps1 review-plan
 .\run.ps1 claim-audit
 .\run.ps1 label-template
+.\run.ps1 label-summary
 .\run.ps1 provenance
 .\run.ps1 validate-outputs
 ```
@@ -96,13 +97,14 @@ Run the detector for the example dates:
   - `outputs/detection/doc_claim_audit.csv`
   - `outputs/detection/doc_claim_audit.md`
   - `outputs/detection/review_metrics_report.md`
-  - `outputs/detection/review_metrics_report.html`
-  - `outputs/detection/candidate_label_template.csv`
-  - `outputs/detection/provenance_manifest.json`
+	  - `outputs/detection/review_metrics_report.html`
+	  - `outputs/detection/candidate_label_template.csv`
+	  - `outputs/detection/candidate_label_summary.csv`
+	  - `outputs/detection/provenance_manifest.json`
   - `outputs/detection/provenance_manifest.md`
   - `outputs/detection/review_packet.md`
   - `outputs/detection/review_artifacts/*.png`
-  - `outputs/detection/candidate_labels_grouped.csv` when human labels exist
+	  - `outputs/detection/candidate_labels_grouped.csv`
 - Separate false positive, false negative, and unmatched-candidate sections.
 - Known published detections as validation targets.
 
@@ -205,6 +207,7 @@ missing image lines for these products.
 .\run.ps1 review-plan
 .\run.ps1 claim-audit
 .\run.ps1 label-template
+.\run.ps1 label-summary
 .\run.ps1 provenance
 .\run.ps1 validate-outputs
 # After a reviewer fills the template:
@@ -384,7 +387,10 @@ fill `human_label`, `confidence`, `reviewer`, and `review_note`, then import it:
 ```
 
 The importer validates labels and writes `candidate_labels.json` plus
-`candidate_labels.csv`.
+`candidate_labels.csv`. `.\run.ps1 label-summary` regenerates
+`candidate_labels_grouped.csv` and `candidate_label_summary.csv` from the saved
+label JSON so positives, negatives, uncertain labels, and total labels can be
+checked without hand-filtering the raw label file.
 
 ## Next Scientific Feature
 

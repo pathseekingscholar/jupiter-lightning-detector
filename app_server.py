@@ -20,6 +20,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 import jupiter_pipeline as pipeline
+import label_tools
 
 
 ROOT = Path(__file__).resolve().parent
@@ -31,6 +32,8 @@ DETECTION_DIR = ROOT / "outputs" / "detection"
 DETECTION_STATUS_PATH = DETECTION_DIR / "status.json"
 LABELS_PATH = DETECTION_DIR / "candidate_labels.json"
 LABELS_CSV_PATH = DETECTION_DIR / "candidate_labels.csv"
+LABELS_GROUPED_CSV_PATH = DETECTION_DIR / "candidate_labels_grouped.csv"
+LABEL_SUMMARY_CSV_PATH = DETECTION_DIR / "candidate_label_summary.csv"
 DETECTION_LOCK = threading.Lock()
 DETECTION_DATES = ("2000-12-31", "2001-01-01", "2001-01-04", "2001-01-05", "2001-01-08", "2001-01-09", "2001-01-10", "2001-01-11", "2001-01-13")
 DEFAULT_DETECTION_DATE = "2001-01-01"
@@ -63,30 +66,12 @@ def write_candidate_labels(payload: dict) -> None:
     DETECTION_DIR.mkdir(parents=True, exist_ok=True)
     LABELS_PATH.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     rows = sorted(payload.get("labels", {}).values(), key=lambda item: (item.get("run_date", ""), item.get("candidate_id", "")))
-    fieldnames = [
-        "run_date",
-        "candidate_id",
-        "image_id",
-        "image_number",
-        "x",
-        "y",
-        "brightness",
-        "blob_size",
-        "snr",
-        "artifact_flags",
-        "candidate_score",
-        "human_label",
-        "confidence",
-        "reviewer",
-        "review_note",
-        "reviewed_at",
-        "updated_at",
-    ]
     with LABELS_CSV_PATH.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer = csv.DictWriter(handle, fieldnames=label_tools.LABEL_FIELDNAMES)
         writer.writeheader()
         for row in rows:
-            writer.writerow({key: row.get(key, "") for key in fieldnames})
+            writer.writerow({key: row.get(key, "") for key in label_tools.LABEL_FIELDNAMES})
+    label_tools.write_derived_label_exports(rows, LABELS_GROUPED_CSV_PATH, LABEL_SUMMARY_CSV_PATH)
 
 
 def labels_by_candidate_id() -> dict[str, dict]:
@@ -434,6 +419,8 @@ def candidate_labels_payload() -> dict:
         },
         "json_url": "/outputs/detection/candidate_labels.json",
         "csv_url": "/outputs/detection/candidate_labels.csv",
+        "grouped_csv_url": "/outputs/detection/candidate_labels_grouped.csv",
+        "summary_csv_url": "/outputs/detection/candidate_label_summary.csv",
     }
 
 

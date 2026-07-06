@@ -66,6 +66,13 @@ REQUIRED_COLUMNS = {
         "reviewer",
         "review_note",
     },
+    "candidate_label_summary.csv": {
+        "summary_item",
+        "label_group",
+        "human_label",
+        "count",
+        "meaning",
+    },
     "geometry_readiness.csv": {
         "image_id",
         "opus_id",
@@ -128,6 +135,7 @@ REQUIRED_FILES = [
     "review_batches/03_negative_artifact_examples.csv",
     "review_batches/04_strong_single_frame_check.csv",
     "review_batches/05_low_priority_hold.csv",
+    "candidate_labels_grouped.csv",
 ]
 
 
@@ -219,6 +227,7 @@ def validate() -> list[str]:
         assert_true("outputs/detection/human_review_audit.csv" in artifact_paths, "Provenance missing human review audit CSV", errors)
         assert_true("outputs/detection/first_pass_review_plan.csv" in artifact_paths, "Provenance missing first-pass review plan CSV", errors)
         assert_true("outputs/detection/doc_claim_audit.csv" in artifact_paths, "Provenance missing documentation claim audit CSV", errors)
+        assert_true("outputs/detection/candidate_label_summary.csv" in artifact_paths, "Provenance missing candidate label summary CSV", errors)
 
     return errors
 
