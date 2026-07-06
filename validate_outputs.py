@@ -122,6 +122,23 @@ REQUIRED_COLUMNS = {
         "training_use",
         "pass_condition",
     },
+    "blind_review_packet.csv": {
+        "blind_id",
+        "image_id",
+        "run_date",
+        "crop_url",
+        "reviewer_label",
+        "reviewer_confidence",
+        "reviewer_note",
+        "needs_second_review",
+    },
+    "blind_review_key.csv": {
+        "blind_id",
+        "candidate_id",
+        "review_batch",
+        "next_action",
+        "suggested_human_label",
+    },
     "training_readiness.csv": {
         "gate",
         "status",
@@ -185,6 +202,7 @@ REQUIRED_FILES = [
     "human_review_audit.md",
     "first_pass_review_plan.md",
     "first_pass_review_plan.html",
+    "blind_review_packet.md",
     "review_labeling_protocol.md",
     "training_readiness.md",
     "doc_claim_audit.md",
@@ -294,6 +312,7 @@ def validate() -> list[str]:
         assert_true("outputs/detection/nearby_filter_context.csv" in artifact_paths, "Provenance missing nearby filter context CSV", errors)
         assert_true("outputs/detection/human_review_audit.csv" in artifact_paths, "Provenance missing human review audit CSV", errors)
         assert_true("outputs/detection/first_pass_review_plan.csv" in artifact_paths, "Provenance missing first-pass review plan CSV", errors)
+        assert_true("outputs/detection/blind_review_packet.csv" in artifact_paths, "Provenance missing blind review packet CSV", errors)
         assert_true("outputs/detection/review_labeling_checklist.csv" in artifact_paths, "Provenance missing review labeling checklist CSV", errors)
         assert_true("outputs/detection/training_readiness.csv" in artifact_paths, "Provenance missing training readiness CSV", errors)
         assert_true("outputs/detection/doc_claim_audit.csv" in artifact_paths, "Provenance missing documentation claim audit CSV", errors)

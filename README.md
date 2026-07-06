@@ -49,6 +49,7 @@ Run the detector for the example dates:
 .\run.ps1 filters
 .\run.ps1 label-audit
 .\run.ps1 review-plan
+.\run.ps1 blind-review
 .\run.ps1 label-protocol
 .\run.ps1 training-readiness
 .\run.ps1 claim-audit
@@ -104,6 +105,9 @@ Run the detector for the example dates:
   - `outputs/detection/first_pass_review_plan.csv`
   - `outputs/detection/first_pass_review_plan.md`
   - `outputs/detection/first_pass_review_plan.html`
+  - `outputs/detection/blind_review_packet.csv`
+  - `outputs/detection/blind_review_key.csv`
+  - `outputs/detection/blind_review_packet.md`
   - `outputs/detection/review_labeling_checklist.csv`
   - `outputs/detection/review_labeling_protocol.md`
   - `outputs/detection/training_readiness.csv`
@@ -228,6 +232,7 @@ missing image lines for these products.
 .\run.ps1 filters
 .\run.ps1 label-audit
 .\run.ps1 review-plan
+.\run.ps1 blind-review
 .\run.ps1 label-protocol
 .\run.ps1 training-readiness
 .\run.ps1 claim-audit
@@ -395,6 +400,11 @@ labeling order: known validation positives first, temporal candidates second,
 negative artifact examples third, and strong single-frame candidates after that.
 It also writes per-batch CSVs under `outputs/detection/review_batches/` so a
 reviewer can open only the batch they are labeling.
+
+`.\run.ps1 blind-review` writes `blind_review_packet.csv`,
+`blind_review_key.csv`, and `blind_review_packet.md`. The reviewer file hides
+the detector's suggested label, review batch, and next action; the key file can
+be opened later to compare reviewer labels against the detector's categories.
 
 `.\run.ps1 label-protocol` writes `review_labeling_protocol.md` and
 `review_labeling_checklist.csv`. These files define positive, negative,

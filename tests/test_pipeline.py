@@ -9,6 +9,7 @@ from PIL import Image
 
 import jupiter_pipeline as pipeline
 import app_server
+import blind_review_packet
 import doc_claim_audit
 import first_pass_review_plan
 import github_issue_backlog
@@ -324,6 +325,17 @@ END_OBJECT = IMAGE
             self.assertEqual(first_pass_review_plan.PLAN_HTML.name, "first_pass_review_plan.html")
         with self.subTest("batch_dir_constant"):
             self.assertEqual(first_pass_review_plan.BATCH_DIR.name, "review_batches")
+
+    def test_blind_review_packet_outputs(self):
+        review_plan_path = blind_review_packet.OUTPUT_DIR / "first_pass_review_plan.csv"
+        if not review_plan_path.exists():
+            self.skipTest("First-pass review plan has not been generated")
+        packet_rows, key_rows = blind_review_packet.build_packet_rows()
+        self.assertTrue(packet_rows)
+        self.assertEqual(len(packet_rows), len(key_rows))
+        self.assertIn("blind_id", packet_rows[0])
+        self.assertNotIn("suggested_human_label", packet_rows[0])
+        self.assertIn("suggested_human_label", key_rows[0])
 
     def test_review_labeling_protocol_outputs(self):
         review_plan_path = review_labeling_protocol.OUTPUT_DIR / "first_pass_review_plan.csv"
