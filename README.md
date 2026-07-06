@@ -50,6 +50,7 @@ Run the detector for the example dates:
 .\run.ps1 label-audit
 .\run.ps1 review-plan
 .\run.ps1 label-protocol
+.\run.ps1 training-readiness
 .\run.ps1 claim-audit
 .\run.ps1 research-gates
 .\run.ps1 issue-backlog
@@ -105,6 +106,8 @@ Run the detector for the example dates:
   - `outputs/detection/first_pass_review_plan.html`
   - `outputs/detection/review_labeling_checklist.csv`
   - `outputs/detection/review_labeling_protocol.md`
+  - `outputs/detection/training_readiness.csv`
+  - `outputs/detection/training_readiness.md`
   - `outputs/detection/review_batches/*.csv`
 	  - `outputs/detection/doc_claim_audit.csv`
 	  - `outputs/detection/doc_claim_audit.md`
@@ -226,6 +229,7 @@ missing image lines for these products.
 .\run.ps1 label-audit
 .\run.ps1 review-plan
 .\run.ps1 label-protocol
+.\run.ps1 training-readiness
 .\run.ps1 claim-audit
 .\run.ps1 research-gates
 .\run.ps1 issue-backlog
@@ -396,6 +400,12 @@ reviewer can open only the batch they are labeling.
 `review_labeling_checklist.csv`. These files define positive, negative,
 uncertain, and second-review rules so human labels can become training and
 validation evidence later without accidentally becoming discovery claims.
+
+`.\run.ps1 training-readiness` writes `training_readiness.csv` and
+`training_readiness.md`. This is the gatekeeper for future YOLO or model
+comparison work: it reports whether enough human-confirmed positives,
+negatives, notes, and confidence fields exist to train or compare a learned
+detector.
 
 `.\run.ps1 claim-audit` writes `doc_claim_audit.csv` and
 `doc_claim_audit.md`. It scans project-facing Markdown for stale or unsafe

@@ -24,6 +24,7 @@ import research_gate_audit
 import review_labeling_protocol
 import review_agreement_audit
 import review_metrics
+import training_readiness
 import validate_outputs
 
 
@@ -334,6 +335,17 @@ END_OBJECT = IMAGE
         batches = {row["review_batch"] for row in rows}
         self.assertIn("01_known_validation_positive", batches)
         self.assertIn("03_negative_artifact_examples", batches)
+
+    def test_training_readiness_outputs(self):
+        manifest_path = training_readiness.OUTPUT_DIR / "training_manifest.csv"
+        if not manifest_path.exists():
+            self.skipTest("Training manifest has not been generated")
+        rows = training_readiness.build_readiness_rows()
+        self.assertTrue(rows)
+        gates = {row["gate"]: row for row in rows}
+        self.assertIn("model_comparison_allowed", gates)
+        self.assertIn(gates["model_comparison_allowed"]["status"], {"ready", "not_ready"})
+        self.assertEqual(gates["positive_examples"]["minimum"], training_readiness.MIN_POSITIVES)
 
     def test_doc_claim_audit_outputs(self):
         rows = doc_claim_audit.audit_docs()
