@@ -30,6 +30,7 @@ import research_exports
 import research_gate_audit
 import review_labeling_protocol
 import review_agreement_audit
+import review_session_audit
 import review_session_planner
 import review_metrics
 import training_readiness
@@ -365,6 +366,15 @@ END_OBJECT = IMAGE
         self.assertTrue(first_session)
         self.assertIn("human_label", first_session[0])
         self.assertIn("review_note", first_session[0])
+
+    def test_review_session_audit_outputs(self):
+        if not review_session_audit.SESSION_PLAN_CSV.exists():
+            self.skipTest("Review session plan has not been generated")
+        rows = review_session_audit.build_audit_rows()
+        self.assertTrue(rows)
+        self.assertTrue(all("session_status" in row for row in rows))
+        self.assertTrue(all(int(row["candidate_count"]) > 0 for row in rows))
+        self.assertTrue(any(row["session_status"] == "not_started" for row in rows))
 
     def test_blind_review_packet_outputs(self):
         review_plan_path = blind_review_packet.OUTPUT_DIR / "first_pass_review_plan.csv"

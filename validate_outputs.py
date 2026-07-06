@@ -154,6 +154,21 @@ REQUIRED_COLUMNS = {
         "training_use",
         "status",
     },
+    "review_session_audit.csv": {
+        "session_id",
+        "review_batch",
+        "candidate_count",
+        "filled_labels",
+        "valid_labels",
+        "invalid_labels",
+        "missing_confidence",
+        "missing_reviewer",
+        "missing_review_note",
+        "import_ready_rows",
+        "training_ready_rows",
+        "session_status",
+        "next_action",
+    },
     "blind_review_packet.csv": {
         "blind_id",
         "image_id",
@@ -279,6 +294,7 @@ REQUIRED_FILES = [
     "first_pass_review_plan.md",
     "first_pass_review_plan.html",
     "review_session_plan.md",
+    "review_session_audit.md",
     "blind_review_packet.md",
     "blind_review_reconciliation.md",
     "evidence_integrity_audit.md",
@@ -399,6 +415,14 @@ def validate() -> list[str]:
         assert_true(len(session_rows) == len(plan_rows), "Review session CSV row counts do not add up to the full review plan", errors)
         assert_true(len(session_plan_rows) == len(list(session_dir.glob("S*.csv"))), "Session plan row count does not match session CSV count", errors)
 
+    session_audit_path = OUTPUT_DIR / "review_session_audit.csv"
+    if session_plan_path.exists() and session_audit_path.exists():
+        session_plan_rows = read_csv(session_plan_path)
+        audit_rows = read_csv(session_audit_path)
+        assert_true(len(audit_rows) == len(session_plan_rows), "Review session audit row count does not match session plan", errors)
+        statuses = {row.get("session_status") for row in audit_rows}
+        assert_true(statuses <= {"missing_session_rows", "not_started", "needs_cleanup", "partial_review", "import_ready"}, f"Unexpected review session statuses: {sorted(statuses)}", errors)
+
     provenance_path = OUTPUT_DIR / "provenance_manifest.json"
     if provenance_path.exists():
         payload = json.loads(provenance_path.read_text(encoding="utf-8"))
@@ -413,6 +437,7 @@ def validate() -> list[str]:
         assert_true("outputs/detection/human_review_audit.csv" in artifact_paths, "Provenance missing human review audit CSV", errors)
         assert_true("outputs/detection/first_pass_review_plan.csv" in artifact_paths, "Provenance missing first-pass review plan CSV", errors)
         assert_true("outputs/detection/review_session_plan.csv" in artifact_paths, "Provenance missing review session plan CSV", errors)
+        assert_true("outputs/detection/review_session_audit.csv" in artifact_paths, "Provenance missing review session audit CSV", errors)
         assert_true("outputs/detection/review_sessions/S001_01_known_validation_positive.csv" in artifact_paths, "Provenance missing first review session CSV", errors)
         assert_true("outputs/detection/blind_review_packet.csv" in artifact_paths, "Provenance missing blind review packet CSV", errors)
         assert_true("outputs/detection/blind_review_reconciliation.csv" in artifact_paths, "Provenance missing blind review reconciliation CSV", errors)
