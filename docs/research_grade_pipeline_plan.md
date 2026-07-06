@@ -186,7 +186,7 @@ Do not start with YOLO as the main claim. Use it later as one comparison method.
 | YOLO / object detector | Later candidate proposal model | Can learn visual patterns from labels | Needs enough labeled examples |
 | Human review | Final scientific gate | Uses context and judgment | Slow, must be documented |
 
-YOLO in plain English:
+YOLO overview:
 
 YOLO is an object-detection model. It looks at an image and draws boxes around
 objects it thinks it recognizes. For each box, it gives a confidence score. In

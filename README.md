@@ -313,6 +313,8 @@ missing image lines for these products.
   classical detector baseline
 - `docs/data_management_plan.md`: what belongs in Git, what stays local, and
   how human labels should be recorded
+- `docs/collaborative_review_deployment.md`: sharing plan for remote reviewers,
+  central hosting, and label collection
 - `docs/human_in_the_loop_training.md`: detector-to-review-to-training loop
 - `docs/reviewer_quickstart.md`: short guide for labeling candidates without
   overclaiming

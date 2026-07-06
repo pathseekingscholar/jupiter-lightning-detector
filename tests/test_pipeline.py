@@ -1,4 +1,5 @@
 import io
+import base64
 import json
 import tempfile
 import unittest
@@ -45,6 +46,27 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class PipelineTests(unittest.TestCase):
+    def test_app_review_key_authorization(self):
+        class FakeRequest:
+            def __init__(self, authorization: str = ""):
+                self.headers = {"Authorization": authorization} if authorization else {}
+
+        original_key = app_server.REVIEW_KEY
+        try:
+            app_server.REVIEW_KEY = ""
+            self.assertTrue(app_server.Handler.is_authorized(FakeRequest()))
+
+            app_server.REVIEW_KEY = "shared-review-key"
+            self.assertFalse(app_server.Handler.is_authorized(FakeRequest()))
+
+            encoded = base64.b64encode(b"reviewer:wrong").decode("ascii")
+            self.assertFalse(app_server.Handler.is_authorized(FakeRequest(f"Basic {encoded}")))
+
+            encoded = base64.b64encode(b"reviewer:shared-review-key").decode("ascii")
+            self.assertTrue(app_server.Handler.is_authorized(FakeRequest(f"Basic {encoded}")))
+        finally:
+            app_server.REVIEW_KEY = original_key
+
     def test_parse_pds_label(self):
         text = """
 RECORD_BYTES = 4096

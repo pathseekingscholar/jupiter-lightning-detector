@@ -460,10 +460,10 @@
 
     <div class="tab-panel" data-tab-panel="explanation">
       <section class="explain-sheet">
-        <p class="section-label">Plain-English detector diagram</p>
+        <p class="section-label">Detector workflow</p>
         <h2>What the detector does</h2>
 
-        <div class="simple-flow" aria-label="Plain English detector pipeline">
+        <div class="simple-flow" aria-label="Detector pipeline">
           <article>
             <small>Input</small>
             <b>Cassini image</b>
@@ -508,7 +508,7 @@
 
         <div class="worked-example">
           <p class="section-label">Worked example</p>
-          <h3>N1357029177, in plain English</h3>
+          <h3>N1357029177 example</h3>
           <ol>
             <li><b>Image goes in:</b> the calibrated Cassini frame is loaded from the local OPUS data folder.</li>
             <li><b>Detector measures:</b> brightness, local contrast, blob size, SNR, shape, and artifact flags.</li>
@@ -521,7 +521,7 @@
         <div class="training-loop">
           <div>
             <p class="section-label">Training loop, kept simple</p>
-            <h3>How the detector can learn later</h3>
+            <h3>How labels improve the detector</h3>
             <p>The current detector is not trained AI. It is classical computer vision. Training starts after humans label enough candidates.</p>
           </div>
           <div class="loop-flow" aria-label="Human review training loop">
@@ -531,7 +531,6 @@
             <span>Future model learns from labels</span>
             <span>Model is tested against known positives and negatives</span>
           </div>
-          <p class="storage-note"><b>Free storage plan:</b> keep raw OPUS images local because they are large, keep generated labels as CSV/JSON in the repo, and use GitHub for versioned summaries. A free Supabase/Firebase table is optional later if multiple reviewers need live shared labeling, but it is not required yet.</p>
         </div>
 
         <div class="kid-grid">

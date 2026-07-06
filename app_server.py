@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import io
+import base64
 import csv
 import json
 import math
 import mimetypes
+import os
 import sqlite3
 import sys
 import traceback
@@ -26,8 +28,11 @@ import label_tools
 ROOT = Path(__file__).resolve().parent
 WEB = ROOT / "web"
 NOTES_PATH = ROOT / "research_notes.json"
-HOST = "127.0.0.1"
-PORT = 8765
+HOST = os.environ.get("HOST", "127.0.0.1")
+PORT = int(os.environ.get("PORT", "8765"))
+PUBLIC_URL = os.environ.get("PUBLIC_URL")
+OPEN_BROWSER = os.environ.get("OPEN_BROWSER", "1").lower() not in {"0", "false", "no"}
+REVIEW_KEY = os.environ.get("REVIEW_KEY", "")
 DETECTION_DIR = ROOT / "outputs" / "detection"
 DETECTION_STATUS_PATH = DETECTION_DIR / "status.json"
 LABELS_PATH = DETECTION_DIR / "candidate_labels.json"
@@ -552,6 +557,29 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, format: str, *args) -> None:
         return
 
+    def is_authorized(self) -> bool:
+        if not REVIEW_KEY:
+            return True
+        header = self.headers.get("Authorization", "")
+        if not header.startswith("Basic "):
+            return False
+        try:
+            decoded = base64.b64decode(header.removeprefix("Basic ").strip()).decode("utf-8")
+        except (ValueError, UnicodeDecodeError):
+            return False
+        _, _, provided_key = decoded.partition(":")
+        return provided_key == REVIEW_KEY
+
+    def send_auth_required(self) -> None:
+        payload = json.dumps({"error": "Review key required"}).encode("utf-8")
+        self.send_response(HTTPStatus.UNAUTHORIZED)
+        self.send_header("WWW-Authenticate", 'Basic realm="Jupiter Lightning Review"')
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(payload)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(payload)
+
     def send_bytes(
         self,
         payload: bytes,
@@ -576,6 +604,9 @@ class Handler(BaseHTTPRequestHandler):
         )
 
     def do_GET(self) -> None:
+        if not self.is_authorized():
+            self.send_auth_required()
+            return
         parsed = urlparse(self.path)
         if parsed.path == "/api/observations":
             self.send_json(observation_payload())
@@ -625,6 +656,9 @@ class Handler(BaseHTTPRequestHandler):
         self.serve_file(WEB / relative)
 
     def do_POST(self) -> None:
+        if not self.is_authorized():
+            self.send_auth_required()
+            return
         parsed = urlparse(self.path)
         if parsed.path == "/api/run-detection":
             query = parse_qs(parsed.query)
@@ -675,9 +709,10 @@ def run(open_browser: bool = True) -> None:
     if not pipeline.DB_PATH.exists():
         pipeline.run_all()
     server = ThreadingHTTPServer((HOST, PORT), Handler)
-    if open_browser:
-        threading.Timer(0.7, lambda: webbrowser.open(f"http://{HOST}:{PORT}")).start()
-    print(f"Jupiter Lightning Workbench: http://{HOST}:{PORT}")
+    display_url = PUBLIC_URL or f"http://{HOST}:{PORT}"
+    if open_browser and OPEN_BROWSER and HOST in {"127.0.0.1", "localhost"}:
+        threading.Timer(0.7, lambda: webbrowser.open(display_url)).start()
+    print(f"Jupiter Lightning Workbench: {display_url}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
