@@ -18,6 +18,7 @@ LABELS_BY_GATE = {
     "published_marks_human_confirmed": "candidate-review,validation",
     "candidate_geometry": "geometry,science-validation",
     "model_training_readiness": "model-comparison,human-labels,validation",
+    "evidence_integrity": "evidence,review-workflow,reproducibility",
     "nearby_filter_followup": "data-provenance,spectrum-followup",
     "documentation_claim_safety": "documentation,science-validation",
 }
@@ -54,6 +55,7 @@ def issue_title(gate: str, status: str) -> str:
         "published_marks_human_confirmed": "Human-confirm all six published validation marks",
         "candidate_geometry": "Add candidate pixel-to-Jupiter geometry mapping",
         "model_training_readiness": "Hold YOLO/model comparison until reviewed labels exist",
+        "evidence_integrity": "Fix reviewer evidence package integrity checks",
         "nearby_filter_followup": "Review nearby non-HAL filter context after candidate validation",
         "documentation_claim_safety": "Keep documentation claim audit clean",
     }
@@ -92,6 +94,12 @@ def acceptance_criteria(gate: str) -> list[str]:
             "At least 6 human-confirmed positive labels and 20 human-confirmed negative labels exist.",
             "Training-ready labels include confidence, reviewer notes, and no unresolved second-review flag.",
             "Any YOLO or learned model comparison is evaluated against the classical detector baseline.",
+        ],
+        "evidence_integrity": [
+            "`outputs/detection/evidence_integrity_audit.csv` has zero `not_ready` checks.",
+            "Review plan, dossier, blind packet, blind key, and reconciliation row counts agree.",
+            "Reviewer crop URLs are well formed and referenced calibrated products exist locally.",
+            "Review artifact PNGs open successfully.",
         ],
         "nearby_filter_followup": [
             "Only human-reviewed candidate rows are linked to nearby non-HAL context.",

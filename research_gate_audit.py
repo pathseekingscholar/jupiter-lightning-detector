@@ -57,6 +57,7 @@ def build_gate_audit() -> list[dict[str, object]]:
     filter_context = read_csv(OUTPUT_DIR / "nearby_filter_context.csv")
     review_plan = read_csv(OUTPUT_DIR / "first_pass_review_plan.csv")
     training_readiness = read_csv(OUTPUT_DIR / "training_readiness.csv")
+    evidence_integrity = read_csv(OUTPUT_DIR / "evidence_integrity_audit.csv")
 
     images_processed = sum(int(numeric(row.get("images_processed"))) for row in detection)
     published_matches = sum(int(numeric(row.get("published_matches"))) for row in detection)
@@ -77,6 +78,17 @@ def build_gate_audit() -> list[dict[str, object]]:
     model_status = model_gate.get("status", "not_ready")
     model_value = model_gate.get("value", "not evaluated")
     model_next_action = model_gate.get("next_action", "Generate training readiness and finish human labels before model comparison.")
+    integrity_not_ready = sum(1 for row in evidence_integrity if row.get("status") == "not_ready")
+    integrity_in_progress = sum(1 for row in evidence_integrity if row.get("status") == "in_progress")
+    integrity_ready = sum(1 for row in evidence_integrity if row.get("status") == "ready")
+    if integrity_not_ready:
+        integrity_status = "not_ready"
+    elif integrity_in_progress:
+        integrity_status = "in_progress"
+    elif integrity_ready:
+        integrity_status = "ready"
+    else:
+        integrity_status = "not_ready"
 
     published_human_value = ""
     for row in human_audit:
@@ -171,6 +183,14 @@ def build_gate_audit() -> list[dict[str, object]]:
             "outputs/detection/training_readiness.csv",
             "Learned detector comparison is allowed only after human-confirmed positives, negatives, notes, and confidence fields exist.",
             model_next_action,
+        ),
+        gate(
+            "evidence_integrity",
+            integrity_status,
+            f"{integrity_ready} ready; {integrity_in_progress} in progress; {integrity_not_ready} not ready",
+            "outputs/detection/evidence_integrity_audit.csv",
+            "Reviewer-facing evidence files should be internally consistent before review or presentation.",
+            "Fix any not-ready evidence-integrity checks before relying on the review packet.",
         ),
     ]
 
