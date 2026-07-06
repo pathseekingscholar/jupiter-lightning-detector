@@ -37,6 +37,7 @@ TRACKED_OUTPUTS = [
     "human_review_audit.md",
     "first_pass_review_plan.csv",
     "first_pass_review_plan.md",
+    "first_pass_review_plan.html",
     "doc_claim_audit.csv",
     "doc_claim_audit.md",
     "candidate_label_template.csv",

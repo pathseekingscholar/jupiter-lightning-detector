@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import html
 from collections import Counter
 from pathlib import Path
 
@@ -9,6 +10,7 @@ ROOT = Path(__file__).resolve().parent
 OUTPUT_DIR = ROOT / "outputs" / "detection"
 PLAN_CSV = OUTPUT_DIR / "first_pass_review_plan.csv"
 PLAN_MD = OUTPUT_DIR / "first_pass_review_plan.md"
+PLAN_HTML = OUTPUT_DIR / "first_pass_review_plan.html"
 
 
 BATCH_LIMITS = {
@@ -223,6 +225,75 @@ def write_report(rows: list[dict[str, object]]) -> None:
     PLAN_MD.write_text("\n".join(lines), encoding="utf-8")
 
 
+def write_html_report(rows: list[dict[str, object]]) -> None:
+    counts = Counter(row["review_batch"] for row in rows)
+    count_rows = "\n".join(
+        "<tr>"
+        f"<td>{html.escape(batch)}</td>"
+        f"<td>{count}</td>"
+        f"<td>{batch_purpose(batch)}</td>"
+        "</tr>"
+        for batch, count in sorted(counts.items())
+    )
+    review_rows = "\n".join(
+        "<tr>"
+        f"<td>{html.escape(str(row['review_order']))}</td>"
+        f"<td>{html.escape(str(row['review_batch']))}</td>"
+        f"<td><a href=\"{html.escape(str(row['crop_url']))}\">{html.escape(str(row['candidate_id']))}</a></td>"
+        f"<td>{html.escape(str(row['image_id']))}</td>"
+        f"<td>{html.escape(str(row['run_date']))}</td>"
+        f"<td>{html.escape(str(row['x']))}, {html.escape(str(row['y']))}</td>"
+        f"<td>{html.escape(str(row['suggested_human_label']))}</td>"
+        f"<td>{html.escape(str(row['reviewer_task']))}</td>"
+        f"<td>{html.escape(str(row['snr']))}</td>"
+        f"<td>{html.escape(str(row['blob_size']))}</td>"
+        f"<td>{html.escape(str(row['frame_count']))}</td>"
+        f"<td>{html.escape(str(row['artifact_flags'] or 'none'))}</td>"
+        f"<td>{html.escape(str(row['review_note_prompt']))}</td>"
+        "</tr>"
+        for row in rows
+    )
+    document = f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Jupiter Lightning First-Pass Review Plan</title>
+  <style>
+    body {{ font-family: Arial, sans-serif; margin: 32px; line-height: 1.45; color: #1d1b16; background: #f7f4ec; }}
+    h1, h2 {{ font-family: Georgia, serif; }}
+    table {{ border-collapse: collapse; width: 100%; margin: 16px 0 28px; background: white; }}
+    th, td {{ border: 1px solid #d8d0c0; padding: 7px 9px; text-align: left; font-size: 13px; vertical-align: top; }}
+    th {{ background: #eee5d4; position: sticky; top: 0; }}
+    .warning {{ background: #fff2c7; border: 1px solid #e2c15c; padding: 12px; }}
+    a {{ color: #7a2c1f; }}
+  </style>
+</head>
+<body>
+  <h1>First-Pass Review Plan</h1>
+  <p class="warning">This is a human-review worklist, not a confirmed lightning catalog. A row becomes training data only after a reviewer saves a label, confidence, reviewer name, and note.</p>
+  <h2>Batch Counts</h2>
+  <table><thead><tr><th>Batch</th><th>Rows</th><th>Purpose</th></tr></thead><tbody>{count_rows}</tbody></table>
+  <h2>Review Worklist</h2>
+  <table>
+    <thead><tr><th>Order</th><th>Batch</th><th>Candidate</th><th>Image</th><th>Date</th><th>x/y</th><th>Suggested label</th><th>Task</th><th>SNR</th><th>Blob</th><th>Frames</th><th>Flags</th><th>Note prompt</th></tr></thead>
+    <tbody>{review_rows}</tbody>
+  </table>
+</body>
+</html>
+"""
+    PLAN_HTML.write_text(document, encoding="utf-8")
+
+
+def batch_purpose(batch: str) -> str:
+    return {
+        "01_known_validation_positive": "Confirm published validation positives first.",
+        "02_temporal_persistence_check": "Check repeated candidates across neighboring frames.",
+        "03_negative_artifact_examples": "Build reviewed negative examples for false-positive analysis.",
+        "04_strong_single_frame_check": "Inspect strong single-frame candidates cautiously.",
+        "05_low_priority_hold": "Preserve remaining candidates for later review.",
+    }.get(batch, "Review later.")
+
+
 def main() -> None:
     rows = build_plan()
     write_csv(
@@ -250,8 +321,10 @@ def main() -> None:
         ],
     )
     write_report(rows)
+    write_html_report(rows)
     print(f"Wrote {PLAN_CSV}")
     print(f"Wrote {PLAN_MD}")
+    print(f"Wrote {PLAN_HTML}")
 
 
 if __name__ == "__main__":

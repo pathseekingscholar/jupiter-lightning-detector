@@ -116,6 +116,7 @@ REQUIRED_FILES = [
     "nearby_filter_context_report.md",
     "human_review_audit.md",
     "first_pass_review_plan.md",
+    "first_pass_review_plan.html",
     "doc_claim_audit.md",
     "provenance_manifest.json",
     "provenance_manifest.md",

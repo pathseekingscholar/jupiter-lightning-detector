@@ -272,6 +272,8 @@ END_OBJECT = IMAGE
         self.assertIn("01_known_validation_positive", batches)
         self.assertIn("03_negative_artifact_examples", batches)
         self.assertTrue(all(row["review_note_prompt"] for row in rows))
+        with self.subTest("html_report_constant"):
+            self.assertEqual(first_pass_review_plan.PLAN_HTML.name, "first_pass_review_plan.html")
 
     def test_doc_claim_audit_outputs(self):
         rows = doc_claim_audit.audit_docs()

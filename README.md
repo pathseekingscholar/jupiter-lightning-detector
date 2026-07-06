@@ -91,6 +91,7 @@ Run the detector for the example dates:
   - `outputs/detection/human_review_audit.md`
   - `outputs/detection/first_pass_review_plan.csv`
   - `outputs/detection/first_pass_review_plan.md`
+  - `outputs/detection/first_pass_review_plan.html`
   - `outputs/detection/doc_claim_audit.csv`
   - `outputs/detection/doc_claim_audit.md`
   - `outputs/detection/review_metrics_report.md`
@@ -351,10 +352,10 @@ how many published validation marks have human labels, and how many candidates
 are still only detector outputs.
 
 `.\run.ps1 review-plan` writes `first_pass_review_plan.csv` and
-`first_pass_review_plan.md`. It turns the review matrix into a practical
+`first_pass_review_plan.md`, plus a browser-readable
+`first_pass_review_plan.html`. It turns the review matrix into a practical
 labeling order: known validation positives first, temporal candidates second,
-negative artifact examples third, and strong single-frame candidates after
-that.
+negative artifact examples third, and strong single-frame candidates after that.
 
 `.\run.ps1 claim-audit` writes `doc_claim_audit.csv` and
 `doc_claim_audit.md`. It scans project-facing Markdown for stale or unsafe
