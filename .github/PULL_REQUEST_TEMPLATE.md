@@ -1,21 +1,35 @@
 ## Summary
 
-What changed?
+-
 
-## Scientific Boundary
+## Research Claim Boundary
 
-- [ ] This PR does not claim new lightning unless reviewed and validated.
-- [ ] Candidate outputs are described as candidates, not confirmed detections.
-- [ ] Any changed thresholds or scoring rules are documented.
+Choose the strongest true statement:
+
+- [ ] Documentation/process only
+- [ ] Detector/review workflow change
+- [ ] Validation improvement
+- [ ] Human labels added
+- [ ] Candidate follow-up added
+- [ ] Confirmed science result
+
+Unsafe claims avoided:
+
+- [ ] I am not claiming new lightning without review.
+- [ ] I am not treating detector score as probability.
+- [ ] I am not claiming YOLO/trained AI unless labels and tests exist.
 
 ## Verification
 
 - [ ] `.\run.ps1 test`
-- [ ] `.\run.ps1 exports`
-- [ ] Workbench opens locally, if UI changed
-- [ ] No raw/bulky generated data committed
-- [ ] No secrets committed
+- [ ] `.\run.ps1 validate-outputs`
+- [ ] Output files regenerated when needed
+- [ ] Provenance manifest updated when generated outputs changed
+- [ ] No raw/bulky data committed
+- [ ] Secret scan completed
 
-## Notes For Reviewers
+## Evidence Files
 
-What should a scientific reviewer inspect first?
+List the main files a reviewer should open:
+
+-
