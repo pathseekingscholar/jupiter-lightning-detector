@@ -295,6 +295,12 @@ REQUIRED_COLUMNS = {
         "evidence",
         "next_action",
     },
+    "key_findings_summary.csv": {
+        "item",
+        "value",
+        "evidence_file",
+        "interpretation",
+    },
     "processed_date_coverage_summary.csv": {
         "run_date",
         "images_processed",
@@ -334,6 +340,8 @@ REQUIRED_FILES = [
     "evidence_index.json",
     "evidence_index.md",
     "reproduction_audit.md",
+    "current_key_findings.md",
+    "current_key_findings.html",
     "processed_date_coverage_summary.md",
     "provenance_manifest.json",
     "provenance_manifest.md",
@@ -481,6 +489,7 @@ def validate() -> list[str]:
         assert_true("outputs/detection/review_agreement_audit.csv" in artifact_paths, "Provenance missing review agreement audit CSV", errors)
         assert_true("outputs/detection/evidence_index.json" in artifact_paths, "Provenance missing evidence index JSON", errors)
         assert_true("outputs/detection/reproduction_audit.csv" in artifact_paths, "Provenance missing reproduction audit CSV", errors)
+        assert_true("outputs/detection/key_findings_summary.csv" in artifact_paths, "Provenance missing key findings summary CSV", errors)
         assert_true("outputs/detection/candidate_label_summary.csv" in artifact_paths, "Provenance missing candidate label summary CSV", errors)
         assert_true("outputs/detection/processed_date_coverage_summary.csv" in artifact_paths, "Provenance missing processed date coverage summary CSV", errors)
 
@@ -498,6 +507,17 @@ def validate() -> list[str]:
         assert_true(bool(audit_rows), "Reproduction audit has no rows", errors)
         not_ready = [row for row in audit_rows if row.get("status") != "ready"]
         assert_true(not not_ready, f"Reproduction audit has not-ready checks: {len(not_ready)}", errors)
+
+    key_findings_path = OUTPUT_DIR / "key_findings_summary.csv"
+    key_findings_md = OUTPUT_DIR / "current_key_findings.md"
+    if key_findings_path.exists():
+        rows = {row.get("item"): row for row in read_csv(key_findings_path)}
+        assert_true(rows.get("images_processed", {}).get("value") == "221", "Key findings image count is not 221", errors)
+        assert_true("6" in rows.get("published_validation_matches", {}).get("value", ""), "Key findings do not report six published matches", errors)
+    if key_findings_md.exists():
+        text = key_findings_md.read_text(encoding="utf-8")
+        assert_true("not new-lightning claims" in text, "Key findings brief lacks safe unmatched-candidate wording", errors)
+        assert_true("221 images" in text, "Key findings brief lacks 221-image scope", errors)
 
     return errors
 

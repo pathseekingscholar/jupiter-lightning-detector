@@ -13,6 +13,7 @@ EVIDENCE_INDEX_MD = OUTPUT_DIR / "evidence_index.md"
 
 
 PURPOSE_RULES = [
+    ("key_findings", ["key_findings", "current_key_findings"]),
     ("validation", ["known_match", "detection_summary", "threshold"]),
     ("candidate_review", ["scientific_review_queue", "review_decision", "candidate_review_dossier", "first_pass_review", "review_batches"]),
     ("human_labels", ["candidate_label", "human_review", "review_session", "blind_review", "review_agreement", "review_labeling"]),
@@ -30,6 +31,7 @@ PURPOSE_RULES = [
 
 PURPOSE_DESCRIPTIONS = {
     "validation": "Published-match recovery, threshold sensitivity, and detector run summaries.",
+    "key_findings": "Meeting-ready current findings generated from the evidence CSVs.",
     "candidate_review": "Curated candidates and reviewer-facing tables.",
     "human_labels": "Human label templates, sessions, audits, blind review, and agreement checks.",
     "temporal_validation": "Frame-to-frame track evidence and temporal-review questions.",
@@ -62,6 +64,7 @@ def purpose_for(path: str) -> str:
 def safe_use_for(purpose: str) -> str:
     return {
         "validation": "Use to state detector recovery of published marks and current run counts.",
+        "key_findings": "Use as the first meeting brief; still follow linked evidence files for proof.",
         "candidate_review": "Use to decide what a human should inspect; do not call rows confirmed lightning.",
         "human_labels": "Use to track human review progress and training readiness.",
         "temporal_validation": "Use to prioritize repeated tracks for review; not enough for discovery alone.",
@@ -129,6 +132,7 @@ def write_report(index: dict[str, object]) -> None:
         "| Question | Start with | Why |",
         "|---|---|---|",
         "| What did the detector process? | `outputs/detection/detection_summary.csv` | Run counts and published-match totals. |",
+        "| What are the current key findings? | `outputs/detection/current_key_findings.md` | Generated meeting brief tied to evidence files. |",
         "| Did it recover known lightning? | `outputs/detection/known_match_report.csv` | Six published validation rows with offsets. |",
         "| What should a human review? | `outputs/detection/first_pass_review_plan.md` | Small, ordered review batches. |",
         "| Are review sessions complete? | `outputs/detection/review_session_audit.md` | Shows missing labels, notes, confidence, and import readiness. |",

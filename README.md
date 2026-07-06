@@ -65,6 +65,7 @@ Run the detector for the example dates:
 .\run.ps1 issue-backlog
 .\run.ps1 project-board
 .\run.ps1 agreement-audit
+.\run.ps1 key-findings
 .\run.ps1 evidence-index
 .\run.ps1 reproduction-audit
 .\run.ps1 label-template
@@ -152,6 +153,9 @@ Run the detector for the example dates:
   - `outputs/detection/github_project_board.md`
   - `outputs/detection/review_agreement_audit.csv`
   - `outputs/detection/review_agreement_audit.md`
+  - `outputs/detection/key_findings_summary.csv`
+  - `outputs/detection/current_key_findings.md`
+  - `outputs/detection/current_key_findings.html`
   - `outputs/detection/review_metrics_report.md`
   - `outputs/detection/review_metrics_report.html`
   - `outputs/detection/candidate_label_template.csv`
@@ -510,6 +514,12 @@ and owner roles. It does not claim remote GitHub issues were created.
 `review_agreement_audit.md`. It separates saved labels from labels that are
 strong enough for validation/training by checking confidence, review notes, and
 the `needs_second_review` flag.
+
+`.\run.ps1 key-findings` writes `key_findings_summary.csv`,
+`current_key_findings.md`, and `current_key_findings.html`. It is the generated
+meeting brief: current image scope, published-match recovery, unmatched review
+candidates, safe claims, unsafe claims, and which evidence files back each
+statement.
 
 `.\run.ps1 evidence-index` writes `evidence_index.json` and
 `evidence_index.md`. It groups generated artifacts by purpose and gives a

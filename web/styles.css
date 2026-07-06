@@ -381,7 +381,7 @@ figcaption { margin-bottom: 7px; }
 .detection-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: end; }
 .simple-action-board {
   display: grid;
-  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 14px;
   margin: 18px 0;
 }

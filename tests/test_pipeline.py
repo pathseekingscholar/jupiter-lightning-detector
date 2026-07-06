@@ -23,6 +23,7 @@ import geometry_input_inventory
 import human_review_audit
 import candidate_geometry_plan
 import date_coverage_summary
+import key_findings_brief
 import label_tools
 import manuscript_claim_matrix
 import nearby_filter_context
@@ -437,6 +438,16 @@ END_OBJECT = IMAGE
         checks = {row["check_id"]: row for row in rows}
         self.assertEqual(checks["RA-003"]["status"], "ready")
         self.assertEqual(checks["RA-007"]["status"], "ready")
+
+    def test_key_findings_brief_outputs(self):
+        rows = key_findings_brief.build_summary_rows()
+        self.assertTrue(rows)
+        by_item = {row["item"]: row for row in rows}
+        self.assertEqual(by_item["images_processed"]["value"], 221)
+        self.assertIn("6", str(by_item["published_validation_matches"]["value"]))
+        markdown = key_findings_brief.build_markdown(rows)
+        self.assertIn("not new-lightning claims", markdown)
+        self.assertIn("221 images", markdown)
 
     def test_review_labeling_protocol_outputs(self):
         review_plan_path = review_labeling_protocol.OUTPUT_DIR / "first_pass_review_plan.csv"
