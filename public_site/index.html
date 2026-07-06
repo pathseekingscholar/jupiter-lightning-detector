@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jupiter Lightning Detector</title>
+  <meta name="description" content="A review-first Cassini Jupiter lightning detection workflow using explainable computer vision and human validation.">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="masthead">
+    <p class="kicker">Cassini Jupiter Lightning Detection</p>
+    <h1>Find candidates first. Confirm science second.</h1>
+    <p class="lede">This project screens Cassini ISS Jupiter images for possible lightning candidates. The detector proposes bright regions; human review decides what is scientifically credible.</p>
+    <div class="actions">
+      <a href="https://github.com/pathseekingscholar/jupiter-lightning-detector/tree/codex/science-first-pipeline">View GitHub</a>
+      <a href="#workflow">See Workflow</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="truth-box">
+      <div>
+        <b>Safe claim</b>
+        <p>The pipeline generates reviewable candidate detections and validates against published lightning locations.</p>
+      </div>
+      <div>
+        <b>Unsafe claim</b>
+        <p>It has not yet confirmed newly discovered Jovian lightning without expert review and temporal/geometric validation.</p>
+      </div>
+    </section>
+
+    <section id="workflow" class="sheet">
+      <p class="section-label">Research Workflow</p>
+      <h2>What happens to one Cassini image?</h2>
+      <div class="flow">
+        <article>
+          <span>1</span>
+          <b>Cassini image</b>
+          <p>A calibrated image is selected from the OPUS/PDS dataset.</p>
+        </article>
+        <article>
+          <span>2</span>
+          <b>Enhance</b>
+          <p>The dark side is stretched so faint bright regions are easier to measure.</p>
+        </article>
+        <article>
+          <span>3</span>
+          <b>Detect blobs</b>
+          <p>The detector measures bright regions, not confirmed lightning.</p>
+        </article>
+        <article>
+          <span>4</span>
+          <b>Filter artifacts</b>
+          <p>Single-pixel events, streaks, and edge artifacts are flagged or rejected.</p>
+        </article>
+        <article>
+          <span>5</span>
+          <b>Score candidates</b>
+          <p>Each candidate receives measurements such as brightness, size, SNR, and shape.</p>
+        </article>
+        <article>
+          <span>6</span>
+          <b>Human review</b>
+          <p>A reviewer labels candidates as likely lightning, artifact, cosmic ray, or uncertain.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article>
+        <p class="section-label">Current Scope</p>
+        <h2>Processed review subset</h2>
+        <p>The current local workflow has processed a focused 221-image Cassini ISS NAC/HAL subset across nine date windows. A broader OPUS query contains thousands of rows and still needs filtering before full detector processing.</p>
+      </article>
+      <article>
+        <p class="section-label">Detector Type</p>
+        <h2>Not YOLO yet</h2>
+        <p>The current baseline is classical computer vision. YOLO or another model can be trained later after enough human-labeled candidate boxes exist.</p>
+      </article>
+      <article>
+        <p class="section-label">Review Loop</p>
+        <h2>How the model improves</h2>
+        <p>Detector outputs become review packets. Human labels become training data. Future models are compared against the explainable baseline before scientific claims are made.</p>
+      </article>
+    </section>
+
+    <section class="sheet">
+      <p class="section-label">Reviewer-Friendly Plan</p>
+      <h2>How collaborators can help without touching code</h2>
+      <ol class="review-list">
+        <li>The detector creates candidate crops and tables.</li>
+        <li>A PDF review packet is generated for experts.</li>
+        <li>Reviewers mark each candidate as positive, negative, or uncertain.</li>
+        <li>The labels are entered into CSV/JSON files.</li>
+        <li>Those labels become the training and validation set for future models.</li>
+      </ol>
+    </section>
+  </main>
+
+  <footer>
+    <span>Jupiter Lightning Detector</span>
+    <span>Review workflow, not confirmed-discovery catalog</span>
+  </footer>
+</body>
+</html>
