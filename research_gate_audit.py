@@ -40,6 +40,13 @@ def summary_value(rows: list[dict[str, str]], item: str) -> float:
     return 0.0
 
 
+def row_by_key(rows: list[dict[str, str]], key: str, value: str) -> dict[str, str]:
+    for row in rows:
+        if row.get(key) == value:
+            return row
+    return {}
+
+
 def build_gate_audit() -> list[dict[str, object]]:
     detection = read_csv(OUTPUT_DIR / "detection_summary.csv")
     known = read_csv(OUTPUT_DIR / "known_match_report.csv")
@@ -49,6 +56,7 @@ def build_gate_audit() -> list[dict[str, object]]:
     geometry = read_csv(OUTPUT_DIR / "geometry_readiness.csv")
     filter_context = read_csv(OUTPUT_DIR / "nearby_filter_context.csv")
     review_plan = read_csv(OUTPUT_DIR / "first_pass_review_plan.csv")
+    training_readiness = read_csv(OUTPUT_DIR / "training_readiness.csv")
 
     images_processed = sum(int(numeric(row.get("images_processed"))) for row in detection)
     published_matches = sum(int(numeric(row.get("published_matches"))) for row in detection)
@@ -65,6 +73,10 @@ def build_gate_audit() -> list[dict[str, object]]:
     )
     context_rows = sum(1 for row in filter_context if row.get("context_status") == "nearby_non_hal_context")
     review_rows = len(review_plan)
+    model_gate = row_by_key(training_readiness, "gate", "model_comparison_allowed")
+    model_status = model_gate.get("status", "not_ready")
+    model_value = model_gate.get("value", "not evaluated")
+    model_next_action = model_gate.get("next_action", "Generate training readiness and finish human labels before model comparison.")
 
     published_human_value = ""
     for row in human_audit:
@@ -151,6 +163,14 @@ def build_gate_audit() -> list[dict[str, object]]:
             "outputs/detection/geometry_readiness.csv",
             "Image-level latitude/longitude bounds exist for some rows, but candidate-level x/y-to-Jupiter mapping is not ready yet.",
             "Add navigation/geometry mapping before making location-based storm claims.",
+        ),
+        gate(
+            "model_training_readiness",
+            "ready" if model_status == "ready" else "not_ready",
+            model_value,
+            "outputs/detection/training_readiness.csv",
+            "Learned detector comparison is allowed only after human-confirmed positives, negatives, notes, and confidence fields exist.",
+            model_next_action,
         ),
     ]
 

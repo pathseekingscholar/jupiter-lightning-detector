@@ -365,6 +365,8 @@ END_OBJECT = IMAGE
         gates = {row["gate"]: row for row in rows}
         self.assertEqual(gates["published_match_recovery"]["status"], "ready")
         self.assertIn(gates["human_positive_labels"]["status"], {"not_ready", "ready"})
+        self.assertIn("model_training_readiness", gates)
+        self.assertEqual(gates["model_training_readiness"]["evidence_file"], "outputs/detection/training_readiness.csv")
         self.assertIn("evidence_file", rows[0])
 
     def test_github_issue_backlog_outputs(self):
@@ -374,6 +376,7 @@ END_OBJECT = IMAGE
         self.assertTrue(rows)
         self.assertIn("issue_id", rows[0])
         self.assertTrue(any(row["gate"] == "human_positive_labels" for row in rows))
+        self.assertTrue(any(row["gate"] == "model_training_readiness" for row in rows))
         self.assertTrue(all(row["acceptance_criteria"] for row in rows))
 
     def test_review_agreement_audit_outputs(self):

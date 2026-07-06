@@ -17,6 +17,7 @@ LABELS_BY_GATE = {
     "saved_human_labels": "candidate-review,data-management",
     "published_marks_human_confirmed": "candidate-review,validation",
     "candidate_geometry": "geometry,science-validation",
+    "model_training_readiness": "model-comparison,human-labels,validation",
     "nearby_filter_followup": "data-provenance,spectrum-followup",
     "documentation_claim_safety": "documentation,science-validation",
 }
@@ -52,6 +53,7 @@ def issue_title(gate: str, status: str) -> str:
         "saved_human_labels": "Run first human label import or workbench labeling pass",
         "published_marks_human_confirmed": "Human-confirm all six published validation marks",
         "candidate_geometry": "Add candidate pixel-to-Jupiter geometry mapping",
+        "model_training_readiness": "Hold YOLO/model comparison until reviewed labels exist",
         "nearby_filter_followup": "Review nearby non-HAL filter context after candidate validation",
         "documentation_claim_safety": "Keep documentation claim audit clean",
     }
@@ -84,6 +86,12 @@ def acceptance_criteria(gate: str) -> list[str]:
             "Candidate x/y coordinates can be mapped to Jupiter latitude/longitude or a documented projection failure.",
             "Geometry output distinguishes image-level bounds from candidate-level mapping.",
             "No location-based storm claim is made until this gate is ready.",
+        ],
+        "model_training_readiness": [
+            "`outputs/detection/training_readiness.csv` marks `model_comparison_allowed` ready.",
+            "At least 6 human-confirmed positive labels and 20 human-confirmed negative labels exist.",
+            "Training-ready labels include confidence, reviewer notes, and no unresolved second-review flag.",
+            "Any YOLO or learned model comparison is evaluated against the classical detector baseline.",
         ],
         "nearby_filter_followup": [
             "Only human-reviewed candidate rows are linked to nearby non-HAL context.",
