@@ -215,6 +215,8 @@ missing image lines for these products.
 - `docs/research_grade_pipeline_plan.md`: science-first pipeline plan
 - `docs/research_log_2026-07-02.md`: dated engineering/research log
 - `docs/current_results_summary.md`: current processed-date evidence summary
+- `docs/evidence_packet_2026-07-06.md`: dated evidence packet with validation
+  numbers, review-plan counts, and safe claims
 - `docs/reproducibility_checklist.md`: clean-room reproduction steps
 - `docs/roadmap.md`: GitHub-facing scientific roadmap
 - `docs/opus_nearby_date_coverage.md`: OPUS availability scan for nearby
