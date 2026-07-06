@@ -44,6 +44,8 @@ TRACKED_OUTPUTS = [
     "first_pass_review_plan.csv",
     "first_pass_review_plan.md",
     "first_pass_review_plan.html",
+    "review_session_plan.csv",
+    "review_session_plan.md",
     "blind_review_packet.csv",
     "blind_review_key.csv",
     "blind_review_packet.md",
@@ -124,6 +126,13 @@ def build_manifest() -> dict[str, object]:
             "sha256": file_sha256(path),
             "rows": csv_row_count(path),
         })
+    for path in sorted((OUTPUT_DIR / "review_sessions").glob("*.csv")):
+        artifacts.append({
+            "path": str(path.relative_to(ROOT)).replace("\\", "/"),
+            "bytes": path.stat().st_size,
+            "sha256": file_sha256(path),
+            "rows": csv_row_count(path),
+        })
 
     return {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -138,6 +147,7 @@ def build_manifest() -> dict[str, object]:
             ".\\run.ps1 review",
             ".\\run.ps1 label-audit",
             ".\\run.ps1 review-plan",
+            ".\\run.ps1 review-sessions",
             ".\\run.ps1 blind-review",
             ".\\run.ps1 blind-reconcile",
             ".\\run.ps1 evidence-integrity",

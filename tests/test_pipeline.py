@@ -28,6 +28,7 @@ import research_exports
 import research_gate_audit
 import review_labeling_protocol
 import review_agreement_audit
+import review_session_planner
 import review_metrics
 import training_readiness
 import validate_outputs
@@ -347,6 +348,21 @@ END_OBJECT = IMAGE
             self.assertEqual(first_pass_review_plan.PLAN_HTML.name, "first_pass_review_plan.html")
         with self.subTest("batch_dir_constant"):
             self.assertEqual(first_pass_review_plan.BATCH_DIR.name, "review_batches")
+
+    def test_review_session_planner_outputs(self):
+        review_plan_path = review_session_planner.PLAN_CSV
+        if not review_plan_path.exists():
+            self.skipTest("First-pass review plan has not been generated")
+        summaries, session_files = review_session_planner.build_session_rows()
+        plan_rows = review_session_planner.read_csv(review_plan_path)
+        self.assertTrue(summaries)
+        self.assertTrue(session_files)
+        self.assertEqual(sum(int(row["candidate_count"]) for row in summaries), len(plan_rows))
+        self.assertIn("S001_01_known_validation_positive", session_files)
+        first_session = session_files["S001_01_known_validation_positive"]
+        self.assertTrue(first_session)
+        self.assertIn("human_label", first_session[0])
+        self.assertIn("review_note", first_session[0])
 
     def test_blind_review_packet_outputs(self):
         review_plan_path = blind_review_packet.OUTPUT_DIR / "first_pass_review_plan.csv"

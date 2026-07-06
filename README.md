@@ -51,6 +51,7 @@ Run the detector for the example dates:
 .\run.ps1 filters
 .\run.ps1 label-audit
 .\run.ps1 review-plan
+.\run.ps1 review-sessions
 .\run.ps1 blind-review
 .\run.ps1 blind-reconcile
 .\run.ps1 evidence-integrity
@@ -113,6 +114,9 @@ Run the detector for the example dates:
   - `outputs/detection/first_pass_review_plan.csv`
   - `outputs/detection/first_pass_review_plan.md`
   - `outputs/detection/first_pass_review_plan.html`
+  - `outputs/detection/review_session_plan.csv`
+  - `outputs/detection/review_session_plan.md`
+  - `outputs/detection/review_sessions/*.csv`
   - `outputs/detection/blind_review_packet.csv`
   - `outputs/detection/blind_review_key.csv`
   - `outputs/detection/blind_review_packet.md`
@@ -247,6 +251,7 @@ missing image lines for these products.
 .\run.ps1 filters
 .\run.ps1 label-audit
 .\run.ps1 review-plan
+.\run.ps1 review-sessions
 .\run.ps1 blind-review
 .\run.ps1 blind-reconcile
 .\run.ps1 evidence-integrity
@@ -417,6 +422,12 @@ labeling order: known validation positives first, temporal candidates second,
 negative artifact examples third, and strong single-frame candidates after that.
 It also writes per-batch CSVs under `outputs/detection/review_batches/` so a
 reviewer can open only the batch they are labeling.
+
+`.\run.ps1 review-sessions` writes `review_session_plan.csv`,
+`review_session_plan.md`, and meeting-sized CSV packets under
+`outputs/detection/review_sessions/`. Each session already contains blank
+human-review fields, so a reviewer can complete one packet and import that file
+directly with `.\run.ps1 label-import -LabelCsv outputs\detection\review_sessions\SESSION_FILE.csv`.
 
 `.\run.ps1 blind-review` writes `blind_review_packet.csv`,
 `blind_review_key.csv`, and `blind_review_packet.md`. The reviewer file hides
