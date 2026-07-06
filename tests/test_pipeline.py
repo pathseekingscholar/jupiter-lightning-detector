@@ -10,6 +10,7 @@ from PIL import Image
 import jupiter_pipeline as pipeline
 import app_server
 import geometry_audit
+import human_review_audit
 import label_tools
 import nearby_filter_context
 import provenance_manifest
@@ -247,6 +248,17 @@ END_OBJECT = IMAGE
         self.assertIn("context_status", rows[0])
         self.assertIn("context_filter", rows[0])
         self.assertTrue(any(row["context_status"] == "nearby_non_hal_context" for row in rows))
+
+    def test_human_review_audit_outputs(self):
+        training_path = human_review_audit.OUTPUT_DIR / "training_manifest.csv"
+        if not training_path.exists():
+            self.skipTest("Training manifest has not been generated")
+        rows = human_review_audit.build_audit()
+        self.assertTrue(rows)
+        items = {row["audit_item"] for row in rows}
+        self.assertIn("positive_training_examples", items)
+        self.assertIn("negative_training_examples", items)
+        self.assertIn("published_validation_marks_labeled", items)
 
 
 if __name__ == "__main__":

@@ -45,6 +45,7 @@ Run the detector for the example dates:
 .\run.ps1 review
 .\run.ps1 geometry
 .\run.ps1 filters
+.\run.ps1 label-audit
 .\run.ps1 label-template
 .\run.ps1 provenance
 .\run.ps1 validate-outputs
@@ -84,6 +85,8 @@ Run the detector for the example dates:
   - `outputs/detection/geometry_readiness_report.md`
   - `outputs/detection/nearby_filter_context.csv`
   - `outputs/detection/nearby_filter_context_report.md`
+  - `outputs/detection/human_review_audit.csv`
+  - `outputs/detection/human_review_audit.md`
   - `outputs/detection/review_metrics_report.md`
   - `outputs/detection/review_metrics_report.html`
   - `outputs/detection/candidate_label_template.csv`
@@ -190,6 +193,7 @@ missing image lines for these products.
 .\run.ps1 review
 .\run.ps1 geometry
 .\run.ps1 filters
+.\run.ps1 label-audit
 .\run.ps1 label-template
 .\run.ps1 provenance
 .\run.ps1 validate-outputs
@@ -329,6 +333,12 @@ The review loop is deliberately simple:
    artifact, cosmic-ray/hot-pixel, or uncertain.
 3. The label is saved with reviewer notes and confidence.
 4. The label table becomes training and validation data for later models.
+
+`.\run.ps1 label-audit` writes `human_review_audit.csv` and
+`human_review_audit.md`. This audit answers the positive/negative question
+directly: how many reviewed positives exist, how many reviewed negatives exist,
+how many published validation marks have human labels, and how many candidates
+are still only detector outputs.
 5. Any future YOLO or neural model must beat the explainable baseline without
    hiding false positives or false negatives.
 

@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("init", "download", "analyze", "report", "all", "test", "app", "detect", "detect-all", "exports", "coverage", "review", "geometry", "filters", "label-template", "label-import", "provenance", "validate-outputs")]
+    [ValidateSet("init", "download", "analyze", "report", "all", "test", "app", "detect", "detect-all", "exports", "coverage", "review", "geometry", "filters", "label-audit", "label-template", "label-import", "provenance", "validate-outputs")]
     [string]$Command = "all",
     [ValidateSet("2000-12-31", "2001-01-01", "2001-01-04", "2001-01-05", "2001-01-08", "2001-01-09", "2001-01-10", "2001-01-11", "2001-01-13")]
     [string]$Date = "2001-01-01",
@@ -40,6 +40,8 @@ if ($Command -eq "test") {
     & $python geometry_audit.py
 } elseif ($Command -eq "filters") {
     & $python nearby_filter_context.py
+} elseif ($Command -eq "label-audit") {
+    & $python human_review_audit.py
 } elseif ($Command -eq "label-template") {
     & $python label_tools.py template --path $LabelCsv
 } elseif ($Command -eq "label-import") {
