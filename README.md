@@ -60,6 +60,7 @@ Run the detector for the example dates:
 .\run.ps1 claim-audit
 .\run.ps1 research-gates
 .\run.ps1 issue-backlog
+.\run.ps1 project-board
 .\run.ps1 agreement-audit
 .\run.ps1 label-template
 .\run.ps1 label-summary
@@ -130,23 +131,25 @@ Run the detector for the example dates:
   - `outputs/detection/training_readiness.csv`
   - `outputs/detection/training_readiness.md`
   - `outputs/detection/review_batches/*.csv`
-	  - `outputs/detection/doc_claim_audit.csv`
-	  - `outputs/detection/doc_claim_audit.md`
-	  - `outputs/detection/research_gate_audit.csv`
-	  - `outputs/detection/research_gate_audit.md`
-	  - `outputs/detection/github_issue_backlog.csv`
-	  - `outputs/detection/github_issue_backlog.md`
-	  - `outputs/detection/review_agreement_audit.csv`
-	  - `outputs/detection/review_agreement_audit.md`
-	  - `outputs/detection/review_metrics_report.md`
-	  - `outputs/detection/review_metrics_report.html`
-	  - `outputs/detection/candidate_label_template.csv`
-	  - `outputs/detection/candidate_label_summary.csv`
-	  - `outputs/detection/provenance_manifest.json`
+  - `outputs/detection/doc_claim_audit.csv`
+  - `outputs/detection/doc_claim_audit.md`
+  - `outputs/detection/research_gate_audit.csv`
+  - `outputs/detection/research_gate_audit.md`
+  - `outputs/detection/github_issue_backlog.csv`
+  - `outputs/detection/github_issue_backlog.md`
+  - `outputs/detection/github_project_board.csv`
+  - `outputs/detection/github_project_board.md`
+  - `outputs/detection/review_agreement_audit.csv`
+  - `outputs/detection/review_agreement_audit.md`
+  - `outputs/detection/review_metrics_report.md`
+  - `outputs/detection/review_metrics_report.html`
+  - `outputs/detection/candidate_label_template.csv`
+  - `outputs/detection/candidate_label_summary.csv`
+  - `outputs/detection/provenance_manifest.json`
   - `outputs/detection/provenance_manifest.md`
   - `outputs/detection/review_packet.md`
   - `outputs/detection/review_artifacts/*.png`
-	  - `outputs/detection/candidate_labels_grouped.csv`
+  - `outputs/detection/candidate_labels_grouped.csv`
 - Separate false positive, false negative, and unmatched-candidate sections.
 - Known published detections as validation targets.
 
@@ -469,6 +472,11 @@ progress, or not ready, using current output files as evidence.
 `github_issue_backlog.md`, and `.github/issue_backlog/*.md`. It turns current
 research-gate gaps into GitHub-ready issue bodies with labels, evidence files,
 and acceptance criteria.
+
+`.\run.ps1 project-board` writes `github_project_board.csv` and
+`github_project_board.md`. It turns the issue backlog into a reproducible
+project-board source with lanes, dependencies, proof commands, proof artifacts,
+and owner roles. It does not claim remote GitHub issues were created.
 
 `.\run.ps1 agreement-audit` writes `review_agreement_audit.csv` and
 `review_agreement_audit.md`. It separates saved labels from labels that are

@@ -15,6 +15,7 @@ import doc_claim_audit
 import evidence_integrity_audit
 import first_pass_review_plan
 import github_issue_backlog
+import github_project_board
 import geometry_audit
 import geometry_acquisition_checklist
 import geometry_input_inventory
@@ -452,6 +453,17 @@ END_OBJECT = IMAGE
         self.assertTrue(any(row["gate"] == "human_positive_labels" for row in rows))
         self.assertTrue(any(row["gate"] == "model_training_readiness" for row in rows))
         self.assertTrue(all(row["acceptance_criteria"] for row in rows))
+
+    def test_github_project_board_outputs(self):
+        if not github_project_board.BACKLOG_CSV.exists():
+            self.skipTest("GitHub issue backlog has not been generated")
+        rows = github_project_board.build_board_rows()
+        self.assertTrue(rows)
+        lanes = {row["lane"] for row in rows}
+        self.assertIn("Human Review", lanes)
+        self.assertIn("Geometry / SPICE", lanes)
+        self.assertTrue(all(row["proof_command"] for row in rows))
+        self.assertTrue(all(row["definition_of_done"] for row in rows))
 
     def test_review_agreement_audit_outputs(self):
         rows = review_agreement_audit.build_agreement_audit()
