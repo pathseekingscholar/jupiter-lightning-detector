@@ -11,6 +11,7 @@ import jupiter_pipeline as pipeline
 import app_server
 import geometry_audit
 import label_tools
+import nearby_filter_context
 import provenance_manifest
 import research_exports
 import review_metrics
@@ -236,6 +237,16 @@ END_OBJECT = IMAGE
         self.assertIn("geometry_context_available", rows[0])
         self.assertIn("candidate_latlon_ready", rows[0])
         self.assertTrue(any(row["geometry_context_available"] == "yes" for row in rows))
+
+    def test_nearby_filter_context_outputs(self):
+        context_path = nearby_filter_context.CONTEXT_CSV
+        if not context_path.exists():
+            self.skipTest("Nearby filter context has not been generated")
+        rows = nearby_filter_context.read_csv(context_path)
+        self.assertTrue(rows)
+        self.assertIn("context_status", rows[0])
+        self.assertIn("context_filter", rows[0])
+        self.assertTrue(any(row["context_status"] == "nearby_non_hal_context" for row in rows))
 
 
 if __name__ == "__main__":

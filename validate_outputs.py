@@ -74,6 +74,14 @@ REQUIRED_COLUMNS = {
         "candidate_latlon_ready",
         "readiness_note",
     },
+    "nearby_filter_context.csv": {
+        "candidate_id",
+        "image_id",
+        "candidate_time",
+        "context_status",
+        "context_filter",
+        "delta_minutes",
+    },
 }
 
 
@@ -81,6 +89,7 @@ REQUIRED_FILES = [
     "review_metrics_report.html",
     "candidate_review_dossier.html",
     "geometry_readiness_report.md",
+    "nearby_filter_context_report.md",
     "provenance_manifest.json",
     "provenance_manifest.md",
     "review_artifacts/published_match.png",
@@ -150,6 +159,7 @@ def validate() -> list[str]:
         assert_true("outputs/detection/candidate_review_dossier.csv" in artifact_paths, "Provenance missing candidate dossier CSV", errors)
         assert_true("outputs/detection/threshold_recommendations.csv" in artifact_paths, "Provenance missing threshold recommendations CSV", errors)
         assert_true("outputs/detection/geometry_readiness.csv" in artifact_paths, "Provenance missing geometry readiness CSV", errors)
+        assert_true("outputs/detection/nearby_filter_context.csv" in artifact_paths, "Provenance missing nearby filter context CSV", errors)
 
     return errors
 

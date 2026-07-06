@@ -44,6 +44,7 @@ Run the detector for the example dates:
 .\run.ps1 exports
 .\run.ps1 review
 .\run.ps1 geometry
+.\run.ps1 filters
 .\run.ps1 label-template
 .\run.ps1 provenance
 .\run.ps1 validate-outputs
@@ -81,6 +82,8 @@ Run the detector for the example dates:
   - `outputs/detection/candidate_review_dossier.html`
   - `outputs/detection/geometry_readiness.csv`
   - `outputs/detection/geometry_readiness_report.md`
+  - `outputs/detection/nearby_filter_context.csv`
+  - `outputs/detection/nearby_filter_context_report.md`
   - `outputs/detection/review_metrics_report.md`
   - `outputs/detection/review_metrics_report.html`
   - `outputs/detection/candidate_label_template.csv`
@@ -186,6 +189,7 @@ missing image lines for these products.
 .\run.ps1 exports
 .\run.ps1 review
 .\run.ps1 geometry
+.\run.ps1 filters
 .\run.ps1 label-template
 .\run.ps1 provenance
 .\run.ps1 validate-outputs
@@ -362,6 +366,11 @@ longitude still require a camera/SPICE projection step.
 The next publishable-analysis path is to connect credible H-alpha candidates to
 nearby broadband/filter images. That is what would make color or spectrum work
 possible instead of just claiming a detector works.
+
+`.\run.ps1 filters` writes `nearby_filter_context.csv` and
+`nearby_filter_context_report.md`. It searches OPUS for non-HAL Cassini ISS NAC
+images within +/- 20 minutes of each review candidate's H-alpha frame. This is
+a follow-up queue only; it does not prove color or spectrum behavior.
 
 ## Sources
 

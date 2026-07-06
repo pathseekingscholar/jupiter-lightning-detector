@@ -31,6 +31,8 @@ TRACKED_OUTPUTS = [
     "candidate_review_dossier.html",
     "geometry_readiness.csv",
     "geometry_readiness_report.md",
+    "nearby_filter_context.csv",
+    "nearby_filter_context_report.md",
     "candidate_label_template.csv",
     "review_packet.md",
     "review_metrics_report.md",
