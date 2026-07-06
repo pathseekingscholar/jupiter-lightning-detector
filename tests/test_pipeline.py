@@ -16,6 +16,7 @@ import evidence_integrity_audit
 import first_pass_review_plan
 import github_issue_backlog
 import geometry_audit
+import geometry_input_inventory
 import human_review_audit
 import candidate_geometry_plan
 import date_coverage_summary
@@ -291,6 +292,16 @@ END_OBJECT = IMAGE
         self.assertIn("geometry_readiness", rows[0])
         self.assertTrue(all(row["required_method"] == "camera_spice_projection" for row in rows))
         self.assertTrue(any(row["x"] and row["y"] for row in rows))
+
+    def test_geometry_input_inventory_outputs(self):
+        manifest_path = geometry_input_inventory.OUTPUT_DIR / "dataset_manifest.csv"
+        if not manifest_path.exists():
+            self.skipTest("Dataset manifest has not been generated")
+        rows = geometry_input_inventory.build_inventory_rows()
+        self.assertTrue(rows)
+        self.assertIn("projection_input_status", rows[0])
+        self.assertTrue(all(row["calibrated_label_exists"] == "yes" for row in rows))
+        self.assertTrue(any("missing_local_spice_kernels" in row["blocking_inputs"] for row in rows))
 
     def test_nearby_filter_context_outputs(self):
         context_path = nearby_filter_context.CONTEXT_CSV

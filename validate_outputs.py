@@ -90,6 +90,16 @@ REQUIRED_COLUMNS = {
         "required_method",
         "next_step",
     },
+    "geometry_input_inventory.csv": {
+        "image_id",
+        "calibrated_image_exists",
+        "calibrated_label_exists",
+        "metadata_exists",
+        "pds_timing_ready",
+        "image_level_geometry_ready",
+        "projection_input_status",
+        "blocking_inputs",
+    },
     "nearby_filter_context.csv": {
         "candidate_id",
         "image_id",
@@ -215,6 +225,7 @@ REQUIRED_FILES = [
     "candidate_review_dossier.html",
     "geometry_readiness_report.md",
     "candidate_geometry_plan.md",
+    "geometry_input_inventory.md",
     "nearby_filter_context_report.md",
     "human_review_audit.md",
     "first_pass_review_plan.md",
@@ -328,6 +339,7 @@ def validate() -> list[str]:
         assert_true("outputs/detection/threshold_recommendations.csv" in artifact_paths, "Provenance missing threshold recommendations CSV", errors)
         assert_true("outputs/detection/geometry_readiness.csv" in artifact_paths, "Provenance missing geometry readiness CSV", errors)
         assert_true("outputs/detection/candidate_geometry_plan.csv" in artifact_paths, "Provenance missing candidate geometry plan CSV", errors)
+        assert_true("outputs/detection/geometry_input_inventory.csv" in artifact_paths, "Provenance missing geometry input inventory CSV", errors)
         assert_true("outputs/detection/nearby_filter_context.csv" in artifact_paths, "Provenance missing nearby filter context CSV", errors)
         assert_true("outputs/detection/human_review_audit.csv" in artifact_paths, "Provenance missing human review audit CSV", errors)
         assert_true("outputs/detection/first_pass_review_plan.csv" in artifact_paths, "Provenance missing first-pass review plan CSV", errors)

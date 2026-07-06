@@ -46,6 +46,7 @@ Run the detector for the example dates:
 .\run.ps1 review
 .\run.ps1 geometry
 .\run.ps1 geometry-plan
+.\run.ps1 geometry-inputs
 .\run.ps1 filters
 .\run.ps1 label-audit
 .\run.ps1 review-plan
@@ -100,6 +101,8 @@ Run the detector for the example dates:
   - `outputs/detection/geometry_readiness_report.md`
   - `outputs/detection/candidate_geometry_plan.csv`
   - `outputs/detection/candidate_geometry_plan.md`
+  - `outputs/detection/geometry_input_inventory.csv`
+  - `outputs/detection/geometry_input_inventory.md`
   - `outputs/detection/nearby_filter_context.csv`
   - `outputs/detection/nearby_filter_context_report.md`
   - `outputs/detection/human_review_audit.csv`
@@ -236,6 +239,7 @@ missing image lines for these products.
 .\run.ps1 review
 .\run.ps1 geometry
 .\run.ps1 geometry-plan
+.\run.ps1 geometry-inputs
 .\run.ps1 filters
 .\run.ps1 label-audit
 .\run.ps1 review-plan
@@ -497,6 +501,11 @@ longitude still require a camera/SPICE projection step.
 `candidate_geometry_plan.md`. These files join the first-pass review candidates
 to the available image-level geometry and list the exact next step for each
 candidate. They are a work plan, not solved latitude/longitude coordinates.
+
+`.\run.ps1 geometry-inputs` writes `geometry_input_inventory.csv` and
+`geometry_input_inventory.md`. It inventories local calibrated products, PDS
+label timing/SCLK fields, OPUS image-level geometry, local SPICE kernel
+presence, and the camera-model blocker for pixel-to-Jupiter projection.
 
 The next publishable-analysis path is to connect credible H-alpha candidates to
 nearby broadband/filter images. That is what would make color or spectrum work
