@@ -9,6 +9,7 @@ from PIL import Image
 
 import jupiter_pipeline as pipeline
 import app_server
+import geometry_audit
 import label_tools
 import provenance_manifest
 import research_exports
@@ -225,6 +226,16 @@ END_OBJECT = IMAGE
             self.skipTest("Generated outputs have not been produced")
         errors = validate_outputs.validate()
         self.assertEqual(errors, [])
+
+    def test_geometry_readiness_audit(self):
+        manifest_path = geometry_audit.OUTPUT_DIR / "dataset_manifest.csv"
+        if not manifest_path.exists():
+            self.skipTest("Dataset manifest has not been generated")
+        rows = geometry_audit.build_geometry_readiness()
+        self.assertTrue(rows)
+        self.assertIn("geometry_context_available", rows[0])
+        self.assertIn("candidate_latlon_ready", rows[0])
+        self.assertTrue(any(row["geometry_context_available"] == "yes" for row in rows))
 
 
 if __name__ == "__main__":

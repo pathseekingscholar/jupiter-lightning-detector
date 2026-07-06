@@ -43,6 +43,7 @@ Run the detector for the example dates:
 .\run.ps1 detect -Date 2001-01-13
 .\run.ps1 exports
 .\run.ps1 review
+.\run.ps1 geometry
 .\run.ps1 label-template
 .\run.ps1 provenance
 .\run.ps1 validate-outputs
@@ -78,6 +79,8 @@ Run the detector for the example dates:
   - `outputs/detection/threshold_recommendations.csv`
   - `outputs/detection/candidate_review_dossier.csv`
   - `outputs/detection/candidate_review_dossier.html`
+  - `outputs/detection/geometry_readiness.csv`
+  - `outputs/detection/geometry_readiness_report.md`
   - `outputs/detection/review_metrics_report.md`
   - `outputs/detection/review_metrics_report.html`
   - `outputs/detection/candidate_label_template.csv`
@@ -182,6 +185,7 @@ missing image lines for these products.
 .\run.ps1 detect -Date 2001-01-13
 .\run.ps1 exports
 .\run.ps1 review
+.\run.ps1 geometry
 .\run.ps1 label-template
 .\run.ps1 provenance
 .\run.ps1 validate-outputs
@@ -349,6 +353,11 @@ The current detector works in x/y pixels. Future validation should map
 candidates to Jupiter latitude and longitude. If the same storm appears at the
 same planet location across multiple frames or days, that is stronger evidence
 than a single bright spot.
+
+`.\run.ps1 geometry` writes `geometry_readiness.csv` and
+`geometry_readiness_report.md`. These files document which processed frames
+have local OPUS viewing-geometry context and why candidate-level latitude and
+longitude still require a camera/SPICE projection step.
 
 The next publishable-analysis path is to connect credible H-alpha candidates to
 nearby broadband/filter images. That is what would make color or spectrum work

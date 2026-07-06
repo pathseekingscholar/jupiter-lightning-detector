@@ -66,12 +66,21 @@ REQUIRED_COLUMNS = {
         "reviewer",
         "review_note",
     },
+    "geometry_readiness.csv": {
+        "image_id",
+        "opus_id",
+        "metadata_available",
+        "geometry_context_available",
+        "candidate_latlon_ready",
+        "readiness_note",
+    },
 }
 
 
 REQUIRED_FILES = [
     "review_metrics_report.html",
     "candidate_review_dossier.html",
+    "geometry_readiness_report.md",
     "provenance_manifest.json",
     "provenance_manifest.md",
     "review_artifacts/published_match.png",
@@ -140,6 +149,7 @@ def validate() -> list[str]:
         artifact_paths = {row["path"] for row in payload.get("artifacts", [])}
         assert_true("outputs/detection/candidate_review_dossier.csv" in artifact_paths, "Provenance missing candidate dossier CSV", errors)
         assert_true("outputs/detection/threshold_recommendations.csv" in artifact_paths, "Provenance missing threshold recommendations CSV", errors)
+        assert_true("outputs/detection/geometry_readiness.csv" in artifact_paths, "Provenance missing geometry readiness CSV", errors)
 
     return errors
 
