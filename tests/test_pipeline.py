@@ -17,6 +17,7 @@ import label_tools
 import nearby_filter_context
 import provenance_manifest
 import research_exports
+import research_gate_audit
 import review_metrics
 import validate_outputs
 
@@ -302,6 +303,16 @@ END_OBJECT = IMAGE
             if row.get("pattern") == "temporal tracking planned" and row.get("status") == "needs_attention"
         ]
         self.assertEqual(stale_temporal, [])
+
+    def test_research_gate_audit_outputs(self):
+        if not (research_gate_audit.OUTPUT_DIR / "detection_summary.csv").exists():
+            self.skipTest("Generated outputs have not been produced")
+        rows = research_gate_audit.build_gate_audit()
+        self.assertTrue(rows)
+        gates = {row["gate"]: row for row in rows}
+        self.assertEqual(gates["published_match_recovery"]["status"], "ready")
+        self.assertIn(gates["human_positive_labels"]["status"], {"not_ready", "ready"})
+        self.assertIn("evidence_file", rows[0])
 
 
 if __name__ == "__main__":

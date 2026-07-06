@@ -48,6 +48,7 @@ Run the detector for the example dates:
 .\run.ps1 label-audit
 .\run.ps1 review-plan
 .\run.ps1 claim-audit
+.\run.ps1 research-gates
 .\run.ps1 label-template
 .\run.ps1 label-summary
 .\run.ps1 provenance
@@ -94,9 +95,11 @@ Run the detector for the example dates:
   - `outputs/detection/first_pass_review_plan.md`
   - `outputs/detection/first_pass_review_plan.html`
   - `outputs/detection/review_batches/*.csv`
-  - `outputs/detection/doc_claim_audit.csv`
-  - `outputs/detection/doc_claim_audit.md`
-  - `outputs/detection/review_metrics_report.md`
+	  - `outputs/detection/doc_claim_audit.csv`
+	  - `outputs/detection/doc_claim_audit.md`
+	  - `outputs/detection/research_gate_audit.csv`
+	  - `outputs/detection/research_gate_audit.md`
+	  - `outputs/detection/review_metrics_report.md`
 	  - `outputs/detection/review_metrics_report.html`
 	  - `outputs/detection/candidate_label_template.csv`
 	  - `outputs/detection/candidate_label_summary.csv`
@@ -206,6 +209,7 @@ missing image lines for these products.
 .\run.ps1 label-audit
 .\run.ps1 review-plan
 .\run.ps1 claim-audit
+.\run.ps1 research-gates
 .\run.ps1 label-template
 .\run.ps1 label-summary
 .\run.ps1 provenance
@@ -367,6 +371,10 @@ reviewer can open only the batch they are labeling.
 `doc_claim_audit.md`. It scans project-facing Markdown for stale or unsafe
 claim wording, such as outdated temporal-tracking statements or unsupported
 new-lightning language.
+
+`.\run.ps1 research-gates` writes `research_gate_audit.csv` and
+`research_gate_audit.md`. It summarizes which research gates are ready, in
+progress, or not ready, using current output files as evidence.
 5. Any future YOLO or neural model must beat the explainable baseline without
    hiding false positives or false negatives.
 
