@@ -831,6 +831,15 @@ async function handleUpload(file) {
   await selectUpload(record);
 }
 
+async function addDroppedFile(file) {
+  try {
+    await handleUpload(file);
+    selectTab("manual");
+  } catch (error) {
+    alert(`Could not add image: ${error.message}`);
+  }
+}
+
 async function renderLibrary() {
   const records = await libraryAll();
   const container = $("library-list");
@@ -994,6 +1003,23 @@ async function init() {
   $("notes-form").addEventListener("submit", saveNote);
   $("export").addEventListener("click", exportProcessed);
   $("upload").addEventListener("click", () => $("upload-file").click());
+  $("drop-zone").addEventListener("click", () => $("upload-file").click());
+  $("drop-zone").addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      $("upload-file").click();
+    }
+  });
+  $("drop-zone").addEventListener("dragover", (event) => {
+    event.preventDefault();
+    $("drop-zone").classList.add("drag-over");
+  });
+  $("drop-zone").addEventListener("dragleave", () => $("drop-zone").classList.remove("drag-over"));
+  $("drop-zone").addEventListener("drop", async (event) => {
+    event.preventDefault();
+    $("drop-zone").classList.remove("drag-over");
+    await addDroppedFile(event.dataTransfer.files[0]);
+  });
   $("upload-file").addEventListener("change", async () => {
     try {
       await handleUpload($("upload-file").files[0]);

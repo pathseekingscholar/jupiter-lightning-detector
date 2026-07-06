@@ -66,6 +66,7 @@ Run the detector for the example dates:
 .\run.ps1 project-board
 .\run.ps1 agreement-audit
 .\run.ps1 evidence-index
+.\run.ps1 reproduction-audit
 .\run.ps1 label-template
 .\run.ps1 label-summary
 .\run.ps1 provenance
@@ -159,6 +160,8 @@ Run the detector for the example dates:
   - `outputs/detection/provenance_manifest.md`
   - `outputs/detection/evidence_index.json`
   - `outputs/detection/evidence_index.md`
+  - `outputs/detection/reproduction_audit.csv`
+  - `outputs/detection/reproduction_audit.md`
   - `outputs/detection/review_packet.md`
   - `outputs/detection/review_artifacts/*.png`
   - `outputs/detection/candidate_labels_grouped.csv`
@@ -512,6 +515,11 @@ the `needs_second_review` flag.
 `evidence_index.md`. It groups generated artifacts by purpose and gives a
 plain-English "open these first" guide for validation, review, temporal checks,
 geometry, claims, and provenance.
+
+`.\run.ps1 reproduction-audit` writes `reproduction_audit.csv` and
+`reproduction_audit.md`. It checks that documented reproduction commands still
+exist in `run.ps1` and that the key evidence artifacts are present, non-empty,
+and tracked by provenance.
 5. Any future YOLO or neural model must beat the explainable baseline without
    hiding false positives or false negatives.
 

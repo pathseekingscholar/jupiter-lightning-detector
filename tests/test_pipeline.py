@@ -29,6 +29,7 @@ import nearby_filter_context
 import provenance_manifest
 import research_exports
 import research_gate_audit
+import reproduction_audit
 import review_labeling_protocol
 import review_agreement_audit
 import review_session_audit
@@ -427,6 +428,15 @@ END_OBJECT = IMAGE
         self.assertIn("validation", index["purpose_counts"])
         self.assertIn("human_labels", index["purpose_counts"])
         self.assertTrue(any(row["path"].endswith("known_match_report.csv") for row in index["artifacts"]))
+
+    def test_reproduction_audit_outputs(self):
+        if not reproduction_audit.PROVENANCE_JSON.exists():
+            self.skipTest("Provenance manifest has not been generated")
+        rows = reproduction_audit.build_audit_rows()
+        self.assertTrue(rows)
+        checks = {row["check_id"]: row for row in rows}
+        self.assertEqual(checks["RA-003"]["status"], "ready")
+        self.assertEqual(checks["RA-007"]["status"], "ready")
 
     def test_review_labeling_protocol_outputs(self):
         review_plan_path = review_labeling_protocol.OUTPUT_DIR / "first_pass_review_plan.csv"

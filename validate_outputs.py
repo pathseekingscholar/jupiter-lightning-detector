@@ -286,6 +286,15 @@ REQUIRED_COLUMNS = {
         "meaning",
         "next_action",
     },
+    "reproduction_audit.csv": {
+        "check_id",
+        "category",
+        "status",
+        "value",
+        "expected",
+        "evidence",
+        "next_action",
+    },
     "processed_date_coverage_summary.csv": {
         "run_date",
         "images_processed",
@@ -324,6 +333,7 @@ REQUIRED_FILES = [
     "review_agreement_audit.md",
     "evidence_index.json",
     "evidence_index.md",
+    "reproduction_audit.md",
     "processed_date_coverage_summary.md",
     "provenance_manifest.json",
     "provenance_manifest.md",
@@ -470,6 +480,7 @@ def validate() -> list[str]:
         assert_true("outputs/detection/github_project_board.csv" in artifact_paths, "Provenance missing GitHub project board CSV", errors)
         assert_true("outputs/detection/review_agreement_audit.csv" in artifact_paths, "Provenance missing review agreement audit CSV", errors)
         assert_true("outputs/detection/evidence_index.json" in artifact_paths, "Provenance missing evidence index JSON", errors)
+        assert_true("outputs/detection/reproduction_audit.csv" in artifact_paths, "Provenance missing reproduction audit CSV", errors)
         assert_true("outputs/detection/candidate_label_summary.csv" in artifact_paths, "Provenance missing candidate label summary CSV", errors)
         assert_true("outputs/detection/processed_date_coverage_summary.csv" in artifact_paths, "Provenance missing processed date coverage summary CSV", errors)
 
@@ -480,6 +491,13 @@ def validate() -> list[str]:
         purpose_counts = payload.get("purpose_counts", {})
         assert_true("validation" in purpose_counts, "Evidence index lacks validation bucket", errors)
         assert_true("human_labels" in purpose_counts, "Evidence index lacks human-label bucket", errors)
+
+    reproduction_audit_path = OUTPUT_DIR / "reproduction_audit.csv"
+    if reproduction_audit_path.exists():
+        audit_rows = read_csv(reproduction_audit_path)
+        assert_true(bool(audit_rows), "Reproduction audit has no rows", errors)
+        not_ready = [row for row in audit_rows if row.get("status") != "ready"]
+        assert_true(not not_ready, f"Reproduction audit has not-ready checks: {len(not_ready)}", errors)
 
     return errors
 

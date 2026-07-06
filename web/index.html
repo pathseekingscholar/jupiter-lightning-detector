@@ -10,7 +10,7 @@
   <header class="masthead">
     <div>
       <p class="kicker">Cassini Jupiter Lightning Detection</p>
-      <h1>Jupiter Lightning Detector Workbench</h1>
+      <h1>Jupiter Lightning Detector</h1>
     </div>
     <div class="date-block">
       <span>REVIEW ONLY</span>
@@ -22,13 +22,13 @@
     <section class="brief" aria-labelledby="brief-title">
       <div class="margin-note">Project goal</div>
       <div>
-        <h2 id="brief-title">Find and characterize possible Jupiter lightning in Cassini images with a simple, explainable detector.</h2>
-        <p>The objective is new planetary science: recover known lightning, screen unpublished images, and build evidence for candidate storms. This is not confirmed lightning. These are candidates for review.</p>
+        <h2 id="brief-title">Drop in a Cassini image. The detector circles bright spots. A human decides what is real.</h2>
+        <p>The objective is new planetary science: recover known lightning, screen more Cassini images, and build a careful review list for possible storms. Nothing here is called confirmed lightning until a scientist checks it.</p>
       </div>
       <ol>
-        <li><b>Input</b> Cassini image</li>
-        <li><b>Output</b> candidate table and thumbnails</li>
-        <li><b>Science</b> validation, spectra, storm context</li>
+        <li><b>1. Image</b> Cassini picture goes in</li>
+        <li><b>2. Detector</b> bright blobs get circled</li>
+        <li><b>3. Review</b> human says yes/no/uncertain</li>
       </ol>
     </section>
 
@@ -45,33 +45,33 @@
         <div class="start-copy">
           <p class="section-label">About</p>
           <h2 id="start-title">What this workbench does</h2>
-          <p>This workbench inspects Cassini ISS Jupiter images for bright spots that might be lightning. The detector does not make a discovery claim. It creates a careful review queue so the science can be checked.</p>
-          <p>The goal is not to showcase AI. The goal is to develop a reliable method for finding, validating, and characterizing overlooked lightning candidates in Cassini data.</p>
+          <p>This workbench does one simple job: look through Cassini Jupiter images and point at bright blobs that may be worth checking.</p>
+          <p>The detector is the first pass. The human reviewer is the decision maker. That is how we keep the science honest.</p>
           <p class="plain-statement">This is not confirmed lightning. These are candidates for review.</p>
         </div>
 
         <div class="paper-flow" aria-label="Detector pipeline">
-          <span>Cassini image</span>
-          <span>brighten night side</span>
-          <span>find bright spots</span>
-          <span>remove obvious artifacts</span>
-          <span>save candidates</span>
-          <span>human review</span>
-          <span>possible lightning</span>
+          <span>Put in a Cassini image</span>
+          <span>Brighten the dark side</span>
+          <span>Circle bright blobs</span>
+          <span>Reject obvious junk</span>
+          <span>Save every candidate</span>
+          <span>Human checks yes/no</span>
+          <span>Build science evidence</span>
         </div>
 
         <div class="start-grid">
           <article>
             <b>What goes in?</b>
-            <p>Calibrated Cassini ISS images, usually NAC/H-alpha frames from OPUS.</p>
+            <p>One Cassini picture, usually a night-side Jupiter image from OPUS.</p>
           </article>
           <article>
             <b>What comes out?</b>
-            <p>A candidate table with x/y position, brightness, blob size, local contrast, artifact flags, and a review score.</p>
+            <p>A list of circled spots with position, brightness, size, artifact flags, and thumbnails.</p>
           </article>
           <article>
             <b>Who decides?</b>
-            <p>A human reviewer labels each candidate as known lightning, possible lightning, artifact, cosmic ray or hot pixel, or uncertain.</p>
+            <p>A scientist or reviewer labels each spot as positive, negative, or uncertain.</p>
           </article>
         </div>
 
@@ -101,7 +101,13 @@
 
       <section class="bench">
         <aside class="controls">
-          <p class="section-label">Manual input controls</p>
+          <p class="section-label">Manual input</p>
+
+          <div class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="Drop a Cassini image here or click to choose a file">
+            <b>Drop Cassini image here</b>
+            <span>PNG, JPEG, WebP, or BMP</span>
+            <small>or click this box to choose a file</small>
+          </div>
 
           <label>
             Output size
@@ -145,7 +151,7 @@
 
           <label class="check"><input id="mark" type="checkbox" checked> Mark inspection coordinate</label>
 
-          <button type="button" id="upload">Add image to library</button>
+          <button type="button" id="upload">Choose image file</button>
           <input id="upload-file" type="file" accept="image/png,image/jpeg,image/webp,image/bmp" hidden>
           <button class="primary" id="export">Export processed PNG</button>
           <a class="text-link" href="https://opus.pds-rings.seti.org/" target="_blank" rel="noreferrer">Open OPUS archive</a>
@@ -244,12 +250,37 @@
         <div class="detection-heading">
           <div>
             <p class="section-label">Detector automation</p>
-            <h2 id="detection-title">Run detector, save candidates, review outputs</h2>
+            <h2 id="detection-title">Three steps: run, look, label</h2>
           </div>
-          <div class="detection-actions">
+        </div>
+
+        <div class="simple-action-board" aria-label="Simple detector actions">
+          <article>
+            <b>1. Run</b>
+            <p>The computer scans the selected Cassini date.</p>
             <button type="button" id="run-detector">Run detector again</button>
+          </article>
+          <article>
+            <b>2. Look</b>
+            <p>Open the picture sheet of the strongest circled spots.</p>
             <a id="contact-sheet-link" class="button-link" href="/outputs/detection/2001-01-01/candidate_contact_sheet.png">Open candidate gallery</a>
+          </article>
+          <article>
+            <b>3. Save</b>
+            <p>Keep the full candidate list so nothing is silently thrown away.</p>
             <a id="all-csv-link" class="button-link" href="/outputs/detection/2001-01-01/candidates.csv">Open all candidates CSV</a>
+          </article>
+          <article>
+            <b>4. Review</b>
+            <p>Use the review sheet to mark yes, no, or uncertain.</p>
+            <a class="button-link" href="/outputs/detection/review_sessions/S001_01_known_validation_positive.csv">Open first review session</a>
+          </article>
+        </div>
+
+        <details class="expert-files">
+          <summary>Expert files and research reports</summary>
+          <p>These are for documentation, GitHub reproducibility, and scientific audit. The simple workflow above is enough for a first meeting walkthrough.</p>
+          <div class="detection-actions">
             <a class="button-link" href="/outputs/detection/detection_summary.csv">Open summary CSV</a>
             <a class="button-link" href="/outputs/detection/processed_date_coverage_summary.md">Open date coverage summary</a>
             <a class="button-link" href="/outputs/detection/dataset_manifest.csv">Open dataset manifest</a>
@@ -274,7 +305,6 @@
             <a class="button-link" href="/outputs/detection/first_pass_review_plan.html">Open review plan table</a>
             <a class="button-link" href="/outputs/detection/review_session_plan.md">Open review session plan</a>
             <a class="button-link" href="/outputs/detection/review_session_audit.md">Open review session audit</a>
-            <a class="button-link" href="/outputs/detection/review_sessions/S001_01_known_validation_positive.csv">Open first review session</a>
             <a class="button-link" href="/outputs/detection/blind_review_packet.md">Open blind review packet</a>
             <a class="button-link" href="/outputs/detection/blind_review_reconciliation.md">Open blind reconciliation</a>
             <a class="button-link" href="/outputs/detection/evidence_integrity_audit.md">Open evidence integrity audit</a>
@@ -289,6 +319,7 @@
             <a class="button-link" href="/outputs/detection/github_project_board.md">Open project board</a>
             <a class="button-link" href="/outputs/detection/review_agreement_audit.md">Open agreement audit</a>
             <a class="button-link" href="/outputs/detection/evidence_index.md">Open evidence index</a>
+            <a class="button-link" href="/outputs/detection/reproduction_audit.md">Open reproduction audit</a>
             <a class="button-link" href="/outputs/detection/temporal_track_summary.csv">Open track summary</a>
             <a class="button-link" href="/outputs/detection/candidate_label_template.csv">Open label template</a>
             <a class="button-link" href="/outputs/detection/candidate_label_summary.csv">Open label summary</a>
@@ -300,7 +331,7 @@
             <a id="labels-csv-link" class="button-link" href="/outputs/detection/candidate_labels.csv">Export labels CSV</a>
             <a id="labels-json-link" class="button-link" href="/outputs/detection/candidate_labels.json">Export labels JSON</a>
           </div>
-        </div>
+        </details>
 
         <div class="date-tabs" id="detection-date-tabs" aria-label="Detector date tabs">
           <button type="button" data-date="2000-12-31">Dec 31</button>
@@ -315,10 +346,10 @@
         </div>
 
         <div class="workflow-box">
-          <b>Input -> process -> output:</b>
+          <b>What happens in the middle?</b>
           <span><b>Input:</b> Cassini H-alpha images for the selected date.</span>
-          <span><b>Process:</b> brighten image, find blobs, measure numbers, flag artifacts.</span>
-          <span><b>Output:</b> all candidates CSV, review candidates, thumbnails, known-match table, and human labels.</span>
+          <span><b>Process:</b> brighten image, find bright blobs, measure each blob, and flag obvious artifacts.</span>
+          <span><b>Output:</b> all candidates, review thumbnails, known-match check, and human labels.</span>
         </div>
 
         <div class="characteristics-panel">
@@ -443,6 +474,36 @@
           <article><b>What is a false positive?</b><p>The detector flags something that is not lightning, like a cosmic ray or hot pixel.</p></article>
           <article><b>What is a false negative?</b><p>The detector misses a real or published lightning spot.</p></article>
           <article><b>What is the score?</b><p>A review priority ranking. It is not a probability unless it is calibrated later.</p></article>
+        </div>
+
+        <h3 class="subhead">How does the detector decide?</h3>
+        <div class="kid-grid">
+          <article><b>Brightness</b><p>It looks for pixels that are much brighter than the nearby night-side background.</p></article>
+          <article><b>Local contrast</b><p>It checks whether the bright spot stands out from its local neighborhood.</p></article>
+          <article><b>Blob size</b><p>It groups touching bright pixels together, because a real diffuse flash should often cover more than one pixel.</p></article>
+          <article><b>Signal-to-noise ratio</b><p>It asks whether the spot is strong compared with local image noise.</p></article>
+          <article><b>Shape metrics</b><p>It measures whether the blob is round/diffuse or suspiciously sharp/streak-like.</p></article>
+          <article><b>Artifact filters</b><p>It flags single pixels, tiny points, very sharp hits, and streak-like shapes for review.</p></article>
+        </div>
+
+        <h3 class="subhead">What is NOT happening?</h3>
+        <div class="kid-grid">
+          <article><b>No answer key during search</b><p>The detector is not handed the lightning coordinates when it scans an image.</p></article>
+          <article><b>No manual clicking first</b><p>The detector is not manually told where to look before it finds candidate blobs.</p></article>
+          <article><b>No reinforcement learning</b><p>This is not an agent learning by reward. It is a simple measurement-and-filter pipeline.</p></article>
+          <article><b>No YOLO yet</b><p>YOLO may come later after humans label examples, but it is not the current detector.</p></article>
+          <article><b>No discovery claim</b><p>An unmatched candidate is not automatically new lightning.</p></article>
+          <article><b>No hidden deletion</b><p>The pipeline saves candidates so humans can inspect positives, negatives, and uncertain cases.</p></article>
+        </div>
+
+        <h3 class="subhead">Current Status</h3>
+        <div class="kid-grid">
+          <article><b>Published detections validated</b><p>The current outputs recover the six published validation marks across Jan 1, Jan 10, and Jan 11.</p></article>
+          <article><b>Candidate generation working</b><p>The detector has processed nine Cassini NAC/H-alpha date windows and writes candidate CSVs and galleries.</p></article>
+          <article><b>False positives tracked</b><p>Likely artifacts, single-pixel hits, and unmatched candidates are kept for review instead of hidden.</p></article>
+          <article><b>Human labels next</b><p>The next research gate is yes/no/uncertain review by a human, then using those labels for training readiness.</p></article>
+          <article><b>Temporal tracking planned</b><p>The project is moving toward checking whether candidates repeat across nearby frames with consistent motion.</p></article>
+          <article><b>Geometry still needed</b><p>Candidate x/y pixels still need Jupiter latitude/longitude projection before strong planet-location claims.</p></article>
         </div>
 
         <h3 class="subhead">Detector numbers</h3>
