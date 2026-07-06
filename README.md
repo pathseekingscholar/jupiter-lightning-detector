@@ -53,6 +53,7 @@ Run the detector for the example dates:
 .\run.ps1 review-plan
 .\run.ps1 review-sessions
 .\run.ps1 review-session-audit
+.\run.ps1 temporal-validation
 .\run.ps1 blind-review
 .\run.ps1 blind-reconcile
 .\run.ps1 evidence-integrity
@@ -99,6 +100,8 @@ Run the detector for the example dates:
   - `outputs/detection/review_metrics_summary.csv`
   - `outputs/detection/review_decision_matrix.csv`
   - `outputs/detection/temporal_track_quality.csv`
+  - `outputs/detection/temporal_validation_plan.csv`
+  - `outputs/detection/temporal_validation_plan.md`
   - `outputs/detection/threshold_recommendations.csv`
   - `outputs/detection/candidate_review_dossier.csv`
   - `outputs/detection/candidate_review_dossier.html`
@@ -367,6 +370,9 @@ candidates.
 - `temporal_track_quality.csv`: track-level quality labels that separate
   strong temporal-review targets from single-frame candidates that are not
   temporal evidence.
+- `temporal_validation_plan.csv` and `temporal_validation_plan.md`: explicit
+  temporal-review checklist for top repeated tracks, including persistence,
+  motion, artifact, geometry, and second-review questions.
 - `threshold_recommendations.csv`: sweep summary showing how stricter SNR and
   blob-size rules affect review workload and published-mark recovery.
 - `candidate_review_dossier.html`: reviewer-facing candidate table with crop

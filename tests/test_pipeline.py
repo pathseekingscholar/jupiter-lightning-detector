@@ -33,6 +33,7 @@ import review_agreement_audit
 import review_session_audit
 import review_session_planner
 import review_metrics
+import temporal_validation_plan
 import training_readiness
 import validate_outputs
 
@@ -375,6 +376,15 @@ END_OBJECT = IMAGE
         self.assertTrue(all("session_status" in row for row in rows))
         self.assertTrue(all(int(row["candidate_count"]) > 0 for row in rows))
         self.assertTrue(any(row["session_status"] == "not_started" for row in rows))
+
+    def test_temporal_validation_plan_outputs(self):
+        if not temporal_validation_plan.TRACK_QUALITY_CSV.exists():
+            self.skipTest("Temporal track quality has not been generated")
+        rows = temporal_validation_plan.build_plan_rows(limit=20)
+        self.assertTrue(rows)
+        self.assertIn("review_questions", rows[0])
+        self.assertIn("required_next_evidence", rows[0])
+        self.assertTrue(any(row["review_priority"] == "A_top_temporal_review" for row in rows))
 
     def test_blind_review_packet_outputs(self):
         review_plan_path = blind_review_packet.OUTPUT_DIR / "first_pass_review_plan.csv"

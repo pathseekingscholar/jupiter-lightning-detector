@@ -169,6 +169,21 @@ REQUIRED_COLUMNS = {
         "session_status",
         "next_action",
     },
+    "temporal_validation_plan.csv": {
+        "review_rank",
+        "track_id",
+        "run_date",
+        "temporal_quality",
+        "frame_count",
+        "first_image_id",
+        "last_image_id",
+        "motion_consistency",
+        "candidate_score",
+        "geometry_status",
+        "review_priority",
+        "review_questions",
+        "required_next_evidence",
+    },
     "blind_review_packet.csv": {
         "blind_id",
         "image_id",
@@ -295,6 +310,7 @@ REQUIRED_FILES = [
     "first_pass_review_plan.html",
     "review_session_plan.md",
     "review_session_audit.md",
+    "temporal_validation_plan.md",
     "blind_review_packet.md",
     "blind_review_reconciliation.md",
     "evidence_integrity_audit.md",
@@ -438,6 +454,7 @@ def validate() -> list[str]:
         assert_true("outputs/detection/first_pass_review_plan.csv" in artifact_paths, "Provenance missing first-pass review plan CSV", errors)
         assert_true("outputs/detection/review_session_plan.csv" in artifact_paths, "Provenance missing review session plan CSV", errors)
         assert_true("outputs/detection/review_session_audit.csv" in artifact_paths, "Provenance missing review session audit CSV", errors)
+        assert_true("outputs/detection/temporal_validation_plan.csv" in artifact_paths, "Provenance missing temporal validation plan CSV", errors)
         assert_true("outputs/detection/review_sessions/S001_01_known_validation_positive.csv" in artifact_paths, "Provenance missing first review session CSV", errors)
         assert_true("outputs/detection/blind_review_packet.csv" in artifact_paths, "Provenance missing blind review packet CSV", errors)
         assert_true("outputs/detection/blind_review_reconciliation.csv" in artifact_paths, "Provenance missing blind review reconciliation CSV", errors)
