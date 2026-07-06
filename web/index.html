@@ -463,14 +463,75 @@
         <p class="section-label">Plain-English detector diagram</p>
         <h2>What the detector does</h2>
 
-        <div class="simple-flow">
-          <span>Cassini image</span>
-          <span>Brighten night side</span>
-          <span>Find bright blobs</span>
-          <span>Reject artifacts</span>
-          <span>Save candidates</span>
-          <span>Human review</span>
-          <span>Possible lightning</span>
+        <div class="simple-flow" aria-label="Plain English detector pipeline">
+          <article>
+            <small>Input</small>
+            <b>Cassini image</b>
+            <p>One stored OPUS image from the selected date.</p>
+          </article>
+          <article>
+            <small>Step 1</small>
+            <b>Contrast enhancement</b>
+            <p>Stretch the night side so faint light is visible.</p>
+          </article>
+          <article>
+            <small>Step 2</small>
+            <b>Background estimate</b>
+            <p>Measure the local dark background around each area.</p>
+          </article>
+          <article>
+            <small>Step 3</small>
+            <b>Bright region detection</b>
+            <p>Find pixels brighter than the local background.</p>
+          </article>
+          <article>
+            <small>Step 4</small>
+            <b>Blob formation</b>
+            <p>Group touching bright pixels into one candidate blob.</p>
+          </article>
+          <article>
+            <small>Step 5</small>
+            <b>Artifact filtering</b>
+            <p>Flag single pixels, tiny dots, sharp hits, and streaks.</p>
+          </article>
+          <article>
+            <small>Step 6</small>
+            <b>Candidate scoring</b>
+            <p>Rank by brightness, size, contrast, shape, and SNR.</p>
+          </article>
+          <article>
+            <small>Output</small>
+            <b>Human review</b>
+            <p>A reviewer labels yes, no, or uncertain.</p>
+          </article>
+        </div>
+
+        <div class="worked-example">
+          <p class="section-label">Worked example</p>
+          <h3>N1357029177, in plain English</h3>
+          <ol>
+            <li><b>Image goes in:</b> the calibrated Cassini frame is loaded from the local OPUS data folder.</li>
+            <li><b>Detector measures:</b> brightness, local contrast, blob size, SNR, shape, and artifact flags.</li>
+            <li><b>Candidates come out:</b> bright blobs are saved with x/y coordinates and review thumbnails.</li>
+            <li><b>Validation check:</b> the detector output is compared against the published lightning marks.</li>
+            <li><b>Result:</b> this frame has published matches recovered, but any unmatched blobs still need review.</li>
+          </ol>
+        </div>
+
+        <div class="training-loop">
+          <div>
+            <p class="section-label">Training loop, kept simple</p>
+            <h3>How the detector can learn later</h3>
+            <p>The current detector is not trained AI. It is classical computer vision. Training starts after humans label enough candidates.</p>
+          </div>
+          <div class="loop-flow" aria-label="Human review training loop">
+            <span>Detector suggests candidates</span>
+            <span>Human labels yes / no / uncertain</span>
+            <span>Labels save to local CSV and JSON</span>
+            <span>Future model learns from labels</span>
+            <span>Model is tested against known positives and negatives</span>
+          </div>
+          <p class="storage-note"><b>Free storage plan:</b> keep raw OPUS images local because they are large, keep generated labels as CSV/JSON in the repo, and use GitHub for versioned summaries. A free Supabase/Firebase table is optional later if multiple reviewers need live shared labeling, but it is not required yet.</p>
         </div>
 
         <div class="kid-grid">
@@ -508,7 +569,7 @@
           <article><b>Candidate generation working</b><p>The detector has processed nine Cassini NAC/H-alpha date windows and writes candidate CSVs and galleries.</p></article>
           <article><b>False positives tracked</b><p>Likely artifacts, single-pixel hits, and unmatched candidates are kept for review instead of hidden.</p></article>
           <article><b>Human labels next</b><p>The next research gate is yes/no/uncertain review by a human, then using those labels for training readiness.</p></article>
-          <article><b>Temporal tracking planned</b><p>The project is moving toward checking whether candidates repeat across nearby frames with consistent motion.</p></article>
+          <article><b>Temporal review working</b><p>The project now exports temporal track summaries and a temporal validation plan, but those tracks still need human/geometric review.</p></article>
           <article><b>Geometry still needed</b><p>Candidate x/y pixels still need Jupiter latitude/longitude projection before strong planet-location claims.</p></article>
         </div>
 
