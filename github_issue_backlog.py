@@ -85,8 +85,10 @@ def acceptance_criteria(gate: str) -> list[str]:
             "`research_gate_audit.md` marks `published_marks_human_confirmed` ready.",
         ],
         "candidate_geometry": [
+            "`outputs/detection/geometry_input_inventory.csv` reports projection inputs ready for the target frames.",
+            "Cassini ISS camera model assumptions are documented.",
+            "Required local SPICE kernels are present and listed.",
             "Candidate x/y coordinates can be mapped to Jupiter latitude/longitude or a documented projection failure.",
-            "Geometry output distinguishes image-level bounds from candidate-level mapping.",
             "No location-based storm claim is made until this gate is ready.",
         ],
         "model_training_readiness": [

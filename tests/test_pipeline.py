@@ -415,6 +415,7 @@ END_OBJECT = IMAGE
         self.assertEqual(gates["model_training_readiness"]["evidence_file"], "outputs/detection/training_readiness.csv")
         self.assertIn("evidence_integrity", gates)
         self.assertEqual(gates["evidence_integrity"]["evidence_file"], "outputs/detection/evidence_integrity_audit.csv")
+        self.assertEqual(gates["candidate_geometry"]["evidence_file"], "outputs/detection/geometry_input_inventory.csv")
         self.assertIn("evidence_file", rows[0])
 
     def test_github_issue_backlog_outputs(self):

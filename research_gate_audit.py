@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+from collections import Counter
 from pathlib import Path
 
 
@@ -54,6 +55,7 @@ def build_gate_audit() -> list[dict[str, object]]:
     human_audit = read_csv(OUTPUT_DIR / "human_review_audit.csv")
     claim_audit = read_csv(OUTPUT_DIR / "doc_claim_audit.csv")
     geometry = read_csv(OUTPUT_DIR / "geometry_readiness.csv")
+    geometry_inputs = read_csv(OUTPUT_DIR / "geometry_input_inventory.csv")
     filter_context = read_csv(OUTPUT_DIR / "nearby_filter_context.csv")
     review_plan = read_csv(OUTPUT_DIR / "first_pass_review_plan.csv")
     training_readiness = read_csv(OUTPUT_DIR / "training_readiness.csv")
@@ -72,6 +74,14 @@ def build_gate_audit() -> list[dict[str, object]]:
         if row.get("candidate_latlon_ready") == "yes"
         and "per-candidate mapping still needs" not in row.get("readiness_note", "")
     )
+    projection_ready = sum(1 for row in geometry_inputs if row.get("projection_input_status") == "projection_inputs_ready")
+    projection_blocked = sum(1 for row in geometry_inputs if row.get("projection_input_status") == "blocked")
+    blocker_counts = Counter()
+    for row in geometry_inputs:
+        for blocker in row.get("blocking_inputs", "").split("|"):
+            if blocker:
+                blocker_counts[blocker] += 1
+    blocker_summary = "; ".join(f"{name}: {count}" for name, count in sorted(blocker_counts.items()))
     context_rows = sum(1 for row in filter_context if row.get("context_status") == "nearby_non_hal_context")
     review_rows = len(review_plan)
     model_gate = row_by_key(training_readiness, "gate", "model_comparison_allowed")
@@ -170,11 +180,11 @@ def build_gate_audit() -> list[dict[str, object]]:
         ),
         gate(
             "candidate_geometry",
-            "ready" if candidate_map_ready > 0 else "not_ready",
-            f"{image_level_bounds} image-bound rows; {candidate_map_ready} candidate maps",
-            "outputs/detection/geometry_readiness.csv",
-            "Image-level latitude/longitude bounds exist for some rows, but candidate-level x/y-to-Jupiter mapping is not ready yet.",
-            "Add navigation/geometry mapping before making location-based storm claims.",
+            "ready" if projection_ready > 0 and candidate_map_ready > 0 else "not_ready",
+            f"{projection_ready} projection-ready; {projection_blocked} blocked; {candidate_map_ready} candidate maps",
+            "outputs/detection/geometry_input_inventory.csv",
+            f"Candidate-level geometry is blocked by missing projection inputs. {blocker_summary}",
+            "Collect/document the Cassini ISS camera model and local SPICE kernels before making location-based storm claims.",
         ),
         gate(
             "model_training_readiness",
