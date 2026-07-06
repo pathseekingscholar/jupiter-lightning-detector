@@ -12,6 +12,7 @@ import app_server
 import blind_review_packet
 import blind_review_reconcile
 import doc_claim_audit
+import evidence_integrity_audit
 import first_pass_review_plan
 import github_issue_backlog
 import geometry_audit
@@ -347,6 +348,17 @@ END_OBJECT = IMAGE
         self.assertIn("agreement", rows[0])
         self.assertTrue(all("candidate_id" in row for row in rows))
         self.assertIsInstance(import_rows, list)
+
+    def test_evidence_integrity_audit_outputs(self):
+        review_plan_path = evidence_integrity_audit.OUTPUT_DIR / "first_pass_review_plan.csv"
+        if not review_plan_path.exists():
+            self.skipTest("First-pass review plan has not been generated")
+        rows = evidence_integrity_audit.build_audit_rows()
+        self.assertTrue(rows)
+        checks = {row["check"]: row for row in rows}
+        self.assertIn("blind_packet_key_row_match", checks)
+        self.assertIn("review_crop_url_shape", checks)
+        self.assertIn(checks["blind_packet_key_row_match"]["status"], {"ready", "not_ready"})
 
     def test_review_labeling_protocol_outputs(self):
         review_plan_path = review_labeling_protocol.OUTPUT_DIR / "first_pass_review_plan.csv"

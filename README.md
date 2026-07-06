@@ -51,6 +51,7 @@ Run the detector for the example dates:
 .\run.ps1 review-plan
 .\run.ps1 blind-review
 .\run.ps1 blind-reconcile
+.\run.ps1 evidence-integrity
 .\run.ps1 label-protocol
 .\run.ps1 training-readiness
 .\run.ps1 claim-audit
@@ -112,6 +113,8 @@ Run the detector for the example dates:
   - `outputs/detection/blind_review_reconciliation.csv`
   - `outputs/detection/blind_review_label_import.csv`
   - `outputs/detection/blind_review_reconciliation.md`
+  - `outputs/detection/evidence_integrity_audit.csv`
+  - `outputs/detection/evidence_integrity_audit.md`
   - `outputs/detection/review_labeling_checklist.csv`
   - `outputs/detection/review_labeling_protocol.md`
   - `outputs/detection/training_readiness.csv`
@@ -238,6 +241,7 @@ missing image lines for these products.
 .\run.ps1 review-plan
 .\run.ps1 blind-review
 .\run.ps1 blind-reconcile
+.\run.ps1 evidence-integrity
 .\run.ps1 label-protocol
 .\run.ps1 training-readiness
 .\run.ps1 claim-audit
@@ -415,6 +419,12 @@ be opened later to compare reviewer labels against the detector's categories.
 `blind_review_label_import.csv`, and `blind_review_reconciliation.md`. It joins
 filled blind labels back to candidate IDs and produces an import-ready CSV for
 `.\run.ps1 label-import` after the reconciliation has been checked.
+
+`.\run.ps1 evidence-integrity` writes `evidence_integrity_audit.csv` and
+`evidence_integrity_audit.md`. It checks that reviewer-facing evidence is
+internally consistent: review counts match, blind IDs align, crop URLs are
+well formed, referenced image products exist locally, and review PNG artifacts
+open successfully.
 
 `.\run.ps1 label-protocol` writes `review_labeling_protocol.md` and
 `review_labeling_checklist.csv`. These files define positive, negative,
