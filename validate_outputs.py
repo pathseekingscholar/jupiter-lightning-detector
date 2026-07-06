@@ -89,6 +89,14 @@ REQUIRED_COLUMNS = {
         "meaning",
         "next_action",
     },
+    "first_pass_review_plan.csv": {
+        "review_order",
+        "review_batch",
+        "candidate_id",
+        "suggested_human_label",
+        "reviewer_task",
+        "review_note_prompt",
+    },
 }
 
 
@@ -98,6 +106,7 @@ REQUIRED_FILES = [
     "geometry_readiness_report.md",
     "nearby_filter_context_report.md",
     "human_review_audit.md",
+    "first_pass_review_plan.md",
     "provenance_manifest.json",
     "provenance_manifest.md",
     "review_artifacts/published_match.png",
@@ -169,6 +178,7 @@ def validate() -> list[str]:
         assert_true("outputs/detection/geometry_readiness.csv" in artifact_paths, "Provenance missing geometry readiness CSV", errors)
         assert_true("outputs/detection/nearby_filter_context.csv" in artifact_paths, "Provenance missing nearby filter context CSV", errors)
         assert_true("outputs/detection/human_review_audit.csv" in artifact_paths, "Provenance missing human review audit CSV", errors)
+        assert_true("outputs/detection/first_pass_review_plan.csv" in artifact_paths, "Provenance missing first-pass review plan CSV", errors)
 
     return errors
 

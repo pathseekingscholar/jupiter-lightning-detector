@@ -9,6 +9,7 @@ from PIL import Image
 
 import jupiter_pipeline as pipeline
 import app_server
+import first_pass_review_plan
 import geometry_audit
 import human_review_audit
 import label_tools
@@ -259,6 +260,17 @@ END_OBJECT = IMAGE
         self.assertIn("positive_training_examples", items)
         self.assertIn("negative_training_examples", items)
         self.assertIn("published_validation_marks_labeled", items)
+
+    def test_first_pass_review_plan_outputs(self):
+        dossier_path = first_pass_review_plan.OUTPUT_DIR / "candidate_review_dossier.csv"
+        if not dossier_path.exists():
+            self.skipTest("Candidate review dossier has not been generated")
+        rows = first_pass_review_plan.build_plan()
+        self.assertTrue(rows)
+        batches = {row["review_batch"] for row in rows}
+        self.assertIn("01_known_validation_positive", batches)
+        self.assertIn("03_negative_artifact_examples", batches)
+        self.assertTrue(all(row["review_note_prompt"] for row in rows))
 
 
 if __name__ == "__main__":

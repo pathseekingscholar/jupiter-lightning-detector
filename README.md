@@ -46,6 +46,7 @@ Run the detector for the example dates:
 .\run.ps1 geometry
 .\run.ps1 filters
 .\run.ps1 label-audit
+.\run.ps1 review-plan
 .\run.ps1 label-template
 .\run.ps1 provenance
 .\run.ps1 validate-outputs
@@ -87,6 +88,8 @@ Run the detector for the example dates:
   - `outputs/detection/nearby_filter_context_report.md`
   - `outputs/detection/human_review_audit.csv`
   - `outputs/detection/human_review_audit.md`
+  - `outputs/detection/first_pass_review_plan.csv`
+  - `outputs/detection/first_pass_review_plan.md`
   - `outputs/detection/review_metrics_report.md`
   - `outputs/detection/review_metrics_report.html`
   - `outputs/detection/candidate_label_template.csv`
@@ -194,6 +197,7 @@ missing image lines for these products.
 .\run.ps1 geometry
 .\run.ps1 filters
 .\run.ps1 label-audit
+.\run.ps1 review-plan
 .\run.ps1 label-template
 .\run.ps1 provenance
 .\run.ps1 validate-outputs
@@ -339,6 +343,12 @@ The review loop is deliberately simple:
 directly: how many reviewed positives exist, how many reviewed negatives exist,
 how many published validation marks have human labels, and how many candidates
 are still only detector outputs.
+
+`.\run.ps1 review-plan` writes `first_pass_review_plan.csv` and
+`first_pass_review_plan.md`. It turns the review matrix into a practical
+labeling order: known validation positives first, temporal candidates second,
+negative artifact examples third, and strong single-frame candidates after
+that.
 5. Any future YOLO or neural model must beat the explainable baseline without
    hiding false positives or false negatives.
 
