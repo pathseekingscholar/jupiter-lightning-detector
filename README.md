@@ -47,6 +47,7 @@ Run the detector for the example dates:
 .\run.ps1 geometry
 .\run.ps1 geometry-plan
 .\run.ps1 geometry-inputs
+.\run.ps1 geometry-acquisition
 .\run.ps1 filters
 .\run.ps1 label-audit
 .\run.ps1 review-plan
@@ -103,6 +104,8 @@ Run the detector for the example dates:
   - `outputs/detection/candidate_geometry_plan.md`
   - `outputs/detection/geometry_input_inventory.csv`
   - `outputs/detection/geometry_input_inventory.md`
+  - `outputs/detection/geometry_acquisition_checklist.csv`
+  - `outputs/detection/geometry_acquisition_checklist.md`
   - `outputs/detection/nearby_filter_context.csv`
   - `outputs/detection/nearby_filter_context_report.md`
   - `outputs/detection/human_review_audit.csv`
@@ -240,6 +243,7 @@ missing image lines for these products.
 .\run.ps1 geometry
 .\run.ps1 geometry-plan
 .\run.ps1 geometry-inputs
+.\run.ps1 geometry-acquisition
 .\run.ps1 filters
 .\run.ps1 label-audit
 .\run.ps1 review-plan
@@ -507,6 +511,13 @@ candidate. They are a work plan, not solved latitude/longitude coordinates.
 label timing/SCLK fields, OPUS image-level geometry, local SPICE kernel
 presence, and the camera-model blocker for pixel-to-Jupiter projection.
 
+`.\run.ps1 geometry-acquisition` writes
+`geometry_acquisition_checklist.csv` and `geometry_acquisition_checklist.md`.
+It lists the official NAIF/PDS Cassini SPICE inputs needed before x/y
+candidate pixels can be projected onto Jupiter: ISS instrument kernel, frame
+kernel, pointing CK, trajectory SPK, spacecraft clock, leapseconds, and
+planetary constants. This is an acquisition checklist, not a projection result.
+
 The next publishable-analysis path is to connect credible H-alpha candidates to
 nearby broadband/filter images. That is what would make color or spectrum work
 possible instead of just claiming a detector works.
@@ -523,5 +534,11 @@ a follow-up queue only; it does not prove color or spectrum behavior.
 - OPUS Jupiter search example: <https://opus.pds-rings.seti.org/#/COISScamera=Narrow+Angle&instrument=Cassini+ISS&planet=Jupiter&qtype-SURFACEGEOjupiter_limbaltitude=any&unit-SURFACEGEOjupiter_limbaltitude=km&SURFACEGEOjupiter_planetographiclatitude1=-87&SURFACEGEOjupiter_planetographiclatitude2=88&qtype-SURFACEGEOjupiter_planetographiclatitude=any&unit-SURFACEGEOjupiter_planetographiclatitude=degrees&surfacegeometrytargetname=Jupiter&time1=2001-01-01T01:43:11.699&qtype-time=any&unit-time=ymdhms&cols=opusid,instrument,planet,target,time1,observationduration&widgets=SURFACEGEOjupiter_limbaltitude,SURFACEGEOjupiter_planetographiclatitude,surfacegeometrytargetname,time,planet,COISScamera,instrument&order=time1,opusid&view=browse&browse=gallery&cart_browse=gallery&startobs=29&cart_startobs=1&detail=co-iss-n1359382963>
 - Dyudina et al. (2004), Icarus 172, 24-36:
   <https://ui.adsabs.harvard.edu/abs/2004Icar..172...24D/abstract>
+- NAIF Cassini SPICE kernels:
+  <https://naif.jpl.nasa.gov/pub/naif/CASSINI/kernels/>
+- NAIF/PDS Cassini SPICE archive readme:
+  <https://naif.jpl.nasa.gov/pub/naif/pds/data/co-s_j_e_v-spice-6-v1.0/cosp_1000/aareadme.htm>
+- Cassini ISS instrument kernel:
+  <https://naif.jpl.nasa.gov/pub/naif/CASSINI/kernels/ik/release.10/cas_iss_v09.ti>
 - Local copy of the published paper, if present:
   `C:\Users\vedar\Downloads\lightning_cassini_published.pdf`

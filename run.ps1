@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("init", "download", "analyze", "report", "all", "test", "app", "detect", "detect-all", "exports", "coverage", "coverage-summary", "review", "geometry", "geometry-plan", "geometry-inputs", "filters", "label-audit", "review-plan", "blind-review", "blind-reconcile", "evidence-integrity", "label-protocol", "training-readiness", "claim-audit", "research-gates", "issue-backlog", "agreement-audit", "label-template", "label-import", "label-summary", "provenance", "validate-outputs")]
+    [ValidateSet("init", "download", "analyze", "report", "all", "test", "app", "detect", "detect-all", "exports", "coverage", "coverage-summary", "review", "geometry", "geometry-plan", "geometry-inputs", "geometry-acquisition", "filters", "label-audit", "review-plan", "blind-review", "blind-reconcile", "evidence-integrity", "label-protocol", "training-readiness", "claim-audit", "research-gates", "issue-backlog", "agreement-audit", "label-template", "label-import", "label-summary", "provenance", "validate-outputs")]
     [string]$Command = "all",
     [ValidateSet("2000-12-31", "2001-01-01", "2001-01-04", "2001-01-05", "2001-01-08", "2001-01-09", "2001-01-10", "2001-01-11", "2001-01-13")]
     [string]$Date = "2001-01-01",
@@ -44,6 +44,8 @@ if ($Command -eq "test") {
     & $python candidate_geometry_plan.py
 } elseif ($Command -eq "geometry-inputs") {
     & $python geometry_input_inventory.py
+} elseif ($Command -eq "geometry-acquisition") {
+    & $python geometry_acquisition_checklist.py
 } elseif ($Command -eq "filters") {
     & $python nearby_filter_context.py
 } elseif ($Command -eq "label-audit") {

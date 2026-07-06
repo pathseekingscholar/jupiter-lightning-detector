@@ -16,6 +16,7 @@ import evidence_integrity_audit
 import first_pass_review_plan
 import github_issue_backlog
 import geometry_audit
+import geometry_acquisition_checklist
 import geometry_input_inventory
 import human_review_audit
 import candidate_geometry_plan
@@ -302,6 +303,14 @@ END_OBJECT = IMAGE
         self.assertIn("projection_input_status", rows[0])
         self.assertTrue(all(row["calibrated_label_exists"] == "yes" for row in rows))
         self.assertTrue(any("missing_local_spice_kernels" in row["blocking_inputs"] for row in rows))
+
+    def test_geometry_acquisition_checklist_outputs(self):
+        rows = geometry_acquisition_checklist.build_checklist_rows()
+        self.assertTrue(rows)
+        kinds = {row["kernel_kind"] for row in rows}
+        self.assertIn("IK", kinds)
+        self.assertIn("SPK", kinds)
+        self.assertTrue(all(row["source_url"].startswith("https://naif.jpl.nasa.gov/") for row in rows))
 
     def test_nearby_filter_context_outputs(self):
         context_path = nearby_filter_context.CONTEXT_CSV
