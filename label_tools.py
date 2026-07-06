@@ -44,6 +44,8 @@ LABEL_FIELDNAMES = [
     "confidence",
     "reviewer",
     "review_note",
+    "review_stage",
+    "needs_second_review",
     "reviewed_at",
     "updated_at",
 ]
@@ -121,6 +123,14 @@ def write_derived_label_exports(
         "count": total,
         "meaning": "All saved human labels.",
     })
+    second_review_count = sum(1 for row in labels if truthy(row.get("needs_second_review")))
+    summary.append({
+        "summary_item": "needs_second_review",
+        "label_group": "review_quality",
+        "human_label": "",
+        "count": second_review_count,
+        "meaning": "Labels explicitly marked for second review.",
+    })
     for group in ["positive", "negative", "uncertain", "unlabeled"]:
         count = sum(1 for row in labels if label_group(row.get("human_label") or row.get("label")) == group)
         summary.append({
@@ -140,6 +150,10 @@ def write_derived_label_exports(
             "meaning": "Saved human labels by exact label value.",
         })
     write_csv(summary_path, summary, ["summary_item", "label_group", "human_label", "count", "meaning"])
+
+
+def truthy(value: object) -> bool:
+    return str(value).strip().lower() in {"1", "true", "yes", "y"}
 
 
 def meaning_for_group(group: str) -> str:
@@ -176,6 +190,8 @@ def build_template() -> list[dict[str, object]]:
             "confidence": "",
             "reviewer": "",
             "review_note": "",
+            "review_stage": "first-review",
+            "needs_second_review": "",
             "reviewed_at": "",
         })
     return rows
@@ -204,6 +220,8 @@ def export_template(path: Path = TEMPLATE_CSV) -> None:
             "confidence",
             "reviewer",
             "review_note",
+            "review_stage",
+            "needs_second_review",
             "reviewed_at",
         ],
     )
@@ -255,6 +273,8 @@ def import_labels(path: Path) -> None:
             "confidence": confidence,
             "reviewer": str(row.get("reviewer", "")).strip() or "csv-reviewer",
             "review_note": str(row.get("review_note", ""))[:2000],
+            "review_stage": str(row.get("review_stage", "")).strip() or "first-review",
+            "needs_second_review": "yes" if truthy(row.get("needs_second_review")) else "no",
             "reviewed_at": reviewed_at,
             "updated_at": reviewed_at,
         }

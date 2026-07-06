@@ -53,9 +53,19 @@
       "type": "string",
       "description": "Short reason for the label, including visual or temporal evidence."
     },
+    "review_stage": {
+      "type": "string",
+      "enum": [
+        "first-review",
+        "second-review",
+        "consensus"
+      ],
+      "description": "Where this label sits in the human-review process."
+    },
     "needs_second_review": {
       "type": "boolean",
-      "default": false
+      "default": false,
+      "description": "True when the candidate should be checked by another reviewer before use in training or claims."
     }
   }
 }

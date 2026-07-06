@@ -131,6 +131,13 @@ REQUIRED_COLUMNS = {
         "evidence_file",
         "acceptance_criteria",
     },
+    "review_agreement_audit.csv": {
+        "metric",
+        "value",
+        "status",
+        "meaning",
+        "next_action",
+    },
 }
 
 
@@ -145,6 +152,7 @@ REQUIRED_FILES = [
     "doc_claim_audit.md",
     "research_gate_audit.md",
     "github_issue_backlog.md",
+    "review_agreement_audit.md",
     "provenance_manifest.json",
     "provenance_manifest.md",
     "review_artifacts/published_match.png",
@@ -249,6 +257,7 @@ def validate() -> list[str]:
         assert_true("outputs/detection/doc_claim_audit.csv" in artifact_paths, "Provenance missing documentation claim audit CSV", errors)
         assert_true("outputs/detection/research_gate_audit.csv" in artifact_paths, "Provenance missing research gate audit CSV", errors)
         assert_true("outputs/detection/github_issue_backlog.csv" in artifact_paths, "Provenance missing GitHub issue backlog CSV", errors)
+        assert_true("outputs/detection/review_agreement_audit.csv" in artifact_paths, "Provenance missing review agreement audit CSV", errors)
         assert_true("outputs/detection/candidate_label_summary.csv" in artifact_paths, "Provenance missing candidate label summary CSV", errors)
 
     return errors

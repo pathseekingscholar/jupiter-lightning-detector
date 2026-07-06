@@ -448,6 +448,8 @@ def save_candidate_label(payload: dict) -> dict:
         "confidence": str(payload.get("confidence", "medium")),
         "reviewer": str(payload.get("reviewer", "local-reviewer")),
         "review_note": str(payload.get("review_note", ""))[:2000],
+        "review_stage": str(payload.get("review_stage", "first-review")),
+        "needs_second_review": "yes" if label_tools.truthy(payload.get("needs_second_review")) else "no",
         "reviewed_at": reviewed_at,
         "updated_at": reviewed_at,
     }

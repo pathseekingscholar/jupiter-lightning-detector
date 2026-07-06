@@ -50,6 +50,7 @@ Run the detector for the example dates:
 .\run.ps1 claim-audit
 .\run.ps1 research-gates
 .\run.ps1 issue-backlog
+.\run.ps1 agreement-audit
 .\run.ps1 label-template
 .\run.ps1 label-summary
 .\run.ps1 provenance
@@ -102,6 +103,8 @@ Run the detector for the example dates:
 	  - `outputs/detection/research_gate_audit.md`
 	  - `outputs/detection/github_issue_backlog.csv`
 	  - `outputs/detection/github_issue_backlog.md`
+	  - `outputs/detection/review_agreement_audit.csv`
+	  - `outputs/detection/review_agreement_audit.md`
 	  - `outputs/detection/review_metrics_report.md`
 	  - `outputs/detection/review_metrics_report.html`
 	  - `outputs/detection/candidate_label_template.csv`
@@ -214,6 +217,7 @@ missing image lines for these products.
 .\run.ps1 claim-audit
 .\run.ps1 research-gates
 .\run.ps1 issue-backlog
+.\run.ps1 agreement-audit
 .\run.ps1 label-template
 .\run.ps1 label-summary
 .\run.ps1 provenance
@@ -384,6 +388,11 @@ progress, or not ready, using current output files as evidence.
 `github_issue_backlog.md`, and `.github/issue_backlog/*.md`. It turns current
 research-gate gaps into GitHub-ready issue bodies with labels, evidence files,
 and acceptance criteria.
+
+`.\run.ps1 agreement-audit` writes `review_agreement_audit.csv` and
+`review_agreement_audit.md`. It separates saved labels from labels that are
+strong enough for validation/training by checking confidence, review notes, and
+the `needs_second_review` flag.
 5. Any future YOLO or neural model must beat the explainable baseline without
    hiding false positives or false negatives.
 
@@ -397,7 +406,8 @@ For batch review:
 ```
 
 This writes `outputs/detection/candidate_label_template.csv`. A reviewer can
-fill `human_label`, `confidence`, `reviewer`, and `review_note`, then import it:
+fill `human_label`, `confidence`, `reviewer`, `review_note`, `review_stage`, and
+`needs_second_review`, then import it:
 
 ```powershell
 .\run.ps1 label-import -LabelCsv outputs\detection\candidate_label_template.csv

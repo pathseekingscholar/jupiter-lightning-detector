@@ -19,6 +19,7 @@ import nearby_filter_context
 import provenance_manifest
 import research_exports
 import research_gate_audit
+import review_agreement_audit
 import review_metrics
 import validate_outputs
 
@@ -118,6 +119,8 @@ END_OBJECT = IMAGE
                 saved = json.loads(app_server.LABELS_PATH.read_text(encoding="utf-8"))
                 self.assertEqual(saved["labels"]["1357029177-0001"]["human_label"], "possible-lightning")
                 self.assertEqual(saved["labels"]["1357029177-0001"]["label"], "possible-lightning")
+                self.assertEqual(saved["labels"]["1357029177-0001"]["review_stage"], "first-review")
+                self.assertEqual(saved["labels"]["1357029177-0001"]["needs_second_review"], "no")
                 self.assertIn("reviewer", saved["labels"]["1357029177-0001"])
                 self.assertIn("reviewed_at", saved["labels"]["1357029177-0001"])
                 self.assertIn("candidate_id", app_server.LABELS_CSV_PATH.read_text(encoding="utf-8"))
@@ -216,6 +219,8 @@ END_OBJECT = IMAGE
             row["confidence"] = "high"
             row["reviewer"] = "unit-test"
             row["review_note"] = "known validation mark"
+            row["review_stage"] = "first-review"
+            row["needs_second_review"] = "yes"
             label_tools.write_csv(import_path, [row], list(row.keys()))
             try:
                 label_tools.import_labels(import_path)
@@ -224,6 +229,7 @@ END_OBJECT = IMAGE
                 self.assertEqual(saved["human_label"], "known-lightning")
                 self.assertEqual(saved["confidence"], "high")
                 self.assertEqual(saved["reviewer"], "unit-test")
+                self.assertEqual(saved["needs_second_review"], "yes")
                 self.assertIn("positive", label_tools.LABELS_GROUPED_CSV.read_text(encoding="utf-8"))
                 self.assertIn("label_known-lightning", label_tools.LABEL_SUMMARY_CSV.read_text(encoding="utf-8"))
             finally:
@@ -323,6 +329,13 @@ END_OBJECT = IMAGE
         self.assertIn("issue_id", rows[0])
         self.assertTrue(any(row["gate"] == "human_positive_labels" for row in rows))
         self.assertTrue(all(row["acceptance_criteria"] for row in rows))
+
+    def test_review_agreement_audit_outputs(self):
+        rows = review_agreement_audit.build_agreement_audit()
+        self.assertTrue(rows)
+        metrics = {row["metric"] for row in rows}
+        self.assertIn("total_saved_labels", metrics)
+        self.assertIn("training_ready_labels", metrics)
 
 
 if __name__ == "__main__":
