@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("init", "download", "analyze", "report", "all", "test", "app", "detect", "detect-all", "exports", "coverage", "coverage-summary", "review", "geometry", "geometry-plan", "geometry-inputs", "geometry-acquisition", "filters", "label-audit", "review-plan", "review-sessions", "review-session-audit", "temporal-validation", "blind-review", "blind-reconcile", "evidence-integrity", "label-protocol", "training-readiness", "claim-audit", "research-gates", "manuscript-claims", "issue-backlog", "project-board", "agreement-audit", "label-template", "label-import", "label-summary", "provenance", "validate-outputs")]
+    [ValidateSet("init", "download", "analyze", "report", "all", "test", "app", "detect", "detect-all", "exports", "coverage", "coverage-summary", "review", "geometry", "geometry-plan", "geometry-inputs", "geometry-acquisition", "filters", "label-audit", "review-plan", "review-sessions", "review-session-audit", "temporal-validation", "blind-review", "blind-reconcile", "evidence-integrity", "label-protocol", "training-readiness", "claim-audit", "research-gates", "manuscript-claims", "issue-backlog", "project-board", "agreement-audit", "evidence-index", "label-template", "label-import", "label-summary", "provenance", "validate-outputs")]
     [string]$Command = "all",
     [ValidateSet("2000-12-31", "2001-01-01", "2001-01-04", "2001-01-05", "2001-01-08", "2001-01-09", "2001-01-10", "2001-01-11", "2001-01-13")]
     [string]$Date = "2001-01-01",
@@ -80,6 +80,8 @@ if ($Command -eq "test") {
     & $python github_project_board.py
 } elseif ($Command -eq "agreement-audit") {
     & $python review_agreement_audit.py
+} elseif ($Command -eq "evidence-index") {
+    & $python evidence_index.py
 } elseif ($Command -eq "label-template") {
     & $python label_tools.py template --path $LabelCsv
 } elseif ($Command -eq "label-import") {

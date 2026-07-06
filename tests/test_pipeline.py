@@ -13,6 +13,7 @@ import blind_review_packet
 import blind_review_reconcile
 import doc_claim_audit
 import evidence_integrity_audit
+import evidence_index
 import first_pass_review_plan
 import github_issue_backlog
 import github_project_board
@@ -417,6 +418,15 @@ END_OBJECT = IMAGE
         self.assertIn("blind_packet_key_row_match", checks)
         self.assertIn("review_crop_url_shape", checks)
         self.assertIn(checks["blind_packet_key_row_match"]["status"], {"ready", "not_ready"})
+
+    def test_evidence_index_outputs(self):
+        if not evidence_index.PROVENANCE_JSON.exists():
+            self.skipTest("Provenance manifest has not been generated")
+        index = evidence_index.build_index()
+        self.assertGreater(index["artifact_count"], 0)
+        self.assertIn("validation", index["purpose_counts"])
+        self.assertIn("human_labels", index["purpose_counts"])
+        self.assertTrue(any(row["path"].endswith("known_match_report.csv") for row in index["artifacts"]))
 
     def test_review_labeling_protocol_outputs(self):
         review_plan_path = review_labeling_protocol.OUTPUT_DIR / "first_pass_review_plan.csv"

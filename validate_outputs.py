@@ -322,6 +322,8 @@ REQUIRED_FILES = [
     "github_issue_backlog.md",
     "github_project_board.md",
     "review_agreement_audit.md",
+    "evidence_index.json",
+    "evidence_index.md",
     "processed_date_coverage_summary.md",
     "provenance_manifest.json",
     "provenance_manifest.md",
@@ -467,8 +469,17 @@ def validate() -> list[str]:
         assert_true("outputs/detection/github_issue_backlog.csv" in artifact_paths, "Provenance missing GitHub issue backlog CSV", errors)
         assert_true("outputs/detection/github_project_board.csv" in artifact_paths, "Provenance missing GitHub project board CSV", errors)
         assert_true("outputs/detection/review_agreement_audit.csv" in artifact_paths, "Provenance missing review agreement audit CSV", errors)
+        assert_true("outputs/detection/evidence_index.json" in artifact_paths, "Provenance missing evidence index JSON", errors)
         assert_true("outputs/detection/candidate_label_summary.csv" in artifact_paths, "Provenance missing candidate label summary CSV", errors)
         assert_true("outputs/detection/processed_date_coverage_summary.csv" in artifact_paths, "Provenance missing processed date coverage summary CSV", errors)
+
+    evidence_index_path = OUTPUT_DIR / "evidence_index.json"
+    if evidence_index_path.exists():
+        payload = json.loads(evidence_index_path.read_text(encoding="utf-8"))
+        assert_true(payload.get("artifact_count", 0) > 0, "Evidence index has no artifacts", errors)
+        purpose_counts = payload.get("purpose_counts", {})
+        assert_true("validation" in purpose_counts, "Evidence index lacks validation bucket", errors)
+        assert_true("human_labels" in purpose_counts, "Evidence index lacks human-label bucket", errors)
 
     return errors
 
