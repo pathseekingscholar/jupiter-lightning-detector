@@ -89,6 +89,13 @@ def build_manifest() -> dict[str, object]:
             "sha256": file_sha256(path),
             "rows": None,
         })
+    for path in sorted((OUTPUT_DIR / "review_batches").glob("*.csv")):
+        artifacts.append({
+            "path": str(path.relative_to(ROOT)).replace("\\", "/"),
+            "bytes": path.stat().st_size,
+            "sha256": file_sha256(path),
+            "rows": csv_row_count(path),
+        })
 
     return {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),

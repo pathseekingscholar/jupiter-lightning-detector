@@ -123,6 +123,11 @@ REQUIRED_FILES = [
     "review_artifacts/published_match.png",
     "review_artifacts/top_unmatched_temporal_track.png",
     "review_artifacts/temporal_track_strips.png",
+    "review_batches/01_known_validation_positive.csv",
+    "review_batches/02_temporal_persistence_check.csv",
+    "review_batches/03_negative_artifact_examples.csv",
+    "review_batches/04_strong_single_frame_check.csv",
+    "review_batches/05_low_priority_hold.csv",
 ]
 
 
@@ -193,6 +198,15 @@ def validate() -> list[str]:
         ]
         assert_true(not unsafe_review, f"Documentation claim audit has unsafe review rows: {len(unsafe_review)}", errors)
         assert_true(not stale_temporal, "Documentation still says temporal tracking is only planned", errors)
+
+    review_plan_path = OUTPUT_DIR / "first_pass_review_plan.csv"
+    batch_dir = OUTPUT_DIR / "review_batches"
+    if review_plan_path.exists() and batch_dir.exists():
+        plan_rows = read_csv(review_plan_path)
+        batch_rows = []
+        for batch_path in sorted(batch_dir.glob("*.csv")):
+            batch_rows.extend(read_csv(batch_path))
+        assert_true(len(batch_rows) == len(plan_rows), "Review batch CSV row counts do not add up to the full review plan", errors)
 
     provenance_path = OUTPUT_DIR / "provenance_manifest.json"
     if provenance_path.exists():

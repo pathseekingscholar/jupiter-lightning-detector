@@ -11,6 +11,29 @@ OUTPUT_DIR = ROOT / "outputs" / "detection"
 PLAN_CSV = OUTPUT_DIR / "first_pass_review_plan.csv"
 PLAN_MD = OUTPUT_DIR / "first_pass_review_plan.md"
 PLAN_HTML = OUTPUT_DIR / "first_pass_review_plan.html"
+BATCH_DIR = OUTPUT_DIR / "review_batches"
+
+
+PLAN_FIELDS = [
+    "review_order",
+    "review_batch",
+    "candidate_id",
+    "image_id",
+    "run_date",
+    "x",
+    "y",
+    "crop_url",
+    "next_action",
+    "suggested_human_label",
+    "reviewer_task",
+    "snr",
+    "blob_size",
+    "artifact_flags",
+    "frame_count",
+    "motion_consistency",
+    "candidate_score",
+    "review_note_prompt",
+]
 
 
 BATCH_LIMITS = {
@@ -284,6 +307,15 @@ def write_html_report(rows: list[dict[str, object]]) -> None:
     PLAN_HTML.write_text(document, encoding="utf-8")
 
 
+def write_batch_exports(rows: list[dict[str, object]]) -> None:
+    BATCH_DIR.mkdir(parents=True, exist_ok=True)
+    by_batch: dict[str, list[dict[str, object]]] = {}
+    for row in rows:
+        by_batch.setdefault(str(row["review_batch"]), []).append(row)
+    for batch, batch_rows in sorted(by_batch.items()):
+        write_csv(BATCH_DIR / f"{batch}.csv", batch_rows, PLAN_FIELDS)
+
+
 def batch_purpose(batch: str) -> str:
     return {
         "01_known_validation_positive": "Confirm published validation positives first.",
@@ -299,32 +331,15 @@ def main() -> None:
     write_csv(
         PLAN_CSV,
         rows,
-        [
-            "review_order",
-            "review_batch",
-            "candidate_id",
-            "image_id",
-            "run_date",
-            "x",
-            "y",
-            "crop_url",
-            "next_action",
-            "suggested_human_label",
-            "reviewer_task",
-            "snr",
-            "blob_size",
-            "artifact_flags",
-            "frame_count",
-            "motion_consistency",
-            "candidate_score",
-            "review_note_prompt",
-        ],
+        PLAN_FIELDS,
     )
     write_report(rows)
     write_html_report(rows)
+    write_batch_exports(rows)
     print(f"Wrote {PLAN_CSV}")
     print(f"Wrote {PLAN_MD}")
     print(f"Wrote {PLAN_HTML}")
+    print(f"Wrote review batch CSVs in {BATCH_DIR}")
 
 
 if __name__ == "__main__":

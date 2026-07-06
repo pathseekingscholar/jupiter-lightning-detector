@@ -92,6 +92,7 @@ Run the detector for the example dates:
   - `outputs/detection/first_pass_review_plan.csv`
   - `outputs/detection/first_pass_review_plan.md`
   - `outputs/detection/first_pass_review_plan.html`
+  - `outputs/detection/review_batches/*.csv`
   - `outputs/detection/doc_claim_audit.csv`
   - `outputs/detection/doc_claim_audit.md`
   - `outputs/detection/review_metrics_report.md`
@@ -356,6 +357,8 @@ are still only detector outputs.
 `first_pass_review_plan.html`. It turns the review matrix into a practical
 labeling order: known validation positives first, temporal candidates second,
 negative artifact examples third, and strong single-frame candidates after that.
+It also writes per-batch CSVs under `outputs/detection/review_batches/` so a
+reviewer can open only the batch they are labeling.
 
 `.\run.ps1 claim-audit` writes `doc_claim_audit.csv` and
 `doc_claim_audit.md`. It scans project-facing Markdown for stale or unsafe
