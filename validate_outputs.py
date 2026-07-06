@@ -81,6 +81,15 @@ REQUIRED_COLUMNS = {
         "candidate_latlon_ready",
         "readiness_note",
     },
+    "candidate_geometry_plan.csv": {
+        "candidate_id",
+        "image_id",
+        "x",
+        "y",
+        "geometry_readiness",
+        "required_method",
+        "next_step",
+    },
     "nearby_filter_context.csv": {
         "candidate_id",
         "image_id",
@@ -145,6 +154,7 @@ REQUIRED_FILES = [
     "review_metrics_report.html",
     "candidate_review_dossier.html",
     "geometry_readiness_report.md",
+    "candidate_geometry_plan.md",
     "nearby_filter_context_report.md",
     "human_review_audit.md",
     "first_pass_review_plan.md",
@@ -251,6 +261,7 @@ def validate() -> list[str]:
         assert_true("outputs/detection/candidate_review_dossier.csv" in artifact_paths, "Provenance missing candidate dossier CSV", errors)
         assert_true("outputs/detection/threshold_recommendations.csv" in artifact_paths, "Provenance missing threshold recommendations CSV", errors)
         assert_true("outputs/detection/geometry_readiness.csv" in artifact_paths, "Provenance missing geometry readiness CSV", errors)
+        assert_true("outputs/detection/candidate_geometry_plan.csv" in artifact_paths, "Provenance missing candidate geometry plan CSV", errors)
         assert_true("outputs/detection/nearby_filter_context.csv" in artifact_paths, "Provenance missing nearby filter context CSV", errors)
         assert_true("outputs/detection/human_review_audit.csv" in artifact_paths, "Provenance missing human review audit CSV", errors)
         assert_true("outputs/detection/first_pass_review_plan.csv" in artifact_paths, "Provenance missing first-pass review plan CSV", errors)

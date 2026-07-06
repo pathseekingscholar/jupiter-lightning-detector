@@ -44,6 +44,7 @@ Run the detector for the example dates:
 .\run.ps1 exports
 .\run.ps1 review
 .\run.ps1 geometry
+.\run.ps1 geometry-plan
 .\run.ps1 filters
 .\run.ps1 label-audit
 .\run.ps1 review-plan
@@ -89,6 +90,8 @@ Run the detector for the example dates:
   - `outputs/detection/candidate_review_dossier.html`
   - `outputs/detection/geometry_readiness.csv`
   - `outputs/detection/geometry_readiness_report.md`
+  - `outputs/detection/candidate_geometry_plan.csv`
+  - `outputs/detection/candidate_geometry_plan.md`
   - `outputs/detection/nearby_filter_context.csv`
   - `outputs/detection/nearby_filter_context_report.md`
   - `outputs/detection/human_review_audit.csv`
@@ -211,6 +214,7 @@ missing image lines for these products.
 .\run.ps1 exports
 .\run.ps1 review
 .\run.ps1 geometry
+.\run.ps1 geometry-plan
 .\run.ps1 filters
 .\run.ps1 label-audit
 .\run.ps1 review-plan
@@ -430,6 +434,11 @@ than a single bright spot.
 `geometry_readiness_report.md`. These files document which processed frames
 have local OPUS viewing-geometry context and why candidate-level latitude and
 longitude still require a camera/SPICE projection step.
+
+`.\run.ps1 geometry-plan` writes `candidate_geometry_plan.csv` and
+`candidate_geometry_plan.md`. These files join the first-pass review candidates
+to the available image-level geometry and list the exact next step for each
+candidate. They are a work plan, not solved latitude/longitude coordinates.
 
 The next publishable-analysis path is to connect credible H-alpha candidates to
 nearby broadband/filter images. That is what would make color or spectrum work

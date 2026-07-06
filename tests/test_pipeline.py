@@ -14,6 +14,7 @@ import first_pass_review_plan
 import github_issue_backlog
 import geometry_audit
 import human_review_audit
+import candidate_geometry_plan
 import label_tools
 import nearby_filter_context
 import provenance_manifest
@@ -264,6 +265,16 @@ END_OBJECT = IMAGE
         self.assertIn("geometry_context_available", rows[0])
         self.assertIn("candidate_latlon_ready", rows[0])
         self.assertTrue(any(row["geometry_context_available"] == "yes" for row in rows))
+
+    def test_candidate_geometry_plan_outputs(self):
+        review_plan_path = candidate_geometry_plan.OUTPUT_DIR / "first_pass_review_plan.csv"
+        if not review_plan_path.exists():
+            self.skipTest("First-pass review plan has not been generated")
+        rows = candidate_geometry_plan.build_plan_rows()
+        self.assertTrue(rows)
+        self.assertIn("geometry_readiness", rows[0])
+        self.assertTrue(all(row["required_method"] == "camera_spice_projection" for row in rows))
+        self.assertTrue(any(row["x"] and row["y"] for row in rows))
 
     def test_nearby_filter_context_outputs(self):
         context_path = nearby_filter_context.CONTEXT_CSV
