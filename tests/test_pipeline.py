@@ -11,6 +11,7 @@ import jupiter_pipeline as pipeline
 import app_server
 import doc_claim_audit
 import first_pass_review_plan
+import github_issue_backlog
 import geometry_audit
 import human_review_audit
 import label_tools
@@ -313,6 +314,15 @@ END_OBJECT = IMAGE
         self.assertEqual(gates["published_match_recovery"]["status"], "ready")
         self.assertIn(gates["human_positive_labels"]["status"], {"not_ready", "ready"})
         self.assertIn("evidence_file", rows[0])
+
+    def test_github_issue_backlog_outputs(self):
+        if not (github_issue_backlog.OUTPUT_DIR / "research_gate_audit.csv").exists():
+            self.skipTest("Research gate audit has not been generated")
+        rows = github_issue_backlog.build_backlog()
+        self.assertTrue(rows)
+        self.assertIn("issue_id", rows[0])
+        self.assertTrue(any(row["gate"] == "human_positive_labels" for row in rows))
+        self.assertTrue(all(row["acceptance_criteria"] for row in rows))
 
 
 if __name__ == "__main__":

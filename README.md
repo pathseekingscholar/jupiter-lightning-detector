@@ -49,6 +49,7 @@ Run the detector for the example dates:
 .\run.ps1 review-plan
 .\run.ps1 claim-audit
 .\run.ps1 research-gates
+.\run.ps1 issue-backlog
 .\run.ps1 label-template
 .\run.ps1 label-summary
 .\run.ps1 provenance
@@ -99,6 +100,8 @@ Run the detector for the example dates:
 	  - `outputs/detection/doc_claim_audit.md`
 	  - `outputs/detection/research_gate_audit.csv`
 	  - `outputs/detection/research_gate_audit.md`
+	  - `outputs/detection/github_issue_backlog.csv`
+	  - `outputs/detection/github_issue_backlog.md`
 	  - `outputs/detection/review_metrics_report.md`
 	  - `outputs/detection/review_metrics_report.html`
 	  - `outputs/detection/candidate_label_template.csv`
@@ -210,6 +213,7 @@ missing image lines for these products.
 .\run.ps1 review-plan
 .\run.ps1 claim-audit
 .\run.ps1 research-gates
+.\run.ps1 issue-backlog
 .\run.ps1 label-template
 .\run.ps1 label-summary
 .\run.ps1 provenance
@@ -375,6 +379,11 @@ new-lightning language.
 `.\run.ps1 research-gates` writes `research_gate_audit.csv` and
 `research_gate_audit.md`. It summarizes which research gates are ready, in
 progress, or not ready, using current output files as evidence.
+
+`.\run.ps1 issue-backlog` writes `github_issue_backlog.csv`,
+`github_issue_backlog.md`, and `.github/issue_backlog/*.md`. It turns current
+research-gate gaps into GitHub-ready issue bodies with labels, evidence files,
+and acceptance criteria.
 5. Any future YOLO or neural model must beat the explainable baseline without
    hiding false positives or false negatives.
 
