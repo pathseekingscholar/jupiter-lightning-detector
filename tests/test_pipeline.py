@@ -1,6 +1,7 @@
 import io
 import base64
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -40,6 +41,7 @@ import review_metrics
 import temporal_validation_plan
 import training_readiness
 import validate_outputs
+import build_public_site_data
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -210,6 +212,24 @@ END_OBJECT = IMAGE
                 label_tools.LABELS_CSV = original_csv
                 label_tools.LABELS_GROUPED_CSV = original_grouped
                 label_tools.LABEL_SUMMARY_CSV = original_summary
+
+    def test_public_site_data_includes_review_queue_and_geometry_context(self):
+        original_timestamp = os.environ.get("PUBLIC_SITE_DATA_GENERATED_AT")
+        os.environ["PUBLIC_SITE_DATA_GENERATED_AT"] = "2026-07-08T00:00:00+00:00"
+        try:
+            build_public_site_data.main()
+        finally:
+            if original_timestamp is None:
+                os.environ.pop("PUBLIC_SITE_DATA_GENERATED_AT", None)
+            else:
+                os.environ["PUBLIC_SITE_DATA_GENERATED_AT"] = original_timestamp
+        payload = json.loads((ROOT / "public_site" / "static-data" / "first_pass_review_queue.json").read_text(encoding="utf-8"))
+        self.assertEqual(payload["row_count"], 106)
+        first = payload["rows"][0]
+        self.assertIn("image_subobserver_lat", first)
+        self.assertIn("image_center_resolution_km_px", first)
+        self.assertEqual(first["geometry_status"], "pending-backplane")
+        self.assertEqual(first["jupiter_latitude"], "")
 
     def test_research_exports_have_expected_columns(self):
         summary_path = research_exports.OUTPUT_DIR / "2001-01-01" / "summary.json"

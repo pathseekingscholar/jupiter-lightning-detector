@@ -42,6 +42,12 @@ function normalizeRow(row) {
     jupiter_latitude: row.jupiter_latitude === "" ? "" : toNumber(row.jupiter_latitude, ""),
     jupiter_longitude: row.jupiter_longitude === "" ? "" : toNumber(row.jupiter_longitude, ""),
     geometry_status: row.geometry_status || "pending-backplane",
+    image_subobserver_lat: row.image_subobserver_lat === "" ? "" : toNumber(row.image_subobserver_lat, ""),
+    image_subobserver_lon_w: row.image_subobserver_lon_w === "" ? "" : toNumber(row.image_subobserver_lon_w, ""),
+    image_subsolar_lat: row.image_subsolar_lat === "" ? "" : toNumber(row.image_subsolar_lat, ""),
+    image_subsolar_lon_w: row.image_subsolar_lon_w === "" ? "" : toNumber(row.image_subsolar_lon_w, ""),
+    image_center_resolution_km_px: row.image_center_resolution_km_px === "" ? "" : toNumber(row.image_center_resolution_km_px, ""),
+    image_center_phase_angle: row.image_center_phase_angle === "" ? "" : toNumber(row.image_center_phase_angle, ""),
     snr: toNumber(row.snr),
     blob_size: toNumber(row.blob_size),
     frame_count: toNumber(row.frame_count),
@@ -167,6 +173,9 @@ function renderCandidateDetail() {
     : "Static crop is available.";
   const latText = row.jupiter_latitude === "" ? "pending" : Number(row.jupiter_latitude).toFixed(3);
   const lonText = row.jupiter_longitude === "" ? "pending" : Number(row.jupiter_longitude).toFixed(3);
+  const imageContext = row.image_subobserver_lat === ""
+    ? "not available"
+    : `sub-observer ${Number(row.image_subobserver_lat).toFixed(3)} lat, ${Number(row.image_subobserver_lon_w).toFixed(3)} W lon`;
   detail.innerHTML = `
     <p class="section-label">Candidate Detail</p>
     <h3>${escapeHtml(row.candidate_id)}</h3>
@@ -184,7 +193,11 @@ function renderCandidateDetail() {
       <div><b>Jupiter lat</b>${escapeHtml(latText)}</div>
       <div><b>Jupiter lon</b>${escapeHtml(lonText)}</div>
       <div><b>Geometry</b>${escapeHtml(row.geometry_status)}</div>
+      <div><b>Image geometry</b>${escapeHtml(imageContext)}</div>
+      <div><b>Resolution</b>${row.image_center_resolution_km_px === "" ? "n/a" : `${Number(row.image_center_resolution_km_px).toFixed(2)} km/px`}</div>
+      <div><b>Phase angle</b>${row.image_center_phase_angle === "" ? "n/a" : Number(row.image_center_phase_angle).toFixed(2)}</div>
     </div>
+    <p>${escapeHtml(row.image_geometry_note || "Image-level geometry context may be available, but candidate lat/lon requires SPICE/backplane projection.")}</p>
     <div class="backend-box">
       <b>Image crop</b>
       <span>${cropMessage}</span>

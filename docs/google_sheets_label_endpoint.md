@@ -35,10 +35,11 @@ candidate_id,image_id,run_date,x,y,jupiter_latitude,jupiter_longitude,geometry_s
 Open **Extensions -> Apps Script** in the Sheet and paste:
 
 ```javascript
-Use the ready-to-copy script in:
+Use the ready-to-copy script or deployable Apps Script folder in:
 
 ```text
 tools/google_sheets_label_endpoint.gs
+tools/apps_script_label_endpoint/
 ```
 
 It includes the current review fields plus reserved geometry columns:

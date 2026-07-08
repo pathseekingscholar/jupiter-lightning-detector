@@ -1,68 +1,66 @@
 {
-    "generated_at":  "2026-07-08T21:52:57.6484348Z",
-    "status":  "pending-backplane",
-    "images_inventoried":  221,
-    "candidate_rows_checked":  221,
-    "default_tolerance_degrees":  1,
-    "blocker_counts":  {
-
-                       },
-    "required_inputs":  [
-                            {
-                                "input":  null,
-                                "kind":  null,
-                                "status":  "missing",
-                                "local_matches":  "",
-                                "required_for":  "pixel_to_camera_ray"
-                            },
-                            {
-                                "input":  null,
-                                "kind":  null,
-                                "status":  "missing",
-                                "local_matches":  "",
-                                "required_for":  "camera_frame_to_spacecraft_frame"
-                            },
-                            {
-                                "input":  null,
-                                "kind":  null,
-                                "status":  "missing",
-                                "local_matches":  "",
-                                "required_for":  "spacecraft_pointing_at_image_time"
-                            },
-                            {
-                                "input":  null,
-                                "kind":  null,
-                                "status":  "missing",
-                                "local_matches":  "",
-                                "required_for":  "spacecraft_and_jupiter_position"
-                            },
-                            {
-                                "input":  null,
-                                "kind":  null,
-                                "status":  "missing",
-                                "local_matches":  "",
-                                "required_for":  "image_sclk_to_et"
-                            },
-                            {
-                                "input":  null,
-                                "kind":  null,
-                                "status":  "missing",
-                                "local_matches":  "",
-                                "required_for":  "utc_to_et"
-                            },
-                            {
-                                "input":  null,
-                                "kind":  null,
-                                "status":  "missing",
-                                "local_matches":  "",
-                                "required_for":  "ray_jupiter_intercept"
-                            }
-                        ],
-    "safe_interpretation":  "Candidate latitude/longitude are not computed yet. Current candidates can be reviewed in image x/y coordinates. Geometry requires Cassini ISS camera model plus SPICE kernels before storm-location claims.",
-    "next_steps":  [
-                       "Download/document Cassini ISS IK/FK/CK/SPK/SCLK/LSK/PCK kernels outside Git.",
-                       "Create a local metakernel and coverage report for the 221 processed frames.",
-                       "Validate pixel-to-lat/lon projection on the six published detections.",
-                       "Only then populate jupiter_latitude/jupiter_longitude in public review rows."
-                   ]
+  "generated_at": "2026-07-08T21:59:05.503750+00:00",
+  "status": "pending-backplane",
+  "images_inventoried": 221,
+  "candidate_rows_checked": 221,
+  "default_tolerance_degrees": 1.0,
+  "blocker_counts": {},
+  "required_inputs": [
+    {
+      "input": "",
+      "kind": "",
+      "status": "missing",
+      "local_matches": "",
+      "required_for": "pixel_to_camera_ray"
+    },
+    {
+      "input": "",
+      "kind": "",
+      "status": "missing",
+      "local_matches": "",
+      "required_for": "camera_frame_to_spacecraft_frame"
+    },
+    {
+      "input": "",
+      "kind": "",
+      "status": "missing",
+      "local_matches": "",
+      "required_for": "spacecraft_pointing_at_image_time"
+    },
+    {
+      "input": "",
+      "kind": "",
+      "status": "missing",
+      "local_matches": "",
+      "required_for": "spacecraft_and_jupiter_position"
+    },
+    {
+      "input": "",
+      "kind": "",
+      "status": "missing",
+      "local_matches": "",
+      "required_for": "image_sclk_to_et"
+    },
+    {
+      "input": "",
+      "kind": "",
+      "status": "missing",
+      "local_matches": "",
+      "required_for": "utc_to_et"
+    },
+    {
+      "input": "",
+      "kind": "",
+      "status": "missing",
+      "local_matches": "",
+      "required_for": "ray_jupiter_intercept"
+    }
+  ],
+  "safe_interpretation": "Candidate latitude/longitude are not computed yet. Current candidates can be reviewed in image x/y coordinates. Geometry requires Cassini ISS camera model plus SPICE kernels before storm-location claims.",
+  "next_steps": [
+    "Download/document Cassini ISS IK/FK/CK/SPK/SCLK/LSK/PCK kernels outside Git.",
+    "Create a local metakernel and coverage report for the 221 processed frames.",
+    "Validate pixel-to-lat/lon projection on the six published detections.",
+    "Only then populate jupiter_latitude/jupiter_longitude in public review rows."
+  ]
 }
