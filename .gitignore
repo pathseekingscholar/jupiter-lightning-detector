@@ -18,6 +18,8 @@ co-iss-*-metadata.json
 co-iss-*-files.json
 research_notes.json
 library-backups/
+ai_handoff*/
+jupiter-lightning-ai-handoff*.zip
 
 # Generated/local docs that should not be published as source
 docs/*.html
