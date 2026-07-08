@@ -5,7 +5,8 @@ const state = {
   selected: null,
   labels: JSON.parse(localStorage.getItem("jupiterPublicReviewLabels") || "{}"),
   endpoint: localStorage.getItem("jupiterGoogleSheetEndpoint") || "",
-  reviewer: localStorage.getItem("jupiterReviewerName") || ""
+  reviewer: localStorage.getItem("jupiterReviewerName") || "",
+  collaboration: {}
 };
 
 const labelOptions = [
@@ -89,6 +90,23 @@ function renderCoverage(payload) {
   if (hasGeometry) {
     $("geometry-status").textContent = "Latitude/longitude fields are present. Grouping can compare candidates within the selected tolerance.";
   }
+}
+
+function renderGeometryReadiness(geometry) {
+  const box = $("geometry-readiness");
+  if (!box) return;
+  const blockers = geometry.blocker_counts || {};
+  const blockerText = Object.keys(blockers).length
+    ? Object.entries(blockers).map(([name, count]) => `${name}: ${count}`).join("; ")
+    : "No blockers listed in the static snapshot.";
+  box.innerHTML = `
+    <b>Geometry readiness</b>
+    <span>Status: ${escapeHtml(geometry.status || "unknown")}</span>
+    <span>Images inventoried: ${escapeHtml(geometry.images_inventoried ?? "")}</span>
+    <span>Candidate rows checked: ${escapeHtml(geometry.candidate_rows_checked ?? "")}</span>
+    <span>Blocking inputs: ${escapeHtml(blockerText)}</span>
+    <span>${escapeHtml(geometry.safe_interpretation || "")}</span>
+  `;
 }
 
 function geometryGroups(toleranceDegrees) {
@@ -291,12 +309,30 @@ function exportCsv() {
 async function loadData() {
   const response = await fetch("/static-data/first_pass_review_queue.json");
   const payload = await response.json();
+  try {
+    const collaborationResponse = await fetch("/static-data/collaboration_config.json");
+    state.collaboration = await collaborationResponse.json();
+  } catch (error) {
+    state.collaboration = {};
+  }
+  try {
+    const geometryResponse = await fetch("/static-data/geometry_readiness.json");
+    renderGeometryReadiness(await geometryResponse.json());
+  } catch (error) {
+    renderGeometryReadiness({status: "unavailable", safe_interpretation: `Geometry readiness file could not load: ${error.message}`});
+  }
   state.rows = payload.rows.map(normalizeRow);
   $("snapshot-count").textContent = `${state.rows.length} first-pass review rows loaded`;
   $("reviewer-name").value = state.reviewer;
   $("sheet-endpoint").value = state.endpoint;
+  if (state.collaboration.label_sheet_url) {
+    $("sheet-link").href = state.collaboration.label_sheet_url;
+    $("sheet-link").hidden = false;
+  }
   if (state.endpoint) {
     $("sheet-status").textContent = "Google Sheets endpoint configured in this browser.";
+  } else if (state.collaboration.label_sheet_url) {
+    $("sheet-status").textContent = "Shared label Sheet exists. Deploy/paste the Apps Script endpoint URL to append labels directly from this page.";
   }
   saveLabels();
   renderCoverage(payload);

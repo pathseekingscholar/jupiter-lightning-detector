@@ -223,11 +223,16 @@ textarea { width: 100%; min-height: 90px; resize: vertical; }
 
 .sheet-note {
   display: grid;
-  grid-template-columns: auto minmax(260px, 1fr) auto;
+  grid-template-columns: auto minmax(260px, 1fr) auto minmax(260px, .6fr) auto;
   gap: 10px;
   align-items: center;
   padding: 14px;
   margin: 18px 0;
+}
+
+.sheet-note a {
+  color: var(--blue-ink);
+  font-weight: 700;
 }
 
 .geometry-note {

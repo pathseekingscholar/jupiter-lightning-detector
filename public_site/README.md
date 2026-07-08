@@ -18,8 +18,16 @@ The current candidate data snapshot is:
 public_site/static-data/first_pass_review_queue.json
 ```
 
-Regenerate it from `outputs/detection/first_pass_review_plan.csv` before a new
-public deployment when detector outputs change.
+The current collaboration and geometry snapshots are:
+
+```text
+public_site/static-data/collaboration_config.json
+public_site/static-data/geometry_readiness.json
+```
+
+Regenerate the candidate snapshot from
+`outputs/detection/first_pass_review_plan.csv` before a new public deployment
+when detector outputs change.
 
 For shared labels, configure the Google Apps Script endpoint described in:
 

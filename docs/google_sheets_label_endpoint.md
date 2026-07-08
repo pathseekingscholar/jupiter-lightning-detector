@@ -4,6 +4,24 @@ The public Vercel review page can append labels to a shared Google Sheet through
 a Google Apps Script web app. This keeps the public site static while allowing
 multiple reviewers to contribute rows.
 
+## Current Shared Sheet
+
+The initial shared label sheet has been created:
+
+```text
+Title: Jupiter Lightning Candidate Labels
+Spreadsheet ID: 1c8JX_e_Jcy8N-odK6AFEHUMP3NYIrJq7YCPTBuUI3bg
+URL: https://docs.google.com/spreadsheets/d/1c8JX_e_Jcy8N-odK6AFEHUMP3NYIrJq7YCPTBuUI3bg
+```
+
+The public site also stores this in:
+
+```text
+public_site/static-data/collaboration_config.json
+```
+
+Direct browser appends still require the Apps Script web app deployment URL.
+
 ## Sheet Columns
 
 Create a Google Sheet with this header row:

@@ -117,6 +117,7 @@
         <div class="sheet-note">
           <b>Google Sheets connection:</b>
           <span id="sheet-status">Not configured. Labels are saved in this browser and can be exported. Add a Google Apps Script web app URL below to append labels to a shared sheet.</span>
+          <a id="sheet-link" href="#" target="_blank" rel="noreferrer" hidden>Open label sheet</a>
           <input id="sheet-endpoint" type="url" placeholder="Google Apps Script web app URL">
           <button type="button" id="save-sheet-endpoint">Save Sheets endpoint</button>
         </div>
@@ -169,6 +170,10 @@
           <li><b>Temporal grouping:</b> compare candidates across nearby frames within configurable lat/lon tolerance.</li>
           <li><b>Model comparison:</b> train YOLO or another model only after enough reviewed examples exist.</li>
         </ol>
+        <div class="backend-box" id="geometry-readiness">
+          <b>Geometry readiness</b>
+          <span>Loading geometry readiness summary...</span>
+        </div>
       </div>
     </section>
   </main>
