@@ -121,6 +121,17 @@
           <button type="button" id="save-sheet-endpoint">Save Sheets endpoint</button>
         </div>
 
+        <div class="geometry-note">
+          <b>Geometry grouping:</b>
+          <span id="geometry-status">Latitude/longitude fields are reserved but not computed yet.</span>
+          <label>
+            Tolerance
+            <input id="geometry-tolerance" type="number" min="0.1" step="0.1" value="1.0">
+            degrees
+          </label>
+          <button type="button" id="group-geometry" disabled>Group by lat/lon</button>
+        </div>
+
         <div class="queue-layout">
           <aside class="candidate-list" id="candidate-list">Loading candidates...</aside>
           <section class="candidate-detail" id="candidate-detail">

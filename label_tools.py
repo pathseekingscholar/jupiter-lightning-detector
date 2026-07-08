@@ -34,6 +34,9 @@ LABEL_FIELDNAMES = [
     "image_number",
     "x",
     "y",
+    "jupiter_latitude",
+    "jupiter_longitude",
+    "geometry_status",
     "brightness",
     "blob_size",
     "snr",
@@ -243,7 +246,7 @@ def import_labels(path: Path) -> None:
     skipped = 0
     now = datetime.now(timezone.utc).isoformat()
     for row in rows:
-        human_label = str(row.get("human_label", "")).strip()
+        human_label = str(row.get("human_label") or row.get("reviewer_label") or row.get("label") or "").strip()
         if not human_label:
             skipped += 1
             continue
@@ -263,6 +266,9 @@ def import_labels(path: Path) -> None:
             "image_number": row.get("image_number", str(row.get("image_id", "")).lstrip("N")),
             "x": row.get("x", ""),
             "y": row.get("y", ""),
+            "jupiter_latitude": row.get("jupiter_latitude", ""),
+            "jupiter_longitude": row.get("jupiter_longitude", ""),
+            "geometry_status": row.get("geometry_status", ""),
             "brightness": row.get("snr", ""),
             "blob_size": row.get("blob_size", ""),
             "snr": row.get("snr", ""),

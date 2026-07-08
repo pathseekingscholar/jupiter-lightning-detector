@@ -21,6 +21,58 @@
       "pattern": "^N[0-9]+$",
       "description": "Cassini ISS image ID, for example N1357029177."
     },
+    "x": {
+      "type": [
+        "number",
+        "string"
+      ],
+      "description": "Detector candidate x coordinate in image pixels."
+    },
+    "y": {
+      "type": [
+        "number",
+        "string"
+      ],
+      "description": "Detector candidate y coordinate in image pixels."
+    },
+    "candidate_score": {
+      "type": [
+        "number",
+        "string"
+      ],
+      "description": "Review-priority score from the detector, not a calibrated probability."
+    },
+    "jupiter_latitude": {
+      "type": [
+        "number",
+        "string",
+        "null"
+      ],
+      "description": "Jupiter latitude from geometry/backplanes when available. Blank/null means not computed yet."
+    },
+    "jupiter_longitude": {
+      "type": [
+        "number",
+        "string",
+        "null"
+      ],
+      "description": "Jupiter longitude from geometry/backplanes when available. Blank/null means not computed yet."
+    },
+    "geometry_status": {
+      "type": "string",
+      "description": "Geometry readiness state, for example pending-backplane, computed, or unavailable."
+    },
+    "reviewer_label": {
+      "type": "string",
+      "enum": [
+        "known-lightning",
+        "possible-lightning",
+        "artifact",
+        "cosmic-ray-hot-pixel",
+        "uncertain"
+      ],
+      "description": "Public review-page label; mirrors label/human_label for Google Sheets rows."
+    },
     "label": {
       "type": "string",
       "enum": [

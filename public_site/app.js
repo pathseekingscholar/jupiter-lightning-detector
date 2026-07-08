@@ -38,6 +38,9 @@ function normalizeRow(row) {
     review_order: Number(row.review_order),
     x: toNumber(row.x),
     y: toNumber(row.y),
+    jupiter_latitude: row.jupiter_latitude === "" ? "" : toNumber(row.jupiter_latitude, ""),
+    jupiter_longitude: row.jupiter_longitude === "" ? "" : toNumber(row.jupiter_longitude, ""),
+    geometry_status: row.geometry_status || "pending-backplane",
     snr: toNumber(row.snr),
     blob_size: toNumber(row.blob_size),
     frame_count: toNumber(row.frame_count),
@@ -51,7 +54,9 @@ function labelFor(candidateId) {
 
 function saveLabels() {
   localStorage.setItem("jupiterPublicReviewLabels", JSON.stringify(state.labels));
-  $("label-count").textContent = `${Object.keys(state.labels).length} labels saved in this browser`;
+  const labels = Object.values(state.labels);
+  const sheetsSent = labels.filter((row) => row.sheet_status === "sent").length;
+  $("label-count").textContent = `${labels.length} labels saved in this browser${sheetsSent ? `; ${sheetsSent} sent to Sheets endpoint` : ""}`;
 }
 
 function activateTab(target) {
@@ -75,7 +80,36 @@ function renderCoverage(payload) {
     <article><b>Static boundary</b><p>New detector runs and crop rendering require the Python backend.</p></article>
     <article><b>Candidate status</b><p>${summary.review_candidates || "Review"} candidates are for classification, not confirmed lightning.</p></article>
     <article><b>Training use</b><p>Saved labels become examples for later model comparison.</p></article>
+    <article><b>Geometry</b><p>${escapeHtml(payload.geometry_note || "Latitude/longitude are pending backplane support.")}</p></article>
   `;
+  $("geometry-status").textContent = payload.geometry_note || "Jupiter latitude/longitude are pending backplane support.";
+  $("geometry-tolerance").value = payload.default_lat_lon_tolerance_degrees || 1.0;
+  const hasGeometry = state.rows.some((row) => row.jupiter_latitude !== "" && row.jupiter_longitude !== "");
+  $("group-geometry").disabled = !hasGeometry;
+  if (hasGeometry) {
+    $("geometry-status").textContent = "Latitude/longitude fields are present. Grouping can compare candidates within the selected tolerance.";
+  }
+}
+
+function geometryGroups(toleranceDegrees) {
+  const groups = [];
+  const rowsWithGeometry = state.rows.filter((row) => row.jupiter_latitude !== "" && row.jupiter_longitude !== "");
+  rowsWithGeometry.forEach((row) => {
+    const existing = groups.find((group) => (
+      Math.abs(group.latitude - Number(row.jupiter_latitude)) <= toleranceDegrees
+      && Math.abs(group.longitude - Number(row.jupiter_longitude)) <= toleranceDegrees
+    ));
+    if (existing) {
+      existing.rows.push(row);
+    } else {
+      groups.push({
+        latitude: Number(row.jupiter_latitude),
+        longitude: Number(row.jupiter_longitude),
+        rows: [row]
+      });
+    }
+  });
+  return groups;
 }
 
 function renderCandidateList() {
@@ -113,6 +147,8 @@ function renderCandidateDetail() {
   const cropMessage = row.crop_url?.startsWith("/api/")
     ? "Crop rendering is backend-only for this row. Use the local Python workbench for image crops."
     : "Static crop is available.";
+  const latText = row.jupiter_latitude === "" ? "pending" : Number(row.jupiter_latitude).toFixed(3);
+  const lonText = row.jupiter_longitude === "" ? "pending" : Number(row.jupiter_longitude).toFixed(3);
   detail.innerHTML = `
     <p class="section-label">Candidate Detail</p>
     <h3>${escapeHtml(row.candidate_id)}</h3>
@@ -127,6 +163,9 @@ function renderCandidateDetail() {
       <div><b>Frame count</b>${row.frame_count || ""}</div>
       <div><b>Suggested</b>${escapeHtml(row.suggested_human_label || "")}</div>
       <div><b>Flags</b>${escapeHtml(row.artifact_flags || "none")}</div>
+      <div><b>Jupiter lat</b>${escapeHtml(latText)}</div>
+      <div><b>Jupiter lon</b>${escapeHtml(lonText)}</div>
+      <div><b>Geometry</b>${escapeHtml(row.geometry_status)}</div>
     </div>
     <div class="backend-box">
       <b>Image crop</b>
@@ -171,17 +210,22 @@ function labelPayload(row) {
     run_date: row.run_date,
     x: row.x.toFixed(2),
     y: row.y.toFixed(2),
+    jupiter_latitude: row.jupiter_latitude === "" ? "" : String(row.jupiter_latitude),
+    jupiter_longitude: row.jupiter_longitude === "" ? "" : String(row.jupiter_longitude),
+    geometry_status: row.geometry_status || "pending-backplane",
     snr: row.snr.toFixed(2),
     blob_size: row.blob_size,
     candidate_score: row.candidate_score.toFixed(4),
     artifact_flags: row.artifact_flags || "",
     reviewer_label: reviewerLabel,
     human_label: reviewerLabel,
+    label: reviewerLabel,
     reviewer,
     notes,
     review_note: notes,
     timestamp: now,
     reviewed_at: now,
+    sheet_status: "local-only",
     source: "public-vercel-static-review"
   };
 }
@@ -206,6 +250,9 @@ async function saveCandidateLabel(row) {
         headers: {"Content-Type": "text/plain;charset=utf-8"},
         body: JSON.stringify(payload)
       });
+      payload.sheet_status = "sent";
+      state.labels[row.candidate_id] = payload;
+      saveLabels();
       $("sheet-status").textContent = "Label sent to configured Google Sheets endpoint. Browser cannot verify no-cors response.";
     } catch (error) {
       $("sheet-status").textContent = `Local label saved. Google Sheets append failed: ${error.message}`;
@@ -236,7 +283,7 @@ function csvEscape(value) {
 
 function exportCsv() {
   const rows = Object.values(state.labels);
-  const fields = ["candidate_id", "image_id", "run_date", "x", "y", "snr", "blob_size", "candidate_score", "artifact_flags", "reviewer_label", "reviewer", "notes", "timestamp", "source"];
+  const fields = ["candidate_id", "image_id", "run_date", "x", "y", "jupiter_latitude", "jupiter_longitude", "geometry_status", "snr", "blob_size", "candidate_score", "artifact_flags", "reviewer_label", "human_label", "label", "reviewer", "notes", "review_note", "timestamp", "reviewed_at", "sheet_status", "source"];
   const csv = [fields.join(","), ...rows.map((row) => fields.map((field) => csvEscape(row[field])).join(","))].join("\n");
   downloadText("jupiter_candidate_labels.csv", csv, "text/csv");
 }
@@ -272,6 +319,14 @@ $("save-sheet-endpoint").addEventListener("click", () => {
   $("sheet-status").textContent = state.endpoint
     ? "Google Sheets endpoint saved in this browser. Future labels will be sent when saved."
     : "Google Sheets endpoint cleared. Labels will remain local until exported.";
+});
+
+$("group-geometry").addEventListener("click", () => {
+  const tolerance = toNumber($("geometry-tolerance").value, 1.0);
+  const groups = geometryGroups(tolerance);
+  $("geometry-status").textContent = groups.length
+    ? `${groups.length} geometry group(s) found within ${tolerance} degree tolerance.`
+    : "No candidates currently have latitude/longitude values to group.";
 });
 
 $("export-json").addEventListener("click", exportJson);

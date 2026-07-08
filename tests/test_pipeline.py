@@ -143,6 +143,9 @@ END_OBJECT = IMAGE
                     "image_number": "1357029177",
                     "x": "731.0",
                     "y": "211.0",
+                    "jupiter_latitude": "12.5",
+                    "jupiter_longitude": "44.2",
+                    "geometry_status": "computed",
                     "brightness": "12.3",
                     "blob_size": 4,
                     "snr": "12.3",
@@ -160,6 +163,9 @@ END_OBJECT = IMAGE
                 self.assertEqual(saved["labels"]["1357029177-0001"]["label"], "possible-lightning")
                 self.assertEqual(saved["labels"]["1357029177-0001"]["review_stage"], "first-review")
                 self.assertEqual(saved["labels"]["1357029177-0001"]["needs_second_review"], "no")
+                self.assertEqual(saved["labels"]["1357029177-0001"]["jupiter_latitude"], "12.5")
+                self.assertEqual(saved["labels"]["1357029177-0001"]["jupiter_longitude"], "44.2")
+                self.assertEqual(saved["labels"]["1357029177-0001"]["geometry_status"], "computed")
                 self.assertIn("reviewer", saved["labels"]["1357029177-0001"])
                 self.assertIn("reviewed_at", saved["labels"]["1357029177-0001"])
                 self.assertIn("candidate_id", app_server.LABELS_CSV_PATH.read_text(encoding="utf-8"))
@@ -168,8 +174,42 @@ END_OBJECT = IMAGE
             finally:
                 app_server.LABELS_PATH = original_json
                 app_server.LABELS_CSV_PATH = original_csv
-                app_server.LABELS_GROUPED_CSV_PATH = original_grouped
-                app_server.LABEL_SUMMARY_CSV_PATH = original_summary
+            app_server.LABELS_GROUPED_CSV_PATH = original_grouped
+            app_server.LABEL_SUMMARY_CSV_PATH = original_summary
+
+    def test_public_label_import_preserves_geometry_fields(self):
+        original_json = label_tools.LABELS_JSON
+        original_csv = label_tools.LABELS_CSV
+        original_grouped = label_tools.LABELS_GROUPED_CSV
+        original_summary = label_tools.LABEL_SUMMARY_CSV
+        with tempfile.TemporaryDirectory() as directory:
+            temp_dir = Path(directory)
+            source_csv = temp_dir / "public_labels.csv"
+            source_csv.write_text(
+                "\n".join([
+                    "candidate_id,image_id,run_date,x,y,jupiter_latitude,jupiter_longitude,geometry_status,snr,blob_size,candidate_score,artifact_flags,reviewer_label,reviewer,notes,reviewed_at",
+                    "1357029177-0148,N1357029177,2001-01-01,731.37,212.49,12.5,44.2,computed,27.55,75,0.6277,,possible-lightning,vd,looks diffuse,2026-07-08T00:00:00Z",
+                ]),
+                encoding="utf-8",
+            )
+            label_tools.LABELS_JSON = temp_dir / "candidate_labels.json"
+            label_tools.LABELS_CSV = temp_dir / "candidate_labels.csv"
+            label_tools.LABELS_GROUPED_CSV = temp_dir / "candidate_labels_grouped.csv"
+            label_tools.LABEL_SUMMARY_CSV = temp_dir / "candidate_label_summary.csv"
+            try:
+                label_tools.import_labels(source_csv)
+                saved = json.loads(label_tools.LABELS_JSON.read_text(encoding="utf-8"))
+                row = saved["labels"]["1357029177-0148"]
+                self.assertEqual(row["human_label"], "possible-lightning")
+                self.assertEqual(row["jupiter_latitude"], "12.5")
+                self.assertEqual(row["jupiter_longitude"], "44.2")
+                self.assertEqual(row["geometry_status"], "computed")
+                self.assertIn("jupiter_latitude", label_tools.LABELS_CSV.read_text(encoding="utf-8"))
+            finally:
+                label_tools.LABELS_JSON = original_json
+                label_tools.LABELS_CSV = original_csv
+                label_tools.LABELS_GROUPED_CSV = original_grouped
+                label_tools.LABEL_SUMMARY_CSV = original_summary
 
     def test_research_exports_have_expected_columns(self):
         summary_path = research_exports.OUTPUT_DIR / "2001-01-01" / "summary.json"
