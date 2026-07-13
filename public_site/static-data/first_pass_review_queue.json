@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-13T14:48:08.573292+00:00",
+  "generated_at": "2026-07-13T15:02:39.976254+00:00",
   "source": "outputs/detection/first_pass_review_plan.csv",
   "row_count": 106,
   "static_note": "Generated public evidence snapshot. The same frontend uses live Python APIs when opened locally.",

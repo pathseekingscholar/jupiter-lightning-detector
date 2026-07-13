@@ -2,7 +2,7 @@
   "label_sheet_title": "Jupiter Lightning Candidate Labels",
   "label_sheet_id": "1c8JX_e_Jcy8N-odK6AFEHUMP3NYIrJq7YCPTBuUI3bg",
   "label_sheet_url": "https://docs.google.com/spreadsheets/d/1c8JX_e_Jcy8N-odK6AFEHUMP3NYIrJq7YCPTBuUI3bg",
-  "apps_script_endpoint": "",
-  "apps_script_status": "not-deployed",
-  "notes": "The shared Google Sheet exists. Deploy tools/google_sheets_label_endpoint.gs as a Google Apps Script web app, then paste the web app URL into the public review page to enable direct appends."
+  "apps_script_endpoint": "https://script.google.com/macros/s/AKfycbylkyXDKpwZ8ZryGrytZnXif8vh5TPQiw1FrFm0HjzF8yc5Q_LejiTvjd9HPpS6LY0TRA/exec",
+  "apps_script_status": "deployed",
+  "notes": "Save label keeps a browser backup and submits the same review row to the shared Google Sheet."
 }

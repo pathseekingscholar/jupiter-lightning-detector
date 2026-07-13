@@ -1,5 +1,11 @@
 # Google Sheets label endpoint
 
+Deployment status: active.
+
+Web app URL:
+
+`https://script.google.com/macros/s/AKfycbylkyXDKpwZ8ZryGrytZnXif8vh5TPQiw1FrFm0HjzF8yc5Q_LejiTvjd9HPpS6LY0TRA/exec`
+
 The review page keeps a browser backup and can submit the same row to a shared
 Google Sheet through a Google Apps Script web app.
 

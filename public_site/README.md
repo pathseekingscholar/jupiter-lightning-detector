@@ -34,7 +34,7 @@ change:
 .\run.ps1 public-site-data
 ```
 
-For shared labels, configure the Google Apps Script endpoint described in:
+Shared labels are submitted through the deployed Google Apps Script endpoint described in:
 
 ```text
 docs/google_sheets_label_endpoint.md
