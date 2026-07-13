@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Jupiter Lightning Review Metrics</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 32px; line-height: 1.45; color: #1d1b16; background: #f7f4ec; }
+    h1, h2 { font-family: Georgia, serif; }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0 28px; background: white; }
+    th, td { border: 1px solid #d8d0c0; padding: 7px 9px; text-align: left; font-size: 14px; }
+    th { background: #eee5d4; }
+    .warning { background: #fff2c7; border: 1px solid #e2c15c; padding: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Jupiter Lightning Review Metrics</h1>
+  <p class="warning">This report summarizes detector evidence and review priority. It does not confirm new lightning. Strict artifact-filtered thresholds can miss published validation marks, so stricter is not automatically better.</p>
+  <h2>Metrics</h2>
+  <table><thead><tr><th>Metric</th><th>Value</th><th>Meaning</th></tr></thead><tbody><tr><td>images_processed</td><td>221</td><td>Cassini frames processed by generated detector outputs.</td></tr>
+<tr><td>raw_bright_regions</td><td>196233</td><td>All first-pass bright regions saved before strict review filtering.</td></tr>
+<tr><td>review_candidates</td><td>12611</td><td>Candidates after artifact filters; still not confirmed lightning.</td></tr>
+<tr><td>review_fraction</td><td>0.0643</td><td>Fraction of raw bright regions that remain review candidates.</td></tr>
+<tr><td>published_matches_recovered</td><td>6</td><td>Published validation marks recovered by detector outputs.</td></tr>
+<tr><td>unmatched_review_candidates</td><td>12605</td><td>Review candidates not matching published validation marks.</td></tr>
+<tr><td>scientific_review_queue_rows</td><td>106</td><td>Curated first human-review queue.</td></tr>
+<tr><td>saved_human_labels</td><td>0</td><td>Labels currently saved by human reviewers.</td></tr>
+<tr><td>human_label_unlabeled</td><td>106</td><td>Training manifest rows by current saved human label.</td></tr>
+<tr><td>suggested_label_artifact</td><td>40</td><td>Suggested label before human review.</td></tr>
+<tr><td>suggested_label_known-lightning</td><td>6</td><td>Suggested label before human review.</td></tr>
+<tr><td>suggested_label_uncertain</td><td>60</td><td>Suggested label before human review.</td></tr>
+<tr><td>review_category_likely_artifact</td><td>40</td><td>Scientific review queue category.</td></tr>
+<tr><td>review_category_published_match</td><td>6</td><td>Scientific review queue category.</td></tr>
+<tr><td>review_category_strong_single_frame_candidate</td><td>30</td><td>Scientific review queue category.</td></tr>
+<tr><td>review_category_top_unmatched_temporal_track</td><td>30</td><td>Scientific review queue category.</td></tr>
+<tr><td>training_split_active-learning</td><td>60</td><td>Training/review split assignment.</td></tr>
+<tr><td>training_split_negative-review</td><td>40</td><td>Training/review split assignment.</td></tr>
+<tr><td>training_split_validation</td><td>6</td><td>Training/review split assignment.</td></tr>
+<tr><td>artifact_flag_single_pixel</td><td>41</td><td>Artifact flag frequency in curated review queue.</td></tr>
+<tr><td>artifact_flag_too_small</td><td>41</td><td>Artifact flag frequency in curated review queue.</td></tr></tbody></table>
+  <h2>Top Review Queue</h2>
+  <table><thead><tr><th>Rank</th><th>Candidate</th><th>Image</th><th>Date</th><th>Next action</th><th>x/y</th><th>SNR</th><th>Blob</th><th>Score</th></tr></thead><tbody><tr><td>1</td><td>1357029177-0148</td><td>N1357029177</td><td>2001-01-01</td><td>confirm_known_validation_mark</td><td>731.37, 212.49</td><td>27.55</td><td>75</td><td>0.6277</td></tr>
+<tr><td>2</td><td>1357029177-0219</td><td>N1357029177</td><td>2001-01-01</td><td>confirm_known_validation_mark</td><td>847.00, 402.23</td><td>24.75</td><td>13</td><td>0.4360</td></tr>
+<tr><td>3</td><td>1357810970-0228</td><td>N1357810970</td><td>2001-01-10</td><td>confirm_known_validation_mark</td><td>951.80, 333.08</td><td>8.14</td><td>15</td><td>0.3364</td></tr>
+<tr><td>4</td><td>1357810970-0239</td><td>N1357810970</td><td>2001-01-10</td><td>confirm_known_validation_mark</td><td>955.53, 354.96</td><td>7.92</td><td>87</td><td>0.0000</td></tr>
+<tr><td>5</td><td>1357885387-0203</td><td>N1357885387</td><td>2001-01-11</td><td>confirm_known_validation_mark</td><td>776.00, 318.00</td><td>7.50</td><td>1</td><td>0.0000</td></tr>
+<tr><td>6</td><td>1357885387-0218</td><td>N1357885387</td><td>2001-01-11</td><td>confirm_known_validation_mark</td><td>769.65, 339.50</td><td>7.06</td><td>14</td><td>0.0000</td></tr>
+<tr><td>7</td><td>1356990399-0202</td><td>N1356990399</td><td>2000-12-31</td><td>priority_temporal_review</td><td>402.62, 656.20</td><td>41.20</td><td>5</td><td>0.7672</td></tr>
+<tr><td>8</td><td>1356976983-0161</td><td>N1356976983</td><td>2000-12-31</td><td>priority_temporal_review</td><td>62.82, 480.68</td><td>31.42</td><td>4</td><td>0.7556</td></tr>
+<tr><td>9</td><td>1356990399-0080</td><td>N1356990399</td><td>2000-12-31</td><td>priority_temporal_review</td><td>900.63, 316.07</td><td>30.93</td><td>6</td><td>0.7438</td></tr>
+<tr><td>10</td><td>1356985927-0141</td><td>N1356985927</td><td>2000-12-31</td><td>priority_temporal_review</td><td>730.33, 432.12</td><td>36.45</td><td>4</td><td>0.7429</td></tr>
+<tr><td>11</td><td>1356985927-0245</td><td>N1356985927</td><td>2000-12-31</td><td>priority_temporal_review</td><td>612.58, 709.56</td><td>23.17</td><td>4</td><td>0.7424</td></tr>
+<tr><td>12</td><td>1356985927-0162</td><td>N1356985927</td><td>2000-12-31</td><td>priority_temporal_review</td><td>835.23, 498.82</td><td>24.92</td><td>3</td><td>0.7383</td></tr>
+<tr><td>13</td><td>1356990399-0013</td><td>N1356990399</td><td>2000-12-31</td><td>priority_temporal_review</td><td>626.28, 57.49</td><td>31.06</td><td>3</td><td>0.7344</td></tr>
+<tr><td>14</td><td>1356985927-0123</td><td>N1356985927</td><td>2000-12-31</td><td>priority_temporal_review</td><td>515.70, 403.81</td><td>42.51</td><td>4</td><td>0.7323</td></tr>
+<tr><td>15</td><td>1356990399-0030</td><td>N1356990399</td><td>2000-12-31</td><td>priority_temporal_review</td><td>445.85, 114.86</td><td>46.63</td><td>3</td><td>0.7305</td></tr>
+<tr><td>16</td><td>1356976983-0147</td><td>N1356976983</td><td>2000-12-31</td><td>priority_temporal_review</td><td>718.12, 439.44</td><td>39.54</td><td>4</td><td>0.7305</td></tr>
+<tr><td>17</td><td>1356990399-0193</td><td>N1356990399</td><td>2000-12-31</td><td>priority_temporal_review</td><td>744.43, 625.61</td><td>30.54</td><td>5</td><td>0.7268</td></tr>
+<tr><td>18</td><td>1356990399-0086</td><td>N1356990399</td><td>2000-12-31</td><td>priority_temporal_review</td><td>647.43, 332.24</td><td>18.02</td><td>3</td><td>0.7190</td></tr>
+<tr><td>19</td><td>1356990399-0056</td><td>N1356990399</td><td>2000-12-31</td><td>priority_temporal_review</td><td>218.44, 234.51</td><td>46.05</td><td>4</td><td>0.7166</td></tr>
+<tr><td>20</td><td>1356985927-0197</td><td>N1356985927</td><td>2000-12-31</td><td>priority_temporal_review</td><td>116.23, 575.74</td><td>47.55</td><td>5</td><td>0.7160</td></tr>
+<tr><td>21</td><td>1356985927-0308</td><td>N1356985927</td><td>2000-12-31</td><td>priority_temporal_review</td><td>922.55, 771.33</td><td>16.06</td><td>3</td><td>0.7097</td></tr>
+<tr><td>22</td><td>1356990399-0263</td><td>N1356990399</td><td>2000-12-31</td><td>priority_temporal_review</td><td>382.48, 864.12</td><td>43.14</td><td>3</td><td>0.7018</td></tr>
+<tr><td>23</td><td>1356981455-0275</td><td>N1356981455</td><td>2000-12-31</td><td>priority_temporal_review</td><td>343.62, 791.13</td><td>38.33</td><td>10</td><td>0.6962</td></tr>
+<tr><td>24</td><td>1356981455-0109</td><td>N1356981455</td><td>2000-12-31</td><td>priority_temporal_review</td><td>909.59, 321.38</td><td>14.01</td><td>3</td><td>0.6950</td></tr>
+<tr><td>25</td><td>1356985927-0012</td><td>N1356985927</td><td>2000-12-31</td><td>priority_temporal_review</td><td>493.50, 54.00</td><td>11.67</td><td>4</td><td>0.6917</td></tr>
+<tr><td>26</td><td>1356985927-0354</td><td>N1356985927</td><td>2000-12-31</td><td>priority_temporal_review</td><td>558.34, 822.42</td><td>14.54</td><td>5</td><td>0.6866</td></tr>
+<tr><td>27</td><td>1356976983-0402</td><td>N1356976983</td><td>2000-12-31</td><td>priority_temporal_review</td><td>713.50, 944.42</td><td>8.78</td><td>13</td><td>0.6862</td></tr>
+<tr><td>28</td><td>1356985927-0074</td><td>N1356985927</td><td>2000-12-31</td><td>priority_temporal_review</td><td>905.42, 252.21</td><td>35.64</td><td>3</td><td>0.6822</td></tr>
+<tr><td>29</td><td>1356985927-0055</td><td>N1356985927</td><td>2000-12-31</td><td>priority_temporal_review</td><td>451.71, 196.90</td><td>44.99</td><td>3</td><td>0.6815</td></tr>
+<tr><td>30</td><td>1356990399-0348</td><td>N1356990399</td><td>2000-12-31</td><td>temporal_review</td><td>734.98, 945.68</td><td>8.34</td><td>3</td><td>0.7089</td></tr>
+<tr><td>31</td><td>1356990399-0279</td><td>N1356990399</td><td>2000-12-31</td><td>temporal_review</td><td>859.48, 919.10</td><td>16.78</td><td>6</td><td>0.6985</td></tr>
+<tr><td>32</td><td>1356985927-0189</td><td>N1356985927</td><td>2000-12-31</td><td>temporal_review</td><td>752.72, 567.15</td><td>33.22</td><td>9</td><td>0.6904</td></tr>
+<tr><td>33</td><td>1356985927-0173</td><td>N1356985927</td><td>2000-12-31</td><td>temporal_review</td><td>180.25, 527.56</td><td>12.51</td><td>3</td><td>0.6868</td></tr>
+<tr><td>34</td><td>1356976983-0095</td><td>N1356976983</td><td>2000-12-31</td><td>temporal_review</td><td>389.49, 311.88</td><td>19.69</td><td>4</td><td>0.6753</td></tr>
+<tr><td>35</td><td>1356985927-0198</td><td>N1356985927</td><td>2000-12-31</td><td>temporal_review</td><td>433.66, 575.91</td><td>41.70</td><td>3</td><td>0.6735</td></tr>
+<tr><td>36</td><td>1356976983-0286</td><td>N1356976983</td><td>2000-12-31</td><td>temporal_review</td><td>349.71, 798.22</td><td>44.32</td><td>5</td><td>0.6687</td></tr>
+<tr><td>37</td><td>1357352003-0272</td><td>N1357352003</td><td>2001-01-05</td><td>single_frame_visual_review</td><td>626.87, 751.47</td><td>564.80</td><td>11</td><td>0.4375</td></tr>
+<tr><td>38</td><td>1357811330-0180</td><td>N1357811330</td><td>2001-01-10</td><td>single_frame_visual_review</td><td>637.48, 276.04</td><td>434.10</td><td>9</td><td>0.4375</td></tr>
+<tr><td>39</td><td>1357811330-0399</td><td>N1357811330</td><td>2001-01-10</td><td>single_frame_visual_review</td><td>807.98, 614.96</td><td>428.93</td><td>34</td><td>0.4375</td></tr>
+<tr><td>40</td><td>1358099796-0108</td><td>N1358099796</td><td>2001-01-13</td><td>single_frame_visual_review</td><td>812.74, 818.98</td><td>371.83</td><td>10</td><td>0.4375</td></tr>
+<tr><td>41</td><td>1357658284-0195</td><td>N1357658284</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>713.61, 689.45</td><td>370.72</td><td>16</td><td>0.4375</td></tr>
+<tr><td>42</td><td>1358105418-1483</td><td>N1358105418</td><td>2001-01-13</td><td>single_frame_visual_review</td><td>28.87, 888.11</td><td>363.68</td><td>17</td><td>0.4375</td></tr>
+<tr><td>43</td><td>1357667285-0063</td><td>N1357667285</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>164.06, 271.23</td><td>363.49</td><td>9</td><td>0.4375</td></tr>
+<tr><td>44</td><td>1357646415-0076</td><td>N1357646415</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>689.56, 470.36</td><td>305.50</td><td>8</td><td>0.4375</td></tr>
+<tr><td>45</td><td>1358114587-0079</td><td>N1358114587</td><td>2001-01-13</td><td>single_frame_visual_review</td><td>259.57, 429.91</td><td>229.84</td><td>9</td><td>0.4375</td></tr>
+<tr><td>46</td><td>1357628584-0070</td><td>N1357628584</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>939.70, 418.53</td><td>223.82</td><td>11</td><td>0.4375</td></tr>
+<tr><td>47</td><td>1357352003-0194</td><td>N1357352003</td><td>2001-01-05</td><td>single_frame_visual_review</td><td>380.15, 543.48</td><td>164.61</td><td>8</td><td>0.4375</td></tr>
+<tr><td>48</td><td>1357637415-0069</td><td>N1357637415</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>95.74, 471.57</td><td>284.94</td><td>7</td><td>0.4125</td></tr>
+<tr><td>49</td><td>1357665093-0016</td><td>N1357665093</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>807.46, 164.30</td><td>395.79</td><td>6</td><td>0.3875</td></tr>
+<tr><td>50</td><td>1357685285-0112</td><td>N1357685285</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>474.82, 382.50</td><td>379.47</td><td>6</td><td>0.3875</td></tr>
+<tr><td>51</td><td>1357682416-0008</td><td>N1357682416</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>428.07, 73.69</td><td>317.53</td><td>6</td><td>0.3875</td></tr>
+<tr><td>52</td><td>1357685285-0093</td><td>N1357685285</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>504.70, 306.29</td><td>162.69</td><td>6</td><td>0.3875</td></tr>
+<tr><td>53</td><td>1357352003-0192</td><td>N1357352003</td><td>2001-01-05</td><td>single_frame_visual_review</td><td>823.83, 535.84</td><td>564.80</td><td>5</td><td>0.3625</td></tr>
+<tr><td>54</td><td>1357667116-1600</td><td>N1357667116</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>367.96, 1009.04</td><td>402.78</td><td>5</td><td>0.3625</td></tr>
+<tr><td>55</td><td>1357674094-0052</td><td>N1357674094</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>316.82, 479.90</td><td>203.84</td><td>5</td><td>0.3625</td></tr>
+<tr><td>56</td><td>1357638093-0061</td><td>N1357638093</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>717.61, 548.63</td><td>173.37</td><td>5</td><td>0.3625</td></tr>
+<tr><td>57</td><td>1357667285-0006</td><td>N1357667285</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>164.95, 31.31</td><td>287.36</td><td>4</td><td>0.3375</td></tr>
+<tr><td>58</td><td>1357667794-0108</td><td>N1357667794</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>895.25, 681.83</td><td>270.60</td><td>4</td><td>0.3375</td></tr>
+<tr><td>59</td><td>1357685285-0055</td><td>N1357685285</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>906.18, 154.87</td><td>255.45</td><td>4</td><td>0.3375</td></tr>
+<tr><td>60</td><td>1357664584-0715</td><td>N1357664584</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>153.93, 752.40</td><td>243.76</td><td>4</td><td>0.3375</td></tr>
+<tr><td>61</td><td>1358117118-0033</td><td>N1358117118</td><td>2001-01-13</td><td>single_frame_visual_review</td><td>979.81, 140.15</td><td>184.23</td><td>4</td><td>0.3375</td></tr>
+<tr><td>62</td><td>1357673416-1543</td><td>N1357673416</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>158.93, 814.90</td><td>178.46</td><td>4</td><td>0.3375</td></tr>
+<tr><td>63</td><td>1357673585-0019</td><td>N1357673585</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>98.12, 89.79</td><td>250.98</td><td>3</td><td>0.3125</td></tr>
+<tr><td>64</td><td>1357685285-0071</td><td>N1357685285</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>587.04, 220.95</td><td>205.82</td><td>3</td><td>0.3125</td></tr>
+<tr><td>65</td><td>1357646584-0889</td><td>N1357646584</td><td>2001-01-08</td><td>single_frame_visual_review</td><td>616.14, 779.43</td><td>205.13</td><td>3</td><td>0.3125</td></tr>
+<tr><td>66</td><td>1358114587-0121</td><td>N1358114587</td><td>2001-01-13</td><td>single_frame_visual_review</td><td>622.86, 585.04</td><td>178.89</td><td>3</td><td>0.3125</td></tr>
+<tr><td>67</td><td>1357685116-0026</td><td>N1357685116</td><td>2001-01-08</td><td>review_as_negative_example</td><td>715.00, 96.00</td><td>366.52</td><td>1</td><td>0.0000</td></tr>
+<tr><td>68</td><td>1357806858-0398</td><td>N1357806858</td><td>2001-01-10</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>296.12</td><td>1</td><td>0.0000</td></tr>
+<tr><td>69</td><td>1357811330-0392</td><td>N1357811330</td><td>2001-01-10</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>292.83</td><td>1</td><td>0.0000</td></tr>
+<tr><td>70</td><td>1358063118-0224</td><td>N1358063118</td><td>2001-01-13</td><td>review_as_negative_example</td><td>988.00, 902.00</td><td>200.02</td><td>1</td><td>0.0000</td></tr>
+<tr><td>71</td><td>1357352003-0215</td><td>N1357352003</td><td>2001-01-05</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>191.47</td><td>1</td><td>0.0000</td></tr>
+<tr><td>72</td><td>1357691416-0701</td><td>N1357691416</td><td>2001-01-09</td><td>review_as_negative_example</td><td>522.00, 747.00</td><td>176.83</td><td>1</td><td>0.0000</td></tr>
+<tr><td>73</td><td>1358117118-0283</td><td>N1358117118</td><td>2001-01-13</td><td>review_as_negative_example</td><td>318.00, 946.00</td><td>172.49</td><td>1</td><td>0.0000</td></tr>
+<tr><td>74</td><td>1357806858-0226</td><td>N1357806858</td><td>2001-01-10</td><td>review_as_negative_example</td><td>623.00, 335.00</td><td>152.87</td><td>1</td><td>0.0000</td></tr>
+<tr><td>75</td><td>1358108287-0180</td><td>N1358108287</td><td>2001-01-13</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>151.10</td><td>1</td><td>0.0000</td></tr>
+<tr><td>76</td><td>1357352003-0267</td><td>N1357352003</td><td>2001-01-05</td><td>review_as_negative_example</td><td>731.00, 735.00</td><td>150.99</td><td>1</td><td>0.0000</td></tr>
+<tr><td>77</td><td>1357811330-0216</td><td>N1357811330</td><td>2001-01-10</td><td>review_as_negative_example</td><td>623.00, 335.00</td><td>150.48</td><td>1</td><td>0.0000</td></tr>
+<tr><td>78</td><td>1358117287-0194</td><td>N1358117287</td><td>2001-01-13</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>150.02</td><td>1</td><td>0.0000</td></tr>
+<tr><td>79</td><td>1358063287-0194</td><td>N1358063287</td><td>2001-01-13</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>148.97</td><td>1</td><td>0.0000</td></tr>
+<tr><td>80</td><td>1357685285-0182</td><td>N1357685285</td><td>2001-01-08</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>147.11</td><td>1</td><td>0.0000</td></tr>
+<tr><td>81</td><td>1357658284-0162</td><td>N1357658284</td><td>2001-01-08</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>144.03</td><td>1</td><td>0.0000</td></tr>
+<tr><td>82</td><td>1357676285-0173</td><td>N1357676285</td><td>2001-01-08</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>143.75</td><td>1</td><td>0.0000</td></tr>
+<tr><td>83</td><td>1357649284-0160</td><td>N1357649284</td><td>2001-01-08</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>143.46</td><td>1</td><td>0.0000</td></tr>
+<tr><td>84</td><td>1357667285-0154</td><td>N1357667285</td><td>2001-01-08</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>141.09</td><td>1</td><td>0.0000</td></tr>
+<tr><td>85</td><td>1358063287-0001</td><td>N1358063287</td><td>2001-01-13</td><td>review_as_negative_example</td><td>492.00, 4.00</td><td>139.15</td><td>1</td><td>0.0000</td></tr>
+<tr><td>86</td><td>1357631284-0168</td><td>N1357631284</td><td>2001-01-08</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>137.63</td><td>1</td><td>0.0000</td></tr>
+<tr><td>87</td><td>1358117287-0242</td><td>N1358117287</td><td>2001-01-13</td><td>review_as_negative_example</td><td>731.00, 735.00</td><td>132.23</td><td>1</td><td>0.0000</td></tr>
+<tr><td>88</td><td>1358108118-0149</td><td>N1358108118</td><td>2001-01-13</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>131.08</td><td>1</td><td>0.0000</td></tr>
+<tr><td>89</td><td>1358108287-0236</td><td>N1358108287</td><td>2001-01-13</td><td>review_as_negative_example</td><td>731.00, 735.00</td><td>129.94</td><td>1</td><td>0.0000</td></tr>
+<tr><td>90</td><td>1357685285-0216</td><td>N1357685285</td><td>2001-01-08</td><td>review_as_negative_example</td><td>731.00, 735.00</td><td>129.72</td><td>1</td><td>0.0000</td></tr>
+<tr><td>91</td><td>1358063118-0152</td><td>N1358063118</td><td>2001-01-13</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>129.67</td><td>1</td><td>0.0000</td></tr>
+<tr><td>92</td><td>1357685116-0155</td><td>N1357685116</td><td>2001-01-08</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>128.88</td><td>1</td><td>0.0000</td></tr>
+<tr><td>93</td><td>1358063287-0234</td><td>N1358063287</td><td>2001-01-13</td><td>review_as_negative_example</td><td>731.00, 735.00</td><td>128.50</td><td>1</td><td>0.0000</td></tr>
+<tr><td>94</td><td>1356981845-0194</td><td>N1356981845</td><td>2000-12-31</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>128.17</td><td>1</td><td>0.0000</td></tr>
+<tr><td>95</td><td>1357649284-0201</td><td>N1357649284</td><td>2001-01-08</td><td>review_as_negative_example</td><td>731.00, 735.00</td><td>127.78</td><td>1</td><td>0.0000</td></tr>
+<tr><td>96</td><td>1357658284-0216</td><td>N1357658284</td><td>2001-01-08</td><td>review_as_negative_example</td><td>731.00, 735.00</td><td>126.73</td><td>1</td><td>0.0000</td></tr>
+<tr><td>97</td><td>1358117118-0135</td><td>N1358117118</td><td>2001-01-13</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>125.33</td><td>1</td><td>0.0000</td></tr>
+<tr><td>98</td><td>1357658115-0139</td><td>N1357658115</td><td>2001-01-08</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>123.82</td><td>1</td><td>0.0000</td></tr>
+<tr><td>99</td><td>1357667116-0147</td><td>N1357667116</td><td>2001-01-08</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>122.69</td><td>1</td><td>0.0000</td></tr>
+<tr><td>100</td><td>1357649115-0135</td><td>N1357649115</td><td>2001-01-08</td><td>review_as_negative_example</td><td>402.00, 601.00</td><td>121.56</td><td>1</td><td>0.0000</td></tr></tbody></table>
+  <h2>Temporal Track Quality</h2>
+  <table><thead><tr><th>Quality</th><th>Date</th><th>Track</th><th>Frames</th><th>Motion consistency</th><th>Median SNR</th><th>Reason</th></tr></thead><tbody><tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0635</td><td>3</td><td>0.755</td><td>32.52</td><td>appears in 3+ frames; moderate step consistency; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0209</td><td>3</td><td>0.828</td><td>30.17</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0466</td><td>3</td><td>0.920</td><td>35.31</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-04</td><td>T0184</td><td>3</td><td>0.930</td><td>13.29</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0353</td><td>3</td><td>0.919</td><td>41.20</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0237</td><td>3</td><td>0.905</td><td>28.28</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0216</td><td>3</td><td>0.898</td><td>32.19</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0577</td><td>3</td><td>0.897</td><td>32.04</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0363</td><td>3</td><td>0.984</td><td>28.80</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0019</td><td>3</td><td>0.972</td><td>53.41</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0086</td><td>3</td><td>0.864</td><td>32.78</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0559</td><td>3</td><td>0.983</td><td>24.13</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0561</td><td>3</td><td>0.842</td><td>26.25</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0076</td><td>3</td><td>0.941</td><td>34.77</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-04</td><td>T0013</td><td>3</td><td>0.913</td><td>13.36</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0339</td><td>3</td><td>0.925</td><td>30.93</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0231</td><td>3</td><td>0.922</td><td>36.45</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0254</td><td>3</td><td>0.920</td><td>25.45</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0562</td><td>3</td><td>0.926</td><td>24.73</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0234</td><td>3</td><td>0.950</td><td>23.03</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0576</td><td>3</td><td>0.997</td><td>33.29</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0103</td><td>3</td><td>0.791</td><td>27.36</td><td>appears in 3+ frames; moderate step consistency; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0210</td><td>3</td><td>0.889</td><td>46.39</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0682</td><td>3</td><td>0.888</td><td>26.00</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0328</td><td>3</td><td>0.888</td><td>31.12</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0650</td><td>3</td><td>0.992</td><td>20.57</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0228</td><td>3</td><td>0.879</td><td>42.51</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-05</td><td>T0004</td><td>3</td><td>0.974</td><td>12.48</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0332</td><td>3</td><td>0.972</td><td>73.68</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0018</td><td>3</td><td>0.946</td><td>21.91</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-08</td><td>T1412</td><td>3</td><td>0.972</td><td>27.28</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0352</td><td>3</td><td>0.757</td><td>56.14</td><td>appears in 3+ frames; moderate step consistency; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-04</td><td>T0275</td><td>3</td><td>0.870</td><td>11.96</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-11</td><td>T0279</td><td>3</td><td>0.994</td><td>10.61</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0457</td><td>3</td><td>0.849</td><td>26.23</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-08</td><td>T2932</td><td>3</td><td>0.843</td><td>35.70</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0472</td><td>3</td><td>0.836</td><td>33.36</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0202</td><td>3</td><td>0.935</td><td>27.52</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-08</td><td>T4844</td><td>3</td><td>0.956</td><td>11.33</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0340</td><td>3</td><td>0.826</td><td>29.59</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-08</td><td>T1463</td><td>3</td><td>0.939</td><td>11.73</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0320</td><td>3</td><td>0.990</td><td>22.06</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-05</td><td>T0273</td><td>3</td><td>0.963</td><td>14.85</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0558</td><td>3</td><td>0.982</td><td>22.30</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0334</td><td>3</td><td>0.840</td><td>24.00</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0244</td><td>3</td><td>0.914</td><td>47.55</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0329</td><td>3</td><td>0.980</td><td>17.61</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-13</td><td>T0481</td><td>3</td><td>0.914</td><td>11.81</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0648</td><td>3</td><td>0.824</td><td>19.73</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0264</td><td>3</td><td>0.789</td><td>76.05</td><td>appears in 3+ frames; moderate step consistency; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-13</td><td>T0482</td><td>3</td><td>0.812</td><td>11.40</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-11</td><td>T0194</td><td>3</td><td>0.936</td><td>10.41</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-05</td><td>T0331</td><td>3</td><td>0.955</td><td>13.67</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-08</td><td>T3727</td><td>3</td><td>0.887</td><td>12.00</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0341</td><td>3</td><td>0.885</td><td>24.57</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-10</td><td>T0270</td><td>3</td><td>0.968</td><td>12.36</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0663</td><td>3</td><td>0.980</td><td>20.08</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-08</td><td>T4811</td><td>3</td><td>0.994</td><td>11.15</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0651</td><td>3</td><td>0.860</td><td>26.91</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-11</td><td>T0353</td><td>3</td><td>0.999</td><td>10.80</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0359</td><td>3</td><td>0.857</td><td>43.14</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-05</td><td>T0390</td><td>3</td><td>0.755</td><td>12.49</td><td>appears in 3+ frames; moderate step consistency; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0347</td><td>3</td><td>0.968</td><td>15.90</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-13</td><td>T0455</td><td>3</td><td>0.969</td><td>11.67</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0661</td><td>3</td><td>0.862</td><td>20.22</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-08</td><td>T0351</td><td>3</td><td>0.864</td><td>11.77</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0125</td><td>3</td><td>0.776</td><td>15.30</td><td>appears in 3+ frames; moderate step consistency; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-05</td><td>T0224</td><td>3</td><td>0.986</td><td>14.86</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-08</td><td>T2227</td><td>3</td><td>0.790</td><td>10.40</td><td>appears in 3+ frames; moderate step consistency; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-08</td><td>T1492</td><td>3</td><td>0.753</td><td>11.85</td><td>appears in 3+ frames; moderate step consistency; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0155</td><td>3</td><td>0.781</td><td>18.92</td><td>appears in 3+ frames; moderate step consistency; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-10</td><td>T0264</td><td>3</td><td>0.859</td><td>11.48</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-13</td><td>T1091</td><td>3</td><td>0.892</td><td>10.00</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0131</td><td>3</td><td>0.994</td><td>14.01</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0211</td><td>3</td><td>0.981</td><td>13.99</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0761</td><td>3</td><td>0.912</td><td>16.84</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-08</td><td>T4848</td><td>3</td><td>0.846</td><td>11.19</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-08</td><td>T4825</td><td>3</td><td>0.942</td><td>11.23</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-13</td><td>T1664</td><td>3</td><td>0.963</td><td>10.27</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-13</td><td>T1685</td><td>3</td><td>0.865</td><td>10.10</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0424</td><td>3</td><td>0.814</td><td>24.57</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0271</td><td>3</td><td>0.847</td><td>14.54</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-13</td><td>T1671</td><td>3</td><td>0.914</td><td>11.71</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-08</td><td>T4031</td><td>3</td><td>0.832</td><td>10.88</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-13</td><td>T1625</td><td>3</td><td>0.836</td><td>10.40</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-13</td><td>T1609</td><td>3</td><td>0.910</td><td>11.40</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-13</td><td>T1108</td><td>3</td><td>0.935</td><td>10.36</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-05</td><td>T0227</td><td>3</td><td>0.971</td><td>12.95</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0222</td><td>3</td><td>0.779</td><td>32.91</td><td>appears in 3+ frames; moderate step consistency; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2000-12-31</td><td>T0220</td><td>3</td><td>0.776</td><td>32.73</td><td>appears in 3+ frames; moderate step consistency; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-13</td><td>T1096</td><td>3</td><td>0.924</td><td>10.50</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0365</td><td>3</td><td>0.833</td><td>10.11</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-08</td><td>T1482</td><td>3</td><td>0.808</td><td>10.84</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0579</td><td>3</td><td>0.882</td><td>20.10</td><td>appears in 3+ frames; consistent step size; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0338</td><td>3</td><td>0.795</td><td>19.56</td><td>appears in 3+ frames; moderate step consistency; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-04</td><td>T0269</td><td>3</td><td>0.905</td><td>14.90</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-04</td><td>T0009</td><td>3</td><td>0.918</td><td>14.07</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-09</td><td>T0157</td><td>3</td><td>0.957</td><td>12.45</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-01</td><td>T0749</td><td>3</td><td>0.751</td><td>27.39</td><td>appears in 3+ frames; moderate step consistency; high SNR</td></tr>
+<tr><td>strong_temporal_review</td><td>2001-01-13</td><td>T1694</td><td>3</td><td>0.987</td><td>10.93</td><td>appears in 3+ frames; consistent step size; moderate SNR</td></tr></tbody></table>
+  <h2>Threshold Tradeoff</h2>
+  <table><thead><tr><th>Rank</th><th>SNR threshold</th><th>Min blob</th><th>Review candidates</th><th>Published matches</th><th>Recall</th><th>Interpretation</th></tr></thead><tbody><tr><td>1</td><td>7.0</td><td>8</td><td>1395</td><td>5</td><td>0.833</td><td>misses at least one published mark; risky without review</td></tr>
+<tr><td>2</td><td>7.0</td><td>5</td><td>5197</td><td>5</td><td>0.833</td><td>misses at least one published mark; risky without review</td></tr>
+<tr><td>3</td><td>7.0</td><td>3</td><td>17271</td><td>5</td><td>0.833</td><td>misses at least one published mark; risky without review</td></tr>
+<tr><td>4</td><td>7.0</td><td>1</td><td>17271</td><td>5</td><td>0.833</td><td>misses at least one published mark; risky without review</td></tr>
+<tr><td>5</td><td>8.0</td><td>8</td><td>1313</td><td>3</td><td>0.500</td><td>too strict for current validation set</td></tr>
+<tr><td>6</td><td>8.0</td><td>5</td><td>4819</td><td>3</td><td>0.500</td><td>too strict for current validation set</td></tr>
+<tr><td>7</td><td>8.0</td><td>3</td><td>15700</td><td>3</td><td>0.500</td><td>too strict for current validation set</td></tr>
+<tr><td>8</td><td>8.0</td><td>1</td><td>15700</td><td>3</td><td>0.500</td><td>too strict for current validation set</td></tr>
+<tr><td>9</td><td>20.0</td><td>8</td><td>262</td><td>2</td><td>0.333</td><td>too strict for current validation set</td></tr>
+<tr><td>10</td><td>15.0</td><td>8</td><td>364</td><td>2</td><td>0.333</td><td>too strict for current validation set</td></tr>
+<tr><td>11</td><td>12.0</td><td>8</td><td>640</td><td>2</td><td>0.333</td><td>too strict for current validation set</td></tr>
+<tr><td>12</td><td>20.0</td><td>5</td><td>843</td><td>2</td><td>0.333</td><td>too strict for current validation set</td></tr>
+<tr><td>13</td><td>10.0</td><td>8</td><td>992</td><td>2</td><td>0.333</td><td>too strict for current validation set</td></tr>
+<tr><td>14</td><td>15.0</td><td>5</td><td>1215</td><td>2</td><td>0.333</td><td>too strict for current validation set</td></tr>
+<tr><td>15</td><td>12.0</td><td>5</td><td>2094</td><td>2</td><td>0.333</td><td>too strict for current validation set</td></tr>
+<tr><td>16</td><td>20.0</td><td>3</td><td>2220</td><td>2</td><td>0.333</td><td>too strict for current validation set</td></tr>
+<tr><td>17</td><td>20.0</td><td>1</td><td>2220</td><td>2</td><td>0.333</td><td>too strict for current validation set</td></tr>
+<tr><td>18</td><td>15.0</td><td>3</td><td>3378</td><td>2</td><td>0.333</td><td>too strict for current validation set</td></tr>
+<tr><td>19</td><td>15.0</td><td>1</td><td>3378</td><td>2</td><td>0.333</td><td>too strict for current validation set</td></tr>
+<tr><td>20</td><td>10.0</td><td>5</td><td>3470</td><td>2</td><td>0.333</td><td>too strict for current validation set</td></tr>
+<tr><td>21</td><td>12.0</td><td>3</td><td>5618</td><td>2</td><td>0.333</td><td>too strict for current validation set</td></tr>
+<tr><td>22</td><td>12.0</td><td>1</td><td>5618</td><td>2</td><td>0.333</td><td>too strict for current validation set</td></tr>
+<tr><td>23</td><td>10.0</td><td>3</td><td>9927</td><td>2</td><td>0.333</td><td>too strict for current validation set</td></tr>
+<tr><td>24</td><td>10.0</td><td>1</td><td>9927</td><td>2</td><td>0.333</td><td>too strict for current validation set</td></tr></tbody></table>
+</body>
+</html>

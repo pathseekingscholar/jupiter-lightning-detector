@@ -1,0 +1,22 @@
+metric,value,meaning
+images_processed,221,Cassini frames processed by generated detector outputs.
+raw_bright_regions,196233,All first-pass bright regions saved before strict review filtering.
+review_candidates,12611,Candidates after artifact filters; still not confirmed lightning.
+review_fraction,0.0643,Fraction of raw bright regions that remain review candidates.
+published_matches_recovered,6,Published validation marks recovered by detector outputs.
+unmatched_review_candidates,12605,Review candidates not matching published validation marks.
+scientific_review_queue_rows,106,Curated first human-review queue.
+saved_human_labels,0,Labels currently saved by human reviewers.
+human_label_unlabeled,106,Training manifest rows by current saved human label.
+suggested_label_artifact,40,Suggested label before human review.
+suggested_label_known-lightning,6,Suggested label before human review.
+suggested_label_uncertain,60,Suggested label before human review.
+review_category_likely_artifact,40,Scientific review queue category.
+review_category_published_match,6,Scientific review queue category.
+review_category_strong_single_frame_candidate,30,Scientific review queue category.
+review_category_top_unmatched_temporal_track,30,Scientific review queue category.
+training_split_active-learning,60,Training/review split assignment.
+training_split_negative-review,40,Training/review split assignment.
+training_split_validation,6,Training/review split assignment.
+artifact_flag_single_pixel,41,Artifact flag frequency in curated review queue.
+artifact_flag_too_small,41,Artifact flag frequency in curated review queue.

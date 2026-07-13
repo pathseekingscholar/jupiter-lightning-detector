@@ -655,6 +655,9 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path.startswith("/outputs/"):
             self.serve_file(ROOT / parsed.path.lstrip("/"))
             return
+        if parsed.path.startswith("/static-data/") or parsed.path.startswith("/static-assets/"):
+            self.serve_file(ROOT / "public_site" / parsed.path.lstrip("/"))
+            return
         relative = "index.html" if parsed.path in ("", "/") else parsed.path.lstrip("/")
         self.serve_file(WEB / relative)
 
@@ -697,7 +700,13 @@ class Handler(BaseHTTPRequestHandler):
     def serve_file(self, path: Path) -> None:
         try:
             resolved = path.resolve()
-            allowed = (WEB.resolve(), (ROOT / "data").resolve(), (ROOT / "outputs").resolve())
+            allowed = (
+                WEB.resolve(),
+                (ROOT / "data").resolve(),
+                (ROOT / "outputs").resolve(),
+                (ROOT / "public_site" / "static-data").resolve(),
+                (ROOT / "public_site" / "static-assets").resolve(),
+            )
             if not any(resolved == root or root in resolved.parents for root in allowed):
                 raise FileNotFoundError
             payload = resolved.read_bytes()

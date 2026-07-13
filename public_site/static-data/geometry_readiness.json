@@ -1,8 +1,9 @@
 {
-  "generated_at": "2026-07-08T21:59:05.503750+00:00",
+  "generated_at": "2026-07-13T14:48:08.579775+00:00",
   "status": "pending-backplane",
   "images_inventoried": 221,
   "candidate_rows_checked": 221,
+  "candidate_coordinates_computed": 0,
   "default_tolerance_degrees": 1.0,
   "blocker_counts": {},
   "required_inputs": [
@@ -56,11 +57,17 @@
       "required_for": "ray_jupiter_intercept"
     }
   ],
-  "safe_interpretation": "Candidate latitude/longitude are not computed yet. Current candidates can be reviewed in image x/y coordinates. Geometry requires Cassini ISS camera model plus SPICE kernels before storm-location claims.",
+  "safe_interpretation": "Candidate latitude/longitude are available for 0 rows. Blank rows remain in image x/y coordinates until the Cassini ISS camera model and SPICE kernels are validated.",
+  "implementation": {
+    "preferred": "USGS ISIS cassini2isis + spiceinit + campt",
+    "runner": "python candidate_backplanes.py",
+    "output": "outputs/detection/candidate_geometry.csv",
+    "validation_gate": "six published detections before scientific location claims"
+  },
   "next_steps": [
-    "Download/document Cassini ISS IK/FK/CK/SPK/SCLK/LSK/PCK kernels outside Git.",
-    "Create a local metakernel and coverage report for the 221 processed frames.",
-    "Validate pixel-to-lat/lon projection on the six published detections.",
-    "Only then populate jupiter_latitude/jupiter_longitude in public review rows."
+    "Install USGS ISIS in a Linux or Andromeda environment.",
+    "Run candidate_backplanes.py to ingest images, attach kernels, and query image pixels.",
+    "Validate the resulting coordinates against the six published detections.",
+    "Only then use one-degree location grouping for storm evidence."
   ]
 }

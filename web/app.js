@@ -12,6 +12,13 @@ const state = {
   originalObjectUrl: null,
   processedDataUrl: null,
   storageWarned: false,
+  backendAvailable: false,
+  runtimeKnown: false,
+};
+
+window.JupiterWorkbench = {
+  backendAvailable: false,
+  runtimeKnown: false,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -19,6 +26,39 @@ const controls = ["scale", "crop", "low", "high", "gamma", "x", "y", "mark"];
 const DB_NAME = "jupiter-lightning-library";
 const DB_VERSION = 1;
 const IMAGE_STORE = "images";
+
+async function jsonResponse(url) {
+  const response = await fetch(url);
+  const contentType = response.headers.get("content-type") || "";
+  if (!response.ok || !contentType.includes("application/json")) {
+    throw new Error(`${url} returned ${response.status}`);
+  }
+  return response.json();
+}
+
+async function loadRuntime() {
+  try {
+    state.data = await jsonResponse("/api/observations");
+    state.backendAvailable = true;
+  } catch {
+    state.data = await jsonResponse("/static-data/api/observations.json");
+    state.backendAvailable = false;
+    state.data.notes = {
+      ...(state.data.notes || {}),
+      ...JSON.parse(localStorage.getItem("jupiterPublicObservationNotes") || "{}")
+    };
+  }
+  state.runtimeKnown = true;
+  window.JupiterWorkbench.backendAvailable = state.backendAvailable;
+  window.JupiterWorkbench.runtimeKnown = true;
+  $("runtime-mode").textContent = state.backendAvailable
+    ? "Python backend connected"
+    : "Public evidence snapshot";
+}
+
+function publicDataPath(name) {
+  return `/static-data/api/${name}.json`;
+}
 
 function openLibraryDb() {
   return new Promise((resolve, reject) => {
@@ -287,7 +327,7 @@ function renderDetectionReview() {
   renderReviewBuckets(flatCandidates);
   $("track-list").innerHTML = topTracks.map((track) => {
     const lead = track.items[0];
-    const cropUrl = `/api/detection-crop?image=${encodeURIComponent(lead.image_number)}&x=${Math.round(lead.x)}&y=${Math.round(lead.y)}&crop=128`;
+    const cropUrl = lead.crop_url || `/api/detection-crop?image=${encodeURIComponent(lead.image_number)}&x=${Math.round(lead.x)}&y=${Math.round(lead.y)}&crop=128`;
     const frames = track.items.map((item) => `N${item.image_number}`).join(" -> ");
     const savedLabel = lead.human_label || state.labels.labels?.[lead.candidate_id]?.human_label || "";
     const savedNote = lead.review_note || state.labels.labels?.[lead.candidate_id]?.review_note || "";
@@ -412,11 +452,11 @@ function renderReviewBuckets(candidates = []) {
 
 async function loadCandidateLabels() {
   try {
-    const response = await fetch("/api/candidate-labels");
-    if (!response.ok) throw new Error(`Labels API returned ${response.status}`);
-    state.labels = await response.json();
-    $("labels-csv-link").href = state.labels.csv_url;
-    $("labels-json-link").href = state.labels.json_url;
+    state.labels = state.backendAvailable
+      ? await jsonResponse("/api/candidate-labels")
+      : {labels: JSON.parse(localStorage.getItem("jupiterPublicReviewLabels") || "{}"), counts: {}};
+    if (state.labels.csv_url) $("labels-csv-link").href = state.labels.csv_url;
+    if (state.labels.json_url) $("labels-json-link").href = state.labels.json_url;
   } catch (error) {
     state.labels = {labels: {}, counts: {}, error: error.message};
   }
@@ -433,6 +473,36 @@ async function saveCandidateLabel(candidate) {
   const confidence = document.querySelector(`[data-confidence-for="${candidate.candidate_id}"]`)?.value || "medium";
   const reviewer = document.querySelector(`[data-reviewer-for="${candidate.candidate_id}"]`)?.value || "local-reviewer";
   localStorage.setItem("jupiterReviewerName", reviewer);
+  if (!state.backendAvailable) {
+    const labels = JSON.parse(localStorage.getItem("jupiterPublicReviewLabels") || "{}");
+    labels[candidate.candidate_id] = {
+      run_date: state.detectionDate,
+      candidate_id: candidate.candidate_id,
+      image_id: `N${candidate.image_number}`,
+      image_number: candidate.image_number,
+      x: candidate.x.toFixed(2),
+      y: candidate.y.toFixed(2),
+      brightness: candidate.peak_snr.toFixed(2),
+      blob_size: candidate.area_px,
+      snr: candidate.peak_snr.toFixed(2),
+      artifact_flags: candidate.flags || "",
+      candidate_score: candidate.confidence.toFixed(4),
+      reviewer_label: humanLabel,
+      human_label: humanLabel,
+      label: humanLabel,
+      confidence,
+      reviewer,
+      notes: note,
+      review_note: note,
+      timestamp: new Date().toISOString(),
+      reviewed_at: new Date().toISOString(),
+      source: "public-vercel-review"
+    };
+    localStorage.setItem("jupiterPublicReviewLabels", JSON.stringify(labels));
+    state.labels = {labels, counts: {}};
+    renderDetectionReview();
+    return;
+  }
   const response = await fetch("/api/candidate-label", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
@@ -465,9 +535,9 @@ async function saveCandidateLabel(candidate) {
 
 async function loadDetectionReview() {
   try {
-    const response = await fetch(`/api/detection?date=${encodeURIComponent(state.detectionDate)}`);
-    if (!response.ok) throw new Error(`Detector API returned ${response.status}`);
-    state.detection = await response.json();
+    state.detection = state.backendAvailable
+      ? await jsonResponse(`/api/detection?date=${encodeURIComponent(state.detectionDate)}`)
+      : await jsonResponse(publicDataPath(`detection-${state.detectionDate}`));
     renderDetectionReview();
   } catch (error) {
     state.detection = {
@@ -518,9 +588,9 @@ function renderValidation() {
 
 async function loadValidation() {
   try {
-    const response = await fetch("/api/validation");
-    if (!response.ok) throw new Error(`Validation API returned ${response.status}`);
-    state.validation = await response.json();
+    state.validation = state.backendAvailable
+      ? await jsonResponse("/api/validation")
+      : await jsonResponse(publicDataPath("validation"));
   } catch (error) {
     state.validation = {
       available: false,
@@ -570,9 +640,9 @@ function renderDetectorCharacteristics() {
 
 async function loadDetectorCharacteristics() {
   try {
-    const response = await fetch("/api/detector-characteristics");
-    if (!response.ok) throw new Error(`Detector characteristics API returned ${response.status}`);
-    state.characteristics = await response.json();
+    state.characteristics = state.backendAvailable
+      ? await jsonResponse("/api/detector-characteristics")
+      : await jsonResponse(publicDataPath("detector-characteristics"));
   } catch (error) {
     state.characteristics = {
       classification: {
@@ -597,9 +667,12 @@ function renderDetectorStatus(status) {
 async function refreshDetectorStatus() {
   let status;
   try {
-    const response = await fetch("/api/detection-status");
-    if (!response.ok) throw new Error(`Status API returned ${response.status}`);
-    status = await response.json();
+    status = state.backendAvailable
+      ? await jsonResponse("/api/detection-status")
+      : {
+          running: false,
+          message: "Public view: current outputs are loaded. Starting a new detector run requires the local Python backend."
+        };
   } catch (error) {
     renderDetectorStatus({running: false, message: `Detector status could not be loaded: ${error.message}`});
     return;
@@ -615,6 +688,10 @@ async function refreshDetectorStatus() {
 }
 
 async function runDetectorAgain() {
+  if (!state.backendAvailable) {
+    renderDetectorStatus({running: false, message: "New detector runs require the local Python backend and calibrated OPUS products. The public site shows the latest generated outputs."});
+    return;
+  }
   renderDetectorStatus({running: true, message: `Starting detector for ${state.detectionDate}...`});
   const response = await fetch(`/api/run-detection?date=${encodeURIComponent(state.detectionDate)}`, {method: "POST"});
   if (!response.ok) {
@@ -653,9 +730,7 @@ function percentileFromHistogram(histogram, count, percentile) {
   return 255;
 }
 
-async function renderUploadedImage() {
-  const record = await libraryGet(state.current.id);
-  const bitmap = await createImageBitmap(record.blob);
+async function renderBitmapWithSettings(bitmap) {
   const settings = currentSettings();
   const crop = Math.min(settings.crop, bitmap.width, bitmap.height);
   const x0 = Math.max(0, Math.min(bitmap.width - crop, settings.x - crop / 2));
@@ -709,6 +784,17 @@ async function renderUploadedImage() {
   return state.processedDataUrl;
 }
 
+async function renderUploadedImage() {
+  const record = await libraryGet(state.current.id);
+  return renderBitmapWithSettings(await createImageBitmap(record.blob));
+}
+
+async function renderPublicObservation() {
+  const response = await fetch(state.current.preview_image);
+  if (!response.ok) throw new Error(`Preview image returned ${response.status}`);
+  return renderBitmapWithSettings(await createImageBitmap(await response.blob()));
+}
+
 async function updateProcessed() {
   if (!state.current) return;
   updateOutputs();
@@ -722,6 +808,8 @@ async function updateProcessed() {
   if (state.current.source_type === "upload") {
     image.src = await renderUploadedImage();
     scheduleHistorySave();
+  } else if (!state.backendAvailable) {
+    image.src = await renderPublicObservation();
   } else {
     image.src = processUrl();
   }
@@ -782,6 +870,20 @@ async function saveNote(event) {
     state.current = {...state.current, ...record};
     await renderLibrary();
     $("save-state").textContent = "saved locally";
+    return;
+  }
+  if (!state.backendAvailable) {
+    const notes = JSON.parse(localStorage.getItem("jupiterPublicObservationNotes") || "{}");
+    notes[state.current.opus_id] = {
+      classification: $("classification").value,
+      text: $("note").value,
+      x: Number($("x").value),
+      y: Number($("y").value),
+      updated_at: new Date().toISOString()
+    };
+    localStorage.setItem("jupiterPublicObservationNotes", JSON.stringify(notes));
+    state.data.notes[state.current.opus_id] = notes[state.current.opus_id];
+    $("save-state").textContent = "saved in this browser";
     return;
   }
   const response = await fetch("/api/notes", {
@@ -969,7 +1071,7 @@ async function checkStorage() {
 }
 
 function exportProcessed() {
-  if (state.current.source_type !== "upload") {
+  if (state.current.source_type !== "upload" && state.backendAvailable) {
     window.location.href = processUrl(true);
     return;
   }
@@ -989,8 +1091,7 @@ function selectTab(name) {
 }
 
 async function init() {
-  const response = await fetch("/api/observations");
-  state.data = await response.json();
+  await loadRuntime();
   renderStrip();
   controls.forEach((id) => $(id).addEventListener("input", scheduleUpdate));
   $("run-detector").addEventListener("click", runDetectorAgain);

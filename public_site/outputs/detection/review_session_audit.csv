@@ -1,0 +1,11 @@
+session_id,review_batch,candidate_count,filled_labels,valid_labels,invalid_labels,missing_confidence,invalid_confidence,missing_reviewer,missing_review_note,needs_second_review,import_ready_rows,training_ready_rows,session_status,next_action
+S001_01_known_validation_positive,01_known_validation_positive,6,0,0,0,0,0,0,0,0,0,0,not_started,Open outputs/detection/review_sessions/S001_01_known_validation_positive.csv and fill reviewer labels.
+S002_02_temporal_persistence_check,02_temporal_persistence_check,10,0,0,0,0,0,0,0,0,0,0,not_started,Open outputs/detection/review_sessions/S002_02_temporal_persistence_check.csv and fill reviewer labels.
+S003_02_temporal_persistence_check,02_temporal_persistence_check,10,0,0,0,0,0,0,0,0,0,0,not_started,Open outputs/detection/review_sessions/S003_02_temporal_persistence_check.csv and fill reviewer labels.
+S004_02_temporal_persistence_check,02_temporal_persistence_check,10,0,0,0,0,0,0,0,0,0,0,not_started,Open outputs/detection/review_sessions/S004_02_temporal_persistence_check.csv and fill reviewer labels.
+S005_03_negative_artifact_examples,03_negative_artifact_examples,10,0,0,0,0,0,0,0,0,0,0,not_started,Open outputs/detection/review_sessions/S005_03_negative_artifact_examples.csv and fill reviewer labels.
+S006_03_negative_artifact_examples,03_negative_artifact_examples,10,0,0,0,0,0,0,0,0,0,0,not_started,Open outputs/detection/review_sessions/S006_03_negative_artifact_examples.csv and fill reviewer labels.
+S007_04_strong_single_frame_check,04_strong_single_frame_check,10,0,0,0,0,0,0,0,0,0,0,not_started,Open outputs/detection/review_sessions/S007_04_strong_single_frame_check.csv and fill reviewer labels.
+S008_04_strong_single_frame_check,04_strong_single_frame_check,10,0,0,0,0,0,0,0,0,0,0,not_started,Open outputs/detection/review_sessions/S008_04_strong_single_frame_check.csv and fill reviewer labels.
+S009_05_low_priority_hold,05_low_priority_hold,15,0,0,0,0,0,0,0,0,0,0,not_started,Open outputs/detection/review_sessions/S009_05_low_priority_hold.csv and fill reviewer labels.
+S010_05_low_priority_hold,05_low_priority_hold,15,0,0,0,0,0,0,0,0,0,0,not_started,Open outputs/detection/review_sessions/S010_05_low_priority_hold.csv and fill reviewer labels.

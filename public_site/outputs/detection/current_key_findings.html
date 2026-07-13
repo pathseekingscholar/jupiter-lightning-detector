@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Current Key Findings</title>
+  <style>
+    body { margin: 0; padding: 40px; max-width: 1100px; font: 16px/1.55 Georgia, serif; color: #25241f; background: #fbf6e9; }
+    h1, h2 { font-weight: 500; line-height: 1.1; }
+    h1 { font-size: 44px; border-bottom: 3px double #25241f; padding-bottom: 14px; }
+    h2 { margin-top: 34px; color: #a52d25; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 24px; background: rgba(255,255,255,.35); }
+    th, td { border: 1px solid #aaa18c; padding: 8px 10px; vertical-align: top; }
+    th { text-align: left; background: rgba(246,222,113,.35); }
+    code { font-family: Consolas, monospace; font-size: .92em; }
+    .bullet::before { content: "- "; color: #a52d25; font-weight: bold; }
+  </style>
+</head>
+<body>
+<h1>Current Key Findings</h1>
+<p>This is a generated brief. It pulls numbers from the current detector outputs so the meeting summary and GitHub evidence stay tied to the same files.</p>
+<h2>Two-Minute Bottom Line</h2>
+<p class="bullet">The pipeline has processed nine Cassini ISS NAC/H-alpha date windows around the Jupiter flyby.</p>
+<p class="bullet">The current search scope is 221 images.</p>
+<p class="bullet">The detector recovers the six published validation marks across Jan 1, Jan 10, and Jan 11.</p>
+<p class="bullet">The detector also keeps unmatched review candidates, but those are not new-lightning claims.</p>
+<p class="bullet">The next scientific gate is human yes/no/uncertain labeling, followed by temporal and geometry checks.</p>
+<h2>Key Numbers</h2>
+<table>
+<tr><th>Item</th><th>Value</th><th>Evidence</th><th>Interpretation</th></tr>
+<tr><td>`processed_date_windows`</td><td>9</td><td>`outputs/detection/detection_summary.csv`</td><td>Nine OPUS NAC/H-alpha date windows are currently processed.</td></tr>
+<tr><td>`images_processed`</td><td>221</td><td>`outputs/detection/detection_summary.csv`</td><td>This is the current image-level search scope.</td></tr>
+<tr><td>`raw_bright_regions`</td><td>196,233</td><td>`outputs/detection/detection_summary.csv`</td><td>First-pass bright regions before review filtering.</td></tr>
+<tr><td>`review_candidates`</td><td>12,611</td><td>`outputs/detection/detection_summary.csv`</td><td>Candidates kept after artifact filters; these are not confirmed lightning.</td></tr>
+<tr><td>`rejected_or_artifact_flagged`</td><td>183,622</td><td>`outputs/detection/detection_summary.csv`</td><td>Bright regions the detector deprioritized or flagged as likely artifact-like.</td></tr>
+<tr><td>`published_validation_matches`</td><td>6 detector matches; 6 recovered within 8 px</td><td>`outputs/detection/known_match_report.csv`</td><td>The current detector recovers the published validation marks.</td></tr>
+<tr><td>`unmatched_review_candidates`</td><td>12,605</td><td>`outputs/detection/detection_summary.csv`</td><td>Unmatched means not in the published answer key; it does not mean new lightning.</td></tr>
+<tr><td>`first_pass_review_rows`</td><td>106</td><td>`outputs/detection/first_pass_review_plan.csv`</td><td>Curated queue for human yes/no/uncertain review.</td></tr>
+<tr><td>`review_sessions`</td><td>10 sessions; 0 import-ready</td><td>`outputs/detection/review_session_audit.csv`</td><td>Session CSVs organize human review work; labels still need to be filled.</td></tr>
+<tr><td>`training_readiness`</td><td>saved_labels_exist: not_ready; positive_examples: not_ready; negative_examples: not_ready; training_ready_labels: not_ready</td><td>`outputs/detection/training_readiness.csv`</td><td>Learned-model work is gated on enough reviewed labels.</td></tr>
+</table>
+<h2>Date Coverage</h2>
+<table>
+<tr><td>Date</td><td>Images</td><td>Raw regions</td><td>Review candidates</td><td>Published matches</td><td>Unmatched review</td></tr>
+<tr><td>2000-12-31</td><td>12</td><td>5,035</td><td>565</td><td>0</td><td>565</td></tr>
+<tr><td>2001-01-01</td><td>23</td><td>9,447</td><td>1,094</td><td>2</td><td>1,092</td></tr>
+<tr><td>2001-01-04</td><td>17</td><td>3,888</td><td>483</td><td>0</td><td>483</td></tr>
+<tr><td>2001-01-05</td><td>22</td><td>4,784</td><td>573</td><td>0</td><td>573</td></tr>
+<tr><td>2001-01-08</td><td>54</td><td>115,644</td><td>6,310</td><td>0</td><td>6,310</td></tr>
+<tr><td>2001-01-09</td><td>11</td><td>7,491</td><td>370</td><td>0</td><td>370</td></tr>
+<tr><td>2001-01-10</td><td>26</td><td>5,880</td><td>472</td><td>2</td><td>470</td></tr>
+<tr><td>2001-01-11</td><td>31</td><td>6,737</td><td>418</td><td>2</td><td>416</td></tr>
+<tr><td>2001-01-13</td><td>25</td><td>37,327</td><td>2,326</td><td>0</td><td>2,326</td></tr>
+</table>
+<h2>Published-Match Validation</h2>
+<table>
+<tr><td>Image</td><td>Published mark</td><td>Paper x/y</td><td>Detector x/y</td><td>Offset px</td><td>Recovered?</td></tr>
+<tr><td>N1357029177</td><td>1</td><td>731.0, 211.0</td><td>731.37, 212.49</td><td>1.54</td><td>yes</td></tr>
+<tr><td>N1357029177</td><td>2</td><td>846.0, 397.0</td><td>847.00, 402.23</td><td>5.32</td><td>yes</td></tr>
+<tr><td>N1357810970</td><td>3</td><td>955.0, 357.0</td><td>955.53, 354.96</td><td>2.11</td><td>yes</td></tr>
+<tr><td>N1357810970</td><td>3*</td><td>951.0, 330.0</td><td>951.80, 333.08</td><td>3.18</td><td>yes</td></tr>
+<tr><td>N1357885387</td><td>4</td><td>775.0, 341.0</td><td>769.65, 339.50</td><td>5.56</td><td>yes</td></tr>
+<tr><td>N1357885387</td><td>4*</td><td>775.0, 316.0</td><td>776.00, 318.00</td><td>2.24</td><td>yes</td></tr>
+</table>
+<h2>Human Review Queue</h2>
+<table>
+<tr><th>Review batch</th><th>Rows</th><th>What a human does</th></tr>
+<tr><td>01_known_validation_positive</td><td>6</td><td>Confirm that published matches are visually reasonable.</td></tr>
+<tr><td>02_temporal_persistence_check</td><td>30</td><td>Check whether repeated candidates look like coherent motion or repeated artifacts.</td></tr>
+<tr><td>03_negative_artifact_examples</td><td>20</td><td>Build a clean negative set for cosmic rays, hot pixels, and artifacts.</td></tr>
+<tr><td>04_strong_single_frame_check</td><td>20</td><td>Inspect strong one-frame signals without overclaiming them.</td></tr>
+<tr><td>05_low_priority_hold</td><td>30</td><td>Keep low-priority rows saved but not first in the review queue.</td></tr>
+</table>
+<h2>What We Can Safely Say</h2>
+<p class="bullet">I built a reproducible detector-and-review workflow for Cassini Jupiter lightning candidates.</p>
+<p class="bullet">The detector recovers the published validation marks in the current processed dataset.</p>
+<p class="bullet">The detector produces a saved review queue with positives, likely negatives, temporal candidates, and unmatched candidates.</p>
+<p class="bullet">The work is ready for structured human review, not for claiming new lightning yet.</p>
+<h2>What We Cannot Say Yet</h2>
+<p class="bullet">We cannot say the unmatched candidates are confirmed new Jupiter lightning.</p>
+<p class="bullet">We cannot say the candidate score is a calibrated probability.</p>
+<p class="bullet">We cannot say YOLO or a trained model is ready; labels are still needed.</p>
+<p class="bullet">We cannot claim Jupiter latitude/longitude for candidate pixels until geometry projection is completed.</p>
+<h2>Open First</h2>
+<p class="bullet">`outputs/detection/candidate_review_dossier.html` for reviewer-facing candidates.</p>
+<p class="bullet">`outputs/detection/known_match_report.csv` for published validation recovery.</p>
+<p class="bullet">`outputs/detection/first_pass_review_plan.md` for the ordered human review plan.</p>
+<p class="bullet">`outputs/detection/temporal_validation_plan.md` for repeated-track follow-up.</p>
+<p class="bullet">`outputs/detection/manuscript_claim_matrix.md` for safe/unsafe paper wording.</p>
+</body>
+</html>

@@ -1,0 +1,9 @@
+file,line,pattern,severity,status,context,meaning
+docs/evidence_packet_2026-07-06.md,82,0 of 6,needs_work,needs_attention,| Published validation marks human-labeled positive | 0 of 6 |,Published validation marks still need human labels in the current label set.
+docs/evidence_packet_2026-07-06.md,11,confirmed new lightning,unsafe,ok_boundary,curated human-review queue. I do not yet have human-confirmed new lightning.,Confirmed discovery language should only appear as a negated boundary unless reviewed evidence exists.
+docs/evidence_packet_2026-07-06.md,115,confirmed new lightning,unsafe,ok_boundary,"review workflow, not confirmed new lightning yet.",Confirmed discovery language should only appear as a negated boundary unless reviewed evidence exists.
+docs/jupiter_detector_two_minute_overview.html,412,trained yolo,unsafe,ok_boundary,<li>The detector is not yet a trained YOLO model or any other deep-learning object detector.</li>,YOLO has not been trained for this project yet.
+docs/jupiter_detector_two_minute_overview.md,61,trained yolo,unsafe,ok_boundary,- The detector is not yet a trained YOLO model or any other deep-learning object detector.,YOLO has not been trained for this project yet.
+docs/paper_readiness_matrix.md,11,found new lightning,unsafe,ok_boundary,| The detector found new lightning | Not ready | Unmatched candidates still need review and validation |,New-lightning claims require human review plus temporal/geometric validation.
+docs/reproducibility_checklist.md,65,confirmed new lightning,unsafe,ok_boundary,- The detector has not confirmed new lightning.,Confirmed discovery language should only appear as a negated boundary unless reviewed evidence exists.
+docs/reviewer_quickstart.md,82,found new lightning,unsafe,ok_boundary,The detector found new lightning.,New-lightning claims require human review plus temporal/geometric validation.

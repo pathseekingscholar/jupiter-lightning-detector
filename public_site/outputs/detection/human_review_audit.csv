@@ -1,0 +1,16 @@
+audit_item,value,status,meaning,next_action
+candidate_rows_available_for_review,106,ready,Rows in the review/training manifest.,Use these rows as the controlled review queue.
+human_labels_saved_inside_manifest,0,needs_work,Human-reviewed labels attached to current candidate IDs.,Start by labeling published matches and obvious artifacts.
+human_labels_saved_outside_manifest,0,ok,Labels exist but do not match the current manifest candidate IDs.,Keep if from older runs; reconcile before training.
+positive_training_examples,0,needs_work,Known or possible lightning examples reviewed by a human.,Confirm all published validation matches first.
+negative_training_examples,0,needs_work,Reviewed artifacts and cosmic-ray/hot-pixel examples.,Label artifact examples so future models learn what not to select.
+uncertain_review_examples,0,ok,Candidates explicitly marked as unresolved.,Use second review or temporal/geometric checks.
+unlabeled_candidates_remaining,106,needs_review,Candidates still waiting for human review.,Review active-learning and temporal-priority rows first.
+published_validation_marks_labeled,0 of 6,needs_work,Known published detections that have been human-confirmed in this label set.,Label these as known-lightning with high confidence after visual check.
+artifact_negative_review_queue,40,ready,Rows suggested as negative examples because artifact flags were present.,Inspect and label clear non-lightning examples.
+temporal_review_queue,30,ready,Rows needing repeated-frame review.,Check whether the candidate persists across nearby frames.
+next_action_confirm_known_validation_mark,6,queue,Decision-matrix action count.,"Use this to divide review work into positives, negatives, and temporal checks."
+next_action_priority_temporal_review,23,queue,Decision-matrix action count.,"Use this to divide review work into positives, negatives, and temporal checks."
+next_action_review_as_negative_example,40,queue,Decision-matrix action count.,"Use this to divide review work into positives, negatives, and temporal checks."
+next_action_single_frame_visual_review,30,queue,Decision-matrix action count.,"Use this to divide review work into positives, negatives, and temporal checks."
+next_action_temporal_review,7,queue,Decision-matrix action count.,"Use this to divide review work into positives, negatives, and temporal checks."

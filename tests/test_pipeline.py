@@ -24,6 +24,7 @@ import geometry_acquisition_checklist
 import geometry_input_inventory
 import human_review_audit
 import candidate_geometry_plan
+import candidate_backplanes
 import date_coverage_summary
 import key_findings_brief
 import label_tools
@@ -230,6 +231,32 @@ END_OBJECT = IMAGE
         self.assertIn("image_center_resolution_km_px", first)
         self.assertEqual(first["geometry_status"], "pending-backplane")
         self.assertEqual(first["jupiter_latitude"], "")
+
+    def test_public_frontend_is_generated_from_canonical_web_files(self):
+        build_public_site_data.synchronize_frontend()
+        for name in build_public_site_data.FRONTEND_FILES:
+            self.assertEqual(
+                (ROOT / "web" / name).read_bytes(),
+                (ROOT / "public_site" / name).read_bytes(),
+            )
+
+    def test_campt_flat_parser_and_geometry_grouping(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "campt.csv"
+            path.write_text(
+                "Sample,Line,PlanetographicLatitude,PositiveEastLongitude,Error\n"
+                "731.0,211.0,12.5,315.8,NULL\n",
+                encoding="utf-8",
+            )
+            parsed = candidate_backplanes.parse_campt_flat(path)
+        self.assertEqual(parsed[0]["jupiter_latitude"], "12.5")
+        self.assertAlmostEqual(float(parsed[0]["jupiter_longitude"]), 44.2)
+        rows = [
+            {"geometry_status": "computed", "jupiter_latitude": "12.5", "jupiter_longitude": "359.6"},
+            {"geometry_status": "computed", "jupiter_latitude": "12.8", "jupiter_longitude": "0.2"},
+        ]
+        candidate_backplanes.assign_geometry_groups(rows, tolerance=1.0)
+        self.assertEqual(rows[0]["geometry_group_id"], rows[1]["geometry_group_id"])
 
     def test_research_exports_have_expected_columns(self):
         summary_path = research_exports.OUTPUT_DIR / "2001-01-01" / "summary.json"

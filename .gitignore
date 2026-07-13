@@ -3,8 +3,19 @@ __pycache__/
 .venv/
 
 # Downloaded and generated research products
-data/
-outputs/
+/data/
+/outputs/
+geometry_work/
+kernels/
+*.cub
+*.bsp
+*.bc
+*.bds
+*.tf
+*.ti
+*.tls
+*.tpc
+*.tsc
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal

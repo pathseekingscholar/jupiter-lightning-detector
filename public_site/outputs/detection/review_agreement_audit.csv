@@ -1,0 +1,9 @@
+metric,value,status,meaning,next_action
+total_saved_labels,0,not_started,All saved human labels.,Start labeling from the first-pass review batches.
+positive_labels,0,needs_work,Known or possible lightning labels.,Human-confirm the six published validation marks first.
+negative_labels,0,needs_work,Artifact or cosmic-ray/hot-pixel labels.,Label clear negatives for false-positive analysis.
+uncertain_labels,0,observed,Reviewed but unresolved labels.,"Use second review, temporal checks, or geometry before training."
+needs_second_review,0,ok,Labels explicitly marked for another reviewer.,Prioritize these before using labels for training.
+high_confidence_labels,0,observed,Labels marked high confidence.,Use with notes and no second-review flag for first validation splits.
+labels_with_notes,0,observed,Labels with human review notes.,Require notes for training-ready labels.
+training_ready_labels,0,not_ready,High-confidence labels with notes and no second-review flag.,Need at least 6 positives plus 20 negatives before model comparison.

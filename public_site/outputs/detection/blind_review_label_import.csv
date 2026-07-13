@@ -1,0 +1,1 @@
+review_rank,candidate_id,image_id,image_number,run_date,x,y,snr,blob_size,artifact_flags,candidate_score,next_action,suggested_label,human_label,confidence,reviewer,review_note,review_stage,needs_second_review,reviewed_at

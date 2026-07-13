@@ -1,0 +1,10 @@
+gate,status,value,minimum,evidence_file,interpretation,next_action
+saved_labels_exist,not_ready,0,1,outputs/detection/candidate_label_summary.csv,No human labels have been saved yet.,Save reviewer labels through the workbench or label CSV import.
+positive_examples,not_ready,0,6,outputs/detection/candidate_label_summary.csv,Positive labels are below the first validation target.,Label the six published validation matches first.
+negative_examples,not_ready,0,20,outputs/detection/candidate_label_summary.csv,Negative labels are below the first false-positive target.,Label at least 20 clear artifacts or cosmic-ray/hot-pixel rows.
+training_ready_labels,not_ready,0,26,outputs/detection/review_agreement_audit.csv,Training-ready labels are not sufficient for model comparison.,"Require high confidence, reviewer notes, and no second-review flag for first training-ready rows."
+active_learning_queue,ready,106,1,outputs/detection/active_learning_queue.csv,Unlabeled candidates are prioritized for human review.,Review top active-learning rows after known positives and clear negatives.
+validation_split,ready,6,6,outputs/detection/training_manifest.csv,Validation split has enough published-match rows available for review.,Keep published matches separate from candidate training rows.
+negative_review_batch,ready,20,20,outputs/detection/review_labeling_checklist.csv,A curated negative batch exists for reviewers.,Use the negative artifact batch to create first negative labels.
+model_comparison_allowed,not_ready,0 positives; 0 negatives; 0 training-ready,6 positives; 20 negatives; 26 training-ready,outputs/detection/candidate_label_summary.csv,Do not train or compare YOLO yet.,Finish human labels before training a learned detector.
+notes_and_confidence,not_ready,0 high confidence; 0 with notes; 0 uncertain,26 high confidence and noted labels,outputs/detection/review_agreement_audit.csv,Labels need confidence and notes before training use.,Do not use unlabeled or weakly noted rows as training truth.

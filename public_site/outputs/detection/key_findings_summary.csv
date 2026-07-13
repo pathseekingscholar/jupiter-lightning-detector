@@ -1,0 +1,11 @@
+item,value,evidence_file,interpretation
+processed_date_windows,9,outputs/detection/detection_summary.csv,Nine OPUS NAC/H-alpha date windows are currently processed.
+images_processed,221,outputs/detection/detection_summary.csv,This is the current image-level search scope.
+raw_bright_regions,196233,outputs/detection/detection_summary.csv,First-pass bright regions before review filtering.
+review_candidates,12611,outputs/detection/detection_summary.csv,Candidates kept after artifact filters; these are not confirmed lightning.
+rejected_or_artifact_flagged,183622,outputs/detection/detection_summary.csv,Bright regions the detector deprioritized or flagged as likely artifact-like.
+published_validation_matches,6 detector matches; 6 recovered within 8 px,outputs/detection/known_match_report.csv,The current detector recovers the published validation marks.
+unmatched_review_candidates,12605,outputs/detection/detection_summary.csv,Unmatched means not in the published answer key; it does not mean new lightning.
+first_pass_review_rows,106,outputs/detection/first_pass_review_plan.csv,Curated queue for human yes/no/uncertain review.
+review_sessions,10 sessions; 0 import-ready,outputs/detection/review_session_audit.csv,Session CSVs organize human review work; labels still need to be filled.
+training_readiness,saved_labels_exist: not_ready; positive_examples: not_ready; negative_examples: not_ready; training_ready_labels: not_ready,outputs/detection/training_readiness.csv,Learned-model work is gated on enough reviewed labels.

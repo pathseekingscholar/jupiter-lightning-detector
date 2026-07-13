@@ -1,0 +1,25 @@
+rank,snr_threshold,min_blob_size,candidate_count,review_candidate_count,artifact_flagged_count,published_matches,published_recall,unmatched_review_candidates,review_fraction,interpretation
+1,7.0,8,1595,1395,200,5,0.833,1390,0.8746,misses at least one published mark; risky without review
+2,7.0,5,5615,5197,418,5,0.833,5192,0.9256,misses at least one published mark; risky without review
+3,7.0,3,20067,17271,2796,5,0.833,17266,0.8607,misses at least one published mark; risky without review
+4,7.0,1,196233,17271,178962,5,0.833,17266,0.0880,misses at least one published mark; risky without review
+5,8.0,8,1484,1313,171,3,0.500,1310,0.8848,too strict for current validation set
+6,8.0,5,5187,4819,368,3,0.500,4816,0.9291,too strict for current validation set
+7,8.0,3,18202,15700,2502,3,0.500,15697,0.8625,too strict for current validation set
+8,8.0,1,127208,15700,111508,3,0.500,15697,0.1234,too strict for current validation set
+9,20.0,8,325,262,63,2,0.333,260,0.8062,too strict for current validation set
+10,15.0,8,453,364,89,2,0.333,362,0.8035,too strict for current validation set
+11,12.0,8,748,640,108,2,0.333,638,0.8556,too strict for current validation set
+12,20.0,5,934,843,91,2,0.333,841,0.9026,too strict for current validation set
+13,10.0,8,1129,992,137,2,0.333,990,0.8787,too strict for current validation set
+14,15.0,5,1365,1215,150,2,0.333,1213,0.8901,too strict for current validation set
+15,12.0,5,2304,2094,210,2,0.333,2092,0.9089,too strict for current validation set
+16,20.0,3,2539,2220,319,2,0.333,2218,0.8744,too strict for current validation set
+17,20.0,1,8425,2220,6205,2,0.333,2218,0.2635,too strict for current validation set
+18,15.0,3,3945,3378,567,2,0.333,3376,0.8563,too strict for current validation set
+19,15.0,1,14974,3378,11596,2,0.333,3376,0.2256,too strict for current validation set
+20,10.0,5,3749,3470,279,2,0.333,3468,0.9256,too strict for current validation set
+21,12.0,3,6545,5618,927,2,0.333,5616,0.8584,too strict for current validation set
+22,12.0,1,26417,5618,20799,2,0.333,5616,0.2127,too strict for current validation set
+23,10.0,3,11478,9927,1551,2,0.333,9925,0.8649,too strict for current validation set
+24,10.0,1,52984,9927,43057,2,0.333,9925,0.1874,too strict for current validation set

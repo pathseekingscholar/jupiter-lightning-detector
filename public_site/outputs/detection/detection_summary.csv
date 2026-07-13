@@ -1,0 +1,10 @@
+run_date,run_label,images_processed,candidates_found,review_candidates,rejected_or_artifact_flagged,tracks,published_matches,unmatched_review_candidates
+2000-12-31,"December 31, 2000 NAC/H-alpha",12,5035,565,4470,449,0,565
+2001-01-01,"January 1, 2001 NAC/H-alpha",23,9447,1094,8353,860,2,1092
+2001-01-04,"January 4, 2001 NAC/H-alpha",17,3888,483,3405,396,0,483
+2001-01-05,"January 5, 2001 NAC/H-alpha",22,4784,573,4211,471,0,573
+2001-01-08,"January 8, 2001 NAC/H-alpha",54,115644,6310,109334,5172,0,6310
+2001-01-09,"January 9, 2001 NAC/H-alpha",11,7491,370,7121,324,0,370
+2001-01-10,"January 10, 2001 NAC/H-alpha",26,5880,472,5408,454,2,470
+2001-01-11,"January 11, 2001 NAC/H-alpha",31,6737,418,6319,438,2,416
+2001-01-13,"January 13, 2001 NAC/H-alpha",25,37327,2326,35001,2078,0,2326

@@ -15,6 +15,13 @@ The initial ground-truth set comes from Dyudina et al. (2004), *Lightning on
 Jupiter observed in the H-alpha line by the Cassini imaging science
 subsystem*. It contains six detections in three Cassini NAC/HAL images.
 
+Public review workbench: <https://jupiter-lightning-detector-public.vercel.app>
+
+The local and public interfaces are generated from the same files in `web/`.
+Locally, the interface connects to Python and calibrated data. Online, the same
+tabs use a generated evidence bundle containing review crops, display previews,
+contact sheets, compact tables, and the prioritized 106-row queue.
+
 ## Quick Start
 
 From PowerShell:
@@ -45,6 +52,8 @@ Run the detector for the example dates:
 .\run.ps1 coverage-summary
 .\run.ps1 review
 .\run.ps1 geometry
+.\run.ps1 geometry-check
+.\run.ps1 geometry-project
 .\run.ps1 geometry-plan
 .\run.ps1 geometry-inputs
 .\run.ps1 geometry-acquisition
@@ -71,6 +80,7 @@ Run the detector for the example dates:
 .\run.ps1 label-template
 .\run.ps1 label-summary
 .\run.ps1 provenance
+.\run.ps1 public-site-data
 .\run.ps1 validate-outputs
 ```
 
@@ -86,6 +96,10 @@ Run the detector for the example dates:
   SNR/local contrast, artifact flags, and candidate score.
 - Human labels: known lightning, possible lightning, artifact, cosmic ray/hot
   pixel, and uncertain.
+- A 106-row first-pass review queue with a full-frame context view, adjustable
+  crop, black/white points, midtone lift, OPUS source, timestamp, exposure,
+  image coordinates, and geometry status.
+- Browser CSV/JSON backups plus a shared Google Sheet collaboration target.
 - Exportable labels:
   - `outputs/detection/candidate_labels.csv`
   - `outputs/detection/candidate_labels.json`

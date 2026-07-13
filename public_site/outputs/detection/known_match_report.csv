@@ -1,0 +1,7 @@
+image_id,image_number,published_label,published_x,published_y,published_power_w,nearest_candidate_id,nearest_track_id,nearest_run_date,nearest_x,nearest_y,offset_px,recovered_within_8_px,nearest_peak_snr,nearest_blob_size,nearest_artifact_flags,nearest_candidate_score,source
+N1357029177,1357029177,1,731.0,211.0,413000000,1357029177-0148,T0488,2001-01-01,731.37,212.49,1.54,yes,27.55,75,,0.6277,"Dyudina et al. (2004), Table 2"
+N1357029177,1357029177,2,846.0,397.0,135000000,1357029177-0219,T0534,2001-01-01,847.00,402.23,5.32,yes,24.75,13,,0.4360,"Dyudina et al. (2004), Table 2"
+N1357810970,1357810970,3,955.0,357.0,263000000,1357810970-0239,U022,2001-01-10,955.53,354.96,2.11,yes,7.92,87,,0.0000,"Dyudina et al. (2004), Table 2"
+N1357810970,1357810970,3*,951.0,330.0,72000000,1357810970-0228,T0364,2001-01-10,951.80,333.08,3.18,yes,8.14,15,,0.3364,"Dyudina et al. (2004), Table 2"
+N1357885387,1357885387,4,775.0,341.0,100000000,1357885387-0218,U014,2001-01-11,769.65,339.50,5.56,yes,7.06,14,,0.0000,"Dyudina et al. (2004), Table 2"
+N1357885387,1357885387,4*,775.0,316.0,16000000,1357885387-0203,U014,2001-01-11,776.00,318.00,2.24,yes,7.50,1,single_pixel|too_small,0.0000,"Dyudina et al. (2004), Table 2"

@@ -1,0 +1,10 @@
+run_date,opus_available_frames,exposure_durations_seconds,images_processed,candidates_found,review_candidates,published_matches,unmatched_review_candidates,interpretation
+2000-12-31,12,32,12,5035,565,0,565,"screened date with review candidates, not confirmed lightning"
+2001-01-01,23,32,23,9447,1094,2,1092,published validation date
+2001-01-04,17,32,17,3888,483,0,483,"screened date with review candidates, not confirmed lightning"
+2001-01-05,22,32,22,4784,573,0,573,"screened date with review candidates, not confirmed lightning"
+2001-01-08,54,"100, 32, 68",54,115644,6310,0,6310,"screened date with review candidates, not confirmed lightning"
+2001-01-09,11,"100, 68",11,7491,370,0,370,"screened date with review candidates, not confirmed lightning"
+2001-01-10,26,68,26,5880,472,2,470,published validation date
+2001-01-11,31,68,31,6737,418,2,416,published validation date
+2001-01-13,25,"100, 32, 68",25,37327,2326,0,2326,"screened date with review candidates, not confirmed lightning"

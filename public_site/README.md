@@ -4,13 +4,15 @@ This folder contains the static public workbench deployed on Vercel:
 
 https://jupiter-lightning-detector-public.vercel.app
 
-It mirrors the major workbench tabs and includes a static snapshot of the
-first-pass candidate review queue. Reviewers can label candidates in the browser
-and export CSV/JSON backups.
+It is generated from the same `web/index.html`, `web/styles.css`, `web/app.js`,
+and `web/review.js` files used by the local workbench. It includes the 106-row
+first-pass queue, candidate crops, full-frame display previews, adjustable
+review stretching, date contact sheets, compact evidence tables, and CSV/JSON
+label backups.
 
-It is not the full detector engine. New detector runs, OPUS downloads, calibrated
-image loading, and crop rendering still run from the Python workbench because
-they need local OPUS image products, generated outputs, and label files.
+The online build is an evidence and review surface, not the detector engine. New
+detector runs and calibrated-product processing still require Python and the
+local OPUS data. The header states which mode is active.
 
 The current candidate data snapshot is:
 
@@ -25,9 +27,12 @@ public_site/static-data/collaboration_config.json
 public_site/static-data/geometry_readiness.json
 ```
 
-Regenerate the candidate snapshot from
-`outputs/detection/first_pass_review_plan.csv` before a new public deployment
-when detector outputs change.
+Regenerate the complete public bundle before a deployment when detector outputs
+change:
+
+```powershell
+.\run.ps1 public-site-data
+```
 
 For shared labels, configure the Google Apps Script endpoint described in:
 

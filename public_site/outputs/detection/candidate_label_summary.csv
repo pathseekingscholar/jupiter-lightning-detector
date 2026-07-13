@@ -1,0 +1,12 @@
+summary_item,label_group,human_label,count,meaning
+total_labels,all,all,0,All saved human labels.
+needs_second_review,review_quality,,0,Labels explicitly marked for second review.
+group_positive,positive,,0,Known or possible lightning labels after human review.
+group_negative,negative,,0,Artifact or cosmic-ray/hot-pixel labels after human review.
+group_uncertain,uncertain,,0,Reviewed but unresolved candidates.
+group_unlabeled,unlabeled,,0,Rows without a usable human label.
+label_artifact,negative,artifact,0,Saved human labels by exact label value.
+label_cosmic-ray-hot-pixel,negative,cosmic-ray-hot-pixel,0,Saved human labels by exact label value.
+label_known-lightning,positive,known-lightning,0,Saved human labels by exact label value.
+label_possible-lightning,positive,possible-lightning,0,Saved human labels by exact label value.
+label_uncertain,uncertain,uncertain,0,Saved human labels by exact label value.

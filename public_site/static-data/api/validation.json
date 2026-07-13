@@ -1,0 +1,91 @@
+{
+  "available": true,
+  "source": "Dyudina et al. (2004), Table 2",
+  "results": [
+    {
+      "image_number": "1357029177",
+      "label": "1",
+      "published_x": 731,
+      "published_y": 211,
+      "recovered": true,
+      "distance_px": 1.54,
+      "detected_x": 731.37,
+      "detected_y": 212.49,
+      "candidate_id": "1357029177-0148",
+      "peak_snr": 27.55,
+      "run_date": "2001-01-01",
+      "note": "In detector output"
+    },
+    {
+      "image_number": "1357029177",
+      "label": "2",
+      "published_x": 846,
+      "published_y": 397,
+      "recovered": true,
+      "distance_px": 5.32,
+      "detected_x": 847.0,
+      "detected_y": 402.23,
+      "candidate_id": "1357029177-0219",
+      "peak_snr": 24.75,
+      "run_date": "2001-01-01",
+      "note": "In detector output"
+    },
+    {
+      "image_number": "1357810970",
+      "label": "3",
+      "published_x": 955,
+      "published_y": 357,
+      "recovered": true,
+      "distance_px": 2.11,
+      "detected_x": 955.53,
+      "detected_y": 354.96,
+      "candidate_id": "1357810970-0239",
+      "peak_snr": 7.92,
+      "run_date": "2001-01-10",
+      "note": "In detector output"
+    },
+    {
+      "image_number": "1357810970",
+      "label": "3*",
+      "published_x": 951,
+      "published_y": 330,
+      "recovered": true,
+      "distance_px": 3.18,
+      "detected_x": 951.8,
+      "detected_y": 333.08,
+      "candidate_id": "1357810970-0228",
+      "peak_snr": 8.14,
+      "run_date": "2001-01-10",
+      "note": "In detector output"
+    },
+    {
+      "image_number": "1357885387",
+      "label": "4",
+      "published_x": 775,
+      "published_y": 341,
+      "recovered": true,
+      "distance_px": 5.56,
+      "detected_x": 769.65,
+      "detected_y": 339.5,
+      "candidate_id": "1357885387-0218",
+      "peak_snr": 7.06,
+      "run_date": "2001-01-11",
+      "note": "In detector output"
+    },
+    {
+      "image_number": "1357885387",
+      "label": "4*",
+      "published_x": 775,
+      "published_y": 316,
+      "recovered": true,
+      "distance_px": 2.24,
+      "detected_x": 776.0,
+      "detected_y": 318.0,
+      "candidate_id": "1357885387-0203",
+      "peak_snr": 7.5,
+      "run_date": "2001-01-11",
+      "note": "In detector output"
+    }
+  ],
+  "summary": "6 of 6 published marks recovered across generated detector outputs."
+}

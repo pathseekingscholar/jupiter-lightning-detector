@@ -1,0 +1,120 @@
+{
+  "rules": [
+    "Use calibrated Cassini ISS NAC/H-alpha images, not screenshot photometry.",
+    "Subtract a smooth local background and measure high-pass SNR.",
+    "Detect connected bright regions above SNR 7.",
+    "Flag single-pixel, too-small, sharp cosmic-ray-like, and streak-like detections.",
+    "Promote review candidates only when area >= 3 pixels, peak SNR >= 8, and no artifact flags.",
+    "Link reviewable candidates across nearby frames within 85 pixels and 12 minutes."
+  ],
+  "classification": {
+    "positive": "A detection within 8 pixels of a published Dyudina et al. lightning coordinate.",
+    "negative_or_uncertain": "A detection that does not match the paper. It is not automatically wrong; it needs review as artifact, cosmic ray, uncertain, or possible new candidate.",
+    "not_claimed": "The detector has not confirmed new lightning yet."
+  },
+  "dates": [
+    {
+      "date": "2000-12-31",
+      "available": true,
+      "frames": 12,
+      "raw_candidates": 5035,
+      "review_candidates": 565,
+      "known_recovered": 0,
+      "unmatched_review": 565
+    },
+    {
+      "date": "2001-01-01",
+      "available": true,
+      "frames": 23,
+      "raw_candidates": 9447,
+      "review_candidates": 1094,
+      "known_recovered": 2,
+      "unmatched_review": 1092
+    },
+    {
+      "date": "2001-01-04",
+      "available": true,
+      "frames": 17,
+      "raw_candidates": 3888,
+      "review_candidates": 483,
+      "known_recovered": 0,
+      "unmatched_review": 483
+    },
+    {
+      "date": "2001-01-05",
+      "available": true,
+      "frames": 22,
+      "raw_candidates": 4784,
+      "review_candidates": 573,
+      "known_recovered": 0,
+      "unmatched_review": 573
+    },
+    {
+      "date": "2001-01-08",
+      "available": true,
+      "frames": 54,
+      "raw_candidates": 115644,
+      "review_candidates": 6310,
+      "known_recovered": 0,
+      "unmatched_review": 6310
+    },
+    {
+      "date": "2001-01-09",
+      "available": true,
+      "frames": 11,
+      "raw_candidates": 7491,
+      "review_candidates": 370,
+      "known_recovered": 0,
+      "unmatched_review": 370
+    },
+    {
+      "date": "2001-01-10",
+      "available": true,
+      "frames": 26,
+      "raw_candidates": 5880,
+      "review_candidates": 472,
+      "known_recovered": 2,
+      "unmatched_review": 471
+    },
+    {
+      "date": "2001-01-11",
+      "available": true,
+      "frames": 31,
+      "raw_candidates": 6737,
+      "review_candidates": 418,
+      "known_recovered": 2,
+      "unmatched_review": 418
+    },
+    {
+      "date": "2001-01-13",
+      "available": true,
+      "frames": 25,
+      "raw_candidates": 37327,
+      "review_candidates": 2326,
+      "known_recovered": 0,
+      "unmatched_review": 2326
+    }
+  ],
+  "totals": {
+    "frames": 221,
+    "raw_candidates": 196233,
+    "review_candidates": 12611,
+    "known_recovered": 6,
+    "known_total": 6,
+    "unmatched_review": 12608
+  },
+  "flag_counts": [
+    {
+      "flag": "too_small",
+      "count": 176166
+    },
+    {
+      "flag": "single_pixel",
+      "count": 145862
+    },
+    {
+      "flag": "streak_like",
+      "count": 2796
+    }
+  ]
+}

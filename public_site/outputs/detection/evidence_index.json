@@ -1,0 +1,815 @@
+{
+  "generated_from": "outputs/detection/provenance_manifest.json",
+  "git_branch": "codex/science-first-pipeline",
+  "git_commit": "fd5a1ba3c85e8ab1772d221cab5446b54e802871",
+  "artifact_count": 95,
+  "purpose_counts": {
+    "candidate_review": 12,
+    "claim_safety": 6,
+    "coverage": 3,
+    "filter_context": 3,
+    "geometry": 8,
+    "human_labels": 29,
+    "key_findings": 3,
+    "other": 10,
+    "project_management": 4,
+    "temporal_validation": 6,
+    "training_readiness": 4,
+    "validation": 4,
+    "visual_artifacts": 3
+  },
+  "recommended_reproduction_commands": [
+    ".\\run.ps1 detect-all",
+    ".\\run.ps1 exports",
+    ".\\run.ps1 coverage",
+    ".\\run.ps1 coverage-summary",
+    ".\\run.ps1 review",
+    ".\\run.ps1 label-audit",
+    ".\\run.ps1 review-plan",
+    ".\\run.ps1 review-sessions",
+    ".\\run.ps1 review-session-audit",
+    ".\\run.ps1 temporal-validation",
+    ".\\run.ps1 blind-review",
+    ".\\run.ps1 blind-reconcile",
+    ".\\run.ps1 evidence-integrity",
+    ".\\run.ps1 label-protocol",
+    ".\\run.ps1 training-readiness",
+    ".\\run.ps1 geometry-plan",
+    ".\\run.ps1 geometry-inputs",
+    ".\\run.ps1 geometry-acquisition",
+    ".\\run.ps1 claim-audit",
+    ".\\run.ps1 research-gates",
+    ".\\run.ps1 manuscript-claims",
+    ".\\run.ps1 issue-backlog",
+    ".\\run.ps1 project-board",
+    ".\\run.ps1 agreement-audit",
+    ".\\run.ps1 key-findings",
+    ".\\run.ps1 evidence-index",
+    ".\\run.ps1 reproduction-audit",
+    ".\\run.ps1 label-template",
+    ".\\run.ps1 label-summary",
+    ".\\run.ps1 provenance"
+  ],
+  "artifacts": [
+    {
+      "path": "outputs/detection/dataset_manifest.csv",
+      "purpose": "coverage",
+      "rows": 221,
+      "bytes": 58658,
+      "sha256": "906e81a9edf92bb52333c1295bd7a882745388e194a7e81699dc95579f3c58ac",
+      "safe_use": "Use to explain dataset scope and processed dates."
+    },
+    {
+      "path": "outputs/detection/detection_summary.csv",
+      "purpose": "validation",
+      "rows": 9,
+      "bytes": 794,
+      "sha256": "f329ef39c492e221b2eb91161353afaa0c2bb918a969d1096a81153c72d047cf",
+      "safe_use": "Use to state detector recovery of published marks and current run counts."
+    },
+    {
+      "path": "outputs/detection/threshold_sweep.csv",
+      "purpose": "validation",
+      "rows": 216,
+      "bytes": 14403,
+      "sha256": "401bf114a41f6a85d80476319a18077d1cb768cafb4871180e7f267450b7ab06",
+      "safe_use": "Use to state detector recovery of published marks and current run counts."
+    },
+    {
+      "path": "outputs/detection/known_match_report.csv",
+      "purpose": "validation",
+      "rows": 6,
+      "bytes": 1215,
+      "sha256": "dc6b947cecae30ab62adfee58e32cc51a603ef3a762a85a4fd38e982764401f2",
+      "safe_use": "Use to state detector recovery of published marks and current run counts."
+    },
+    {
+      "path": "outputs/detection/temporal_track_summary.csv",
+      "purpose": "temporal_validation",
+      "rows": 7344,
+      "bytes": 1976601,
+      "sha256": "84455f0a7205fdb3720a9c9a749ea0c86335261d7b070a9401a10fb325dba0a1",
+      "safe_use": "Use to prioritize repeated tracks for review; not enough for discovery alone."
+    },
+    {
+      "path": "outputs/detection/scientific_review_queue.csv",
+      "purpose": "candidate_review",
+      "rows": 106,
+      "bytes": 21201,
+      "sha256": "10ded880d4faafaed610000ac7ac7abdfe33ecccd79d432d3db3e46849ea8e32",
+      "safe_use": "Use to decide what a human should inspect; do not call rows confirmed lightning."
+    },
+    {
+      "path": "outputs/detection/training_manifest.csv",
+      "purpose": "training_readiness",
+      "rows": 106,
+      "bytes": 21342,
+      "sha256": "894377272d205f5843204864c7e9b481dff35296aaa367144fbac2d657885662",
+      "safe_use": "Use to decide whether model comparison is allowed."
+    },
+    {
+      "path": "outputs/detection/active_learning_queue.csv",
+      "purpose": "training_readiness",
+      "rows": 106,
+      "bytes": 21674,
+      "sha256": "5dafbc08794a662797a2c6ac6ca832c1ba0b6569609590a9146e02f25688a93d",
+      "safe_use": "Use to decide whether model comparison is allowed."
+    },
+    {
+      "path": "outputs/detection/review_metrics_summary.csv",
+      "purpose": "other",
+      "rows": 21,
+      "bytes": 1637,
+      "sha256": "ca9ba2605ff173b05cd813904b332fa3bdde8321635ca157ca854d27dd6f1276",
+      "safe_use": "Inspect before using; purpose was not classified automatically."
+    },
+    {
+      "path": "outputs/detection/review_decision_matrix.csv",
+      "purpose": "candidate_review",
+      "rows": 106,
+      "bytes": 24144,
+      "sha256": "9b11ffd5a3053bdd08f9f2cab87e0a888ccebe8af1eba06d6218bd6b1443b202",
+      "safe_use": "Use to decide what a human should inspect; do not call rows confirmed lightning."
+    },
+    {
+      "path": "outputs/detection/temporal_track_quality.csv",
+      "purpose": "temporal_validation",
+      "rows": 7344,
+      "bytes": 1282155,
+      "sha256": "6c59fe5b58d1848ed161e48822071e8d844632501a754705a18eb3e340fbd270",
+      "safe_use": "Use to prioritize repeated tracks for review; not enough for discovery alone."
+    },
+    {
+      "path": "outputs/detection/threshold_recommendations.csv",
+      "purpose": "validation",
+      "rows": 24,
+      "bytes": 2258,
+      "sha256": "178428773b4b444b13e21d29cc0fbc7235d86d0dc43804107575386d9b523099",
+      "safe_use": "Use to state detector recovery of published marks and current run counts."
+    },
+    {
+      "path": "outputs/detection/candidate_review_dossier.csv",
+      "purpose": "candidate_review",
+      "rows": 106,
+      "bytes": 29567,
+      "sha256": "04ced46426577af8cb94ee0828d346c3df5260848ff5bcc2297b03081d69edca",
+      "safe_use": "Use to decide what a human should inspect; do not call rows confirmed lightning."
+    },
+    {
+      "path": "outputs/detection/candidate_review_dossier.html",
+      "purpose": "candidate_review",
+      "rows": null,
+      "bytes": 56823,
+      "sha256": "6d200a95050b9c3da5249de4999f3302540ac0f414426e065f1bae76858e46c0",
+      "safe_use": "Use to decide what a human should inspect; do not call rows confirmed lightning."
+    },
+    {
+      "path": "outputs/detection/geometry_readiness.csv",
+      "purpose": "geometry",
+      "rows": 221,
+      "bytes": 70902,
+      "sha256": "6d99c35bda9bcb2215cfde3ec9934f155bacf11117baf11d46304c853fdb365b",
+      "safe_use": "Use to explain why location claims are blocked or ready."
+    },
+    {
+      "path": "outputs/detection/geometry_readiness_report.md",
+      "purpose": "geometry",
+      "rows": null,
+      "bytes": 4561,
+      "sha256": "3ceb604afdf54446cca3a6733942dc4fcf7a1a8d66d4dd64375b4b05d903cf2b",
+      "safe_use": "Use to explain why location claims are blocked or ready."
+    },
+    {
+      "path": "outputs/detection/candidate_geometry_plan.csv",
+      "purpose": "geometry",
+      "rows": 106,
+      "bytes": 25960,
+      "sha256": "3ad792e1ae2c7b967e9943f976ae2a2c1c7ee1c755a1513f66b5c79e5c8a2452",
+      "safe_use": "Use to explain why location claims are blocked or ready."
+    },
+    {
+      "path": "outputs/detection/candidate_geometry_plan.md",
+      "purpose": "geometry",
+      "rows": null,
+      "bytes": 4888,
+      "sha256": "2d4a95e3f69c1604a8814c179d04c219637da78e04fd66cf584a59160691d976",
+      "safe_use": "Use to explain why location claims are blocked or ready."
+    },
+    {
+      "path": "outputs/detection/geometry_input_inventory.csv",
+      "purpose": "geometry",
+      "rows": 221,
+      "bytes": 55741,
+      "sha256": "40844ca62e235d15022f0da17261441fad1187e1b2b1deb7ad5e0d154cdde471",
+      "safe_use": "Use to explain why location claims are blocked or ready."
+    },
+    {
+      "path": "outputs/detection/geometry_input_inventory.md",
+      "purpose": "geometry",
+      "rows": null,
+      "bytes": 1376,
+      "sha256": "77ba6da462b542eae7dd982e09eed8d351130d83b2e9e9e1abbca45aed5b91bc",
+      "safe_use": "Use to explain why location claims are blocked or ready."
+    },
+    {
+      "path": "outputs/detection/geometry_acquisition_checklist.csv",
+      "purpose": "geometry",
+      "rows": 7,
+      "bytes": 1861,
+      "sha256": "42b23363d78f1f8f8b67ffb41ff25246c30e773275f1bde8f61d8ae4161858d4",
+      "safe_use": "Use to explain why location claims are blocked or ready."
+    },
+    {
+      "path": "outputs/detection/geometry_acquisition_checklist.md",
+      "purpose": "geometry",
+      "rows": null,
+      "bytes": 1984,
+      "sha256": "081446de1dba97d9a439be7f7469ba3ea102d0ecbe879e2288947d434bb7f14a",
+      "safe_use": "Use to explain why location claims are blocked or ready."
+    },
+    {
+      "path": "outputs/detection/nearby_filter_context.csv",
+      "purpose": "filter_context",
+      "rows": 769,
+      "bytes": 157779,
+      "sha256": "712ea32c42fc6449dc7717cdc30d94681b3c85fca8ad620227ed8379887470b9",
+      "safe_use": "Use as follow-up context only after candidate validation."
+    },
+    {
+      "path": "outputs/detection/nearby_filter_context_report.md",
+      "purpose": "filter_context",
+      "rows": null,
+      "bytes": 3938,
+      "sha256": "a28021b1499f33433084944702aa3ddba71ab269a8c896bf1ed8bac7b2626c37",
+      "safe_use": "Use as follow-up context only after candidate validation."
+    },
+    {
+      "path": "outputs/detection/human_review_audit.csv",
+      "purpose": "human_labels",
+      "rows": 15,
+      "bytes": 2364,
+      "sha256": "748f245898a91994c53de0dd0fb9c0c5f2bb923ecf950bf3ec8789d5aa96e8f5",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/human_review_audit.md",
+      "purpose": "human_labels",
+      "rows": null,
+      "bytes": 1894,
+      "sha256": "1ebcedbc61abaffb983eeb807488cbeb39f2554ffcb00a173a29bef1a200ccd8",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/first_pass_review_plan.csv",
+      "purpose": "candidate_review",
+      "rows": 106,
+      "bytes": 39881,
+      "sha256": "a529df46cd164fea616c49e767c350ce2e83c0b41e7830151f7d71e3e429c90f",
+      "safe_use": "Use to decide what a human should inspect; do not call rows confirmed lightning."
+    },
+    {
+      "path": "outputs/detection/first_pass_review_plan.md",
+      "purpose": "candidate_review",
+      "rows": null,
+      "bytes": 1447,
+      "sha256": "3ca668828327e6b0f7dfd0d30113cf30756cbc1a21569da4e3a549db9aa9640d",
+      "safe_use": "Use to decide what a human should inspect; do not call rows confirmed lightning."
+    },
+    {
+      "path": "outputs/detection/first_pass_review_plan.html",
+      "purpose": "candidate_review",
+      "rows": null,
+      "bytes": 52838,
+      "sha256": "26ec75102ad9594d5bfc3c11f77832b4c142e8b50991d62410cf272a4c8611b3",
+      "safe_use": "Use to decide what a human should inspect; do not call rows confirmed lightning."
+    },
+    {
+      "path": "outputs/detection/review_session_plan.csv",
+      "purpose": "human_labels",
+      "rows": 10,
+      "bytes": 5826,
+      "sha256": "a79299236c685d5c265e240925a5a2f57dfff44b4125dc1394fa3c91d27f8300",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/review_session_plan.md",
+      "purpose": "human_labels",
+      "rows": null,
+      "bytes": 3929,
+      "sha256": "97e8bd214a077c7ba36ab060e05fe15598436d36e12b95affc5a8590b8cc34a8",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/review_session_audit.csv",
+      "purpose": "human_labels",
+      "rows": 10,
+      "bytes": 2229,
+      "sha256": "412420253d6aa8a8fd4570373dc651873dab57dcd4d7981206ceabda1dad8ead",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/review_session_audit.md",
+      "purpose": "human_labels",
+      "rows": null,
+      "bytes": 3071,
+      "sha256": "ea45a04f688de41e0916fb128117afd121486278d0bf3fc1b42b2c15bf21723e",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/temporal_validation_plan.csv",
+      "purpose": "temporal_validation",
+      "rows": 120,
+      "bytes": 101683,
+      "sha256": "14208963e2076b0567048e0a3f3ebaa1b759455faae5fe27c50c1fbaace1475e",
+      "safe_use": "Use to prioritize repeated tracks for review; not enough for discovery alone."
+    },
+    {
+      "path": "outputs/detection/temporal_validation_plan.md",
+      "purpose": "temporal_validation",
+      "rows": null,
+      "bytes": 24329,
+      "sha256": "312f962c6aaf768348558a91ea82584fa775b4021a2b2e9b02bbcd8da33f78f2",
+      "safe_use": "Use to prioritize repeated tracks for review; not enough for discovery alone."
+    },
+    {
+      "path": "outputs/detection/blind_review_packet.csv",
+      "purpose": "human_labels",
+      "rows": 106,
+      "bytes": 14064,
+      "sha256": "187817c1b5dcf9b847f947e52db666f42183e45447572fbc0fc28655a35f9ad0",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/blind_review_key.csv",
+      "purpose": "human_labels",
+      "rows": 106,
+      "bytes": 27169,
+      "sha256": "9d564cb6feec7841c2c6429b2d9bdcd1a382839edf4bdc956e7e3e4d770da482",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/blind_review_packet.md",
+      "purpose": "human_labels",
+      "rows": null,
+      "bytes": 1833,
+      "sha256": "c19514e7072bb2e77020ee661a7d2f8f92c75c472781fd09dd9bcba63bf66178",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/blind_review_reconciliation.csv",
+      "purpose": "human_labels",
+      "rows": 106,
+      "bytes": 14687,
+      "sha256": "0da3f0f81121ca74a4a56769dc0ce5eb3cab120eedcfcf11e95d271e651fbafc",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/blind_review_label_import.csv",
+      "purpose": "human_labels",
+      "rows": 0,
+      "bytes": 223,
+      "sha256": "e3952b3c9030160af8289833471c97964c4578c7f012d91680820335e2221f88",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/blind_review_reconciliation.md",
+      "purpose": "human_labels",
+      "rows": null,
+      "bytes": 1276,
+      "sha256": "cce51414aa11810487d0cdd9fa7db75a5138a260e5eb7dffafb535b9908e139b",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/evidence_integrity_audit.csv",
+      "purpose": "other",
+      "rows": 10,
+      "bytes": 2033,
+      "sha256": "8b23de0cea56f70b5ab8cd28e3b6ad0e03daec2558fb0bb61f8e17aa215f0d11",
+      "safe_use": "Inspect before using; purpose was not classified automatically."
+    },
+    {
+      "path": "outputs/detection/evidence_integrity_audit.md",
+      "purpose": "other",
+      "rows": null,
+      "bytes": 2716,
+      "sha256": "cc885fc3348849f723eb2fc8212dbf19e455e72ac113ab3cbb0a8f7616b6f7db",
+      "safe_use": "Inspect before using; purpose was not classified automatically."
+    },
+    {
+      "path": "outputs/detection/review_labeling_checklist.csv",
+      "purpose": "human_labels",
+      "rows": 5,
+      "bytes": 1887,
+      "sha256": "68d87ec1b2dd4fb45ea44dcb95b41f25fa49ca474c79e54a368641d5a74b26fa",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/review_labeling_protocol.md",
+      "purpose": "human_labels",
+      "rows": null,
+      "bytes": 4438,
+      "sha256": "1d154ad06d06ae624dfdb3efa985bf640881098055f41ad3d636c25573a1d736",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/training_readiness.csv",
+      "purpose": "training_readiness",
+      "rows": 9,
+      "bytes": 2020,
+      "sha256": "03847111c1a4cd8ced27a1f388aaff155742191eaa089256a7758822db618f2a",
+      "safe_use": "Use to decide whether model comparison is allowed."
+    },
+    {
+      "path": "outputs/detection/training_readiness.md",
+      "purpose": "training_readiness",
+      "rows": null,
+      "bytes": 2794,
+      "sha256": "ad31f8d445109d179b36591b03848adb416eb4939b3a322992c2954e3a2bc3bd",
+      "safe_use": "Use to decide whether model comparison is allowed."
+    },
+    {
+      "path": "outputs/detection/doc_claim_audit.csv",
+      "purpose": "claim_safety",
+      "rows": 8,
+      "bytes": 1886,
+      "sha256": "29e38c560878b67fc9870d562ac63c33201fcb1586ced4feb9e9295ccf2321e2",
+      "safe_use": "Use when writing reports, abstracts, README text, or meeting summaries."
+    },
+    {
+      "path": "outputs/detection/doc_claim_audit.md",
+      "purpose": "claim_safety",
+      "rows": null,
+      "bytes": 2137,
+      "sha256": "4699a680f8f61f8f5e2751864204fc9876a900edbb591ce720e4fa26cb27b831",
+      "safe_use": "Use when writing reports, abstracts, README text, or meeting summaries."
+    },
+    {
+      "path": "outputs/detection/research_gate_audit.csv",
+      "purpose": "claim_safety",
+      "rows": 12,
+      "bytes": 2965,
+      "sha256": "7b9e432361566900707afbab6cf4f60cd593f4afe7fa5e7a5e561dddb654d652",
+      "safe_use": "Use when writing reports, abstracts, README text, or meeting summaries."
+    },
+    {
+      "path": "outputs/detection/research_gate_audit.md",
+      "purpose": "claim_safety",
+      "rows": null,
+      "bytes": 3756,
+      "sha256": "9176016ca07ac4d5c530b2e96a873562a1c255c593b57e6da6f78eac8684ce8a",
+      "safe_use": "Use when writing reports, abstracts, README text, or meeting summaries."
+    },
+    {
+      "path": "outputs/detection/manuscript_claim_matrix.csv",
+      "purpose": "claim_safety",
+      "rows": 8,
+      "bytes": 3800,
+      "sha256": "860386ea8f34a8c9192720ba7229de9126eb037fa2a915ccf8260c64c5948988",
+      "safe_use": "Use when writing reports, abstracts, README text, or meeting summaries."
+    },
+    {
+      "path": "outputs/detection/manuscript_claim_matrix.md",
+      "purpose": "claim_safety",
+      "rows": null,
+      "bytes": 3831,
+      "sha256": "88b949bbb2532c01165cd4a2ca7d23f9c00dc83ef335af7b485c2bd2f6fe0911",
+      "safe_use": "Use when writing reports, abstracts, README text, or meeting summaries."
+    },
+    {
+      "path": "outputs/detection/github_issue_backlog.csv",
+      "purpose": "project_management",
+      "rows": 8,
+      "bytes": 4972,
+      "sha256": "51bc1b7d4f6c1039f8203d0a4ac1a55bb0315ef17dce380b1fa07ef8c857784b",
+      "safe_use": "Use to coordinate next work; not scientific evidence by itself."
+    },
+    {
+      "path": "outputs/detection/github_issue_backlog.md",
+      "purpose": "project_management",
+      "rows": null,
+      "bytes": 8142,
+      "sha256": "3ff7bad070133abc830a40f167a682d02267b991fa0f606a6e1a5ab1176525fa",
+      "safe_use": "Use to coordinate next work; not scientific evidence by itself."
+    },
+    {
+      "path": "outputs/detection/github_project_board.csv",
+      "purpose": "project_management",
+      "rows": 8,
+      "bytes": 4581,
+      "sha256": "6fe81d1356933a58c94376a937102236e38eee629259785086da98f2de420fc2",
+      "safe_use": "Use to coordinate next work; not scientific evidence by itself."
+    },
+    {
+      "path": "outputs/detection/github_project_board.md",
+      "purpose": "project_management",
+      "rows": null,
+      "bytes": 7846,
+      "sha256": "3174bc60fae6676ee5d7a2a12646dbaa703385ade43ea61fcf01815621b9e931",
+      "safe_use": "Use to coordinate next work; not scientific evidence by itself."
+    },
+    {
+      "path": "outputs/detection/review_agreement_audit.csv",
+      "purpose": "human_labels",
+      "rows": 8,
+      "bytes": 1050,
+      "sha256": "a5b6f1f8313f96032922a1b4a4af47595f00492334fc788e0e3da6ef08206707",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/review_agreement_audit.md",
+      "purpose": "human_labels",
+      "rows": null,
+      "bytes": 1905,
+      "sha256": "06bf282029254d12129986d02309e04f2d90af683b8f9f8d6f622a7c91887963",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/key_findings_summary.csv",
+      "purpose": "key_findings",
+      "rows": 10,
+      "bytes": 1544,
+      "sha256": "04c8493003ddcb39d1f3a38826ce2bc5a8e399066c7a32719a908c56c4166a07",
+      "safe_use": "Use as the first meeting brief; still follow linked evidence files for proof."
+    },
+    {
+      "path": "outputs/detection/current_key_findings.md",
+      "purpose": "key_findings",
+      "rows": null,
+      "bytes": 5326,
+      "sha256": "c98241ee643922bb920990896c7705c65dbdf13dc73a7c7e52b2d2197d05ef86",
+      "safe_use": "Use as the first meeting brief; still follow linked evidence files for proof."
+    },
+    {
+      "path": "outputs/detection/current_key_findings.html",
+      "purpose": "key_findings",
+      "rows": null,
+      "bytes": 7900,
+      "sha256": "c488d8c20fecfb618b7361a5835b6f36fad963cb9cb13b47abe02c8f8a89cf68",
+      "safe_use": "Use as the first meeting brief; still follow linked evidence files for proof."
+    },
+    {
+      "path": "outputs/detection/evidence_index.json",
+      "purpose": "other",
+      "rows": null,
+      "bytes": 32915,
+      "sha256": "e98c59b7bb7cee84bc299b4ef3308306081bf2ad8d3f8f531fb6186dc9fd05d6",
+      "safe_use": "Inspect before using; purpose was not classified automatically."
+    },
+    {
+      "path": "outputs/detection/evidence_index.md",
+      "purpose": "other",
+      "rows": null,
+      "bytes": 17370,
+      "sha256": "6c6c1eb01437308c4b366507397c5a92e210389d2ecdb739143b7cb9034038f7",
+      "safe_use": "Inspect before using; purpose was not classified automatically."
+    },
+    {
+      "path": "outputs/detection/reproduction_audit.csv",
+      "purpose": "other",
+      "rows": 7,
+      "bytes": 1218,
+      "sha256": "b90d92b0c32db6afd3623193792a0cf703dd14c8ace566e644cc9b4cf362d28a",
+      "safe_use": "Inspect before using; purpose was not classified automatically."
+    },
+    {
+      "path": "outputs/detection/reproduction_audit.md",
+      "purpose": "other",
+      "rows": null,
+      "bytes": 2100,
+      "sha256": "88b546134a1e1c4fc5bbd174a4c041f43f282a073f80fd7ff8a6d1ba25e61346",
+      "safe_use": "Inspect before using; purpose was not classified automatically."
+    },
+    {
+      "path": "outputs/detection/candidate_label_template.csv",
+      "purpose": "human_labels",
+      "rows": 106,
+      "bytes": 15920,
+      "sha256": "a14648639a530ea5316e19698c7fb9db848bdcc25061846c5afc6c93eabf080a",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/candidate_labels_grouped.csv",
+      "purpose": "human_labels",
+      "rows": 0,
+      "bytes": 223,
+      "sha256": "5d6e406dc9437692dc91c96166cea9b2b32b99e61b38249879732a42325e7955",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/candidate_label_summary.csv",
+      "purpose": "human_labels",
+      "rows": 11,
+      "bytes": 931,
+      "sha256": "51e9f4c546646de98bed33e5b1f280458535e6d4204be9a7f5f62b4f8ddd04e2",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/review_packet.md",
+      "purpose": "other",
+      "rows": null,
+      "bytes": 4633,
+      "sha256": "8b718255723a73cb4c7ed121f0781f5b2708b9e5f6d8f3c112d21529e50ccec1",
+      "safe_use": "Inspect before using; purpose was not classified automatically."
+    },
+    {
+      "path": "outputs/detection/review_metrics_report.md",
+      "purpose": "other",
+      "rows": null,
+      "bytes": 6022,
+      "sha256": "9fb375f6e12543561026f19ba2fd0cb708345d0582959e2ef2dcd3a2a606b9fb",
+      "safe_use": "Inspect before using; purpose was not classified automatically."
+    },
+    {
+      "path": "outputs/detection/review_metrics_report.html",
+      "purpose": "other",
+      "rows": null,
+      "bytes": 42975,
+      "sha256": "b43322d1ebd0946fdb1014be1c96675d020d214d37242e3d0a10fca2d436e7a2",
+      "safe_use": "Inspect before using; purpose was not classified automatically."
+    },
+    {
+      "path": "outputs/detection/opus_nearby_date_coverage.csv",
+      "purpose": "filter_context",
+      "rows": 20,
+      "bytes": 1931,
+      "sha256": "61d059feb7853fe9eed01815c966f816aeda119a4bc5865be8170b44e4c75143",
+      "safe_use": "Use as follow-up context only after candidate validation."
+    },
+    {
+      "path": "outputs/detection/processed_date_coverage_summary.csv",
+      "purpose": "coverage",
+      "rows": 9,
+      "bytes": 996,
+      "sha256": "9ddcd09467ff0bb4fd60d619595046159855f3e9f8ad84a17de2ce95025ae5bf",
+      "safe_use": "Use to explain dataset scope and processed dates."
+    },
+    {
+      "path": "outputs/detection/processed_date_coverage_summary.md",
+      "purpose": "coverage",
+      "rows": null,
+      "bytes": 1913,
+      "sha256": "c4a9ff07fd2ce3d5f4dcaa6511c7af9fbb076c0bced500408e2cea3ce7f27712",
+      "safe_use": "Use to explain dataset scope and processed dates."
+    },
+    {
+      "path": "outputs/detection/review_artifacts/likely_artifact.png",
+      "purpose": "visual_artifacts",
+      "rows": null,
+      "bytes": 210117,
+      "sha256": "cafd5554601b1685c09eb406621e305b4a0393bf1cf174a249a8d941622af405",
+      "safe_use": "Use for visual inspection and meeting explanation."
+    },
+    {
+      "path": "outputs/detection/review_artifacts/published_match.png",
+      "purpose": "visual_artifacts",
+      "rows": null,
+      "bytes": 82162,
+      "sha256": "33499b26fca6807b6b5c15623c2f0f675f262d7e8f2a5b2fc54bd0dc6e03890a",
+      "safe_use": "Use for visual inspection and meeting explanation."
+    },
+    {
+      "path": "outputs/detection/review_artifacts/strong_single_frame_candidate.png",
+      "purpose": "visual_artifacts",
+      "rows": null,
+      "bytes": 208722,
+      "sha256": "7a743ce69d9c93c2b6e7deca4270cfb452f1d37e07e795ab1d7096a98ed8b284",
+      "safe_use": "Use for visual inspection and meeting explanation."
+    },
+    {
+      "path": "outputs/detection/review_artifacts/temporal_track_strips.png",
+      "purpose": "temporal_validation",
+      "rows": null,
+      "bytes": 322574,
+      "sha256": "cf6dcd71ee64cc545915832e3e6bf02fb6d10b5430127e9955f8edc63fcd935f",
+      "safe_use": "Use to prioritize repeated tracks for review; not enough for discovery alone."
+    },
+    {
+      "path": "outputs/detection/review_artifacts/top_unmatched_temporal_track.png",
+      "purpose": "temporal_validation",
+      "rows": null,
+      "bytes": 184921,
+      "sha256": "3ffe051dd5ab4bd287790a638560c02112f617682c7d6df838b8b736360b38dd",
+      "safe_use": "Use to prioritize repeated tracks for review; not enough for discovery alone."
+    },
+    {
+      "path": "outputs/detection/review_batches/01_known_validation_positive.csv",
+      "purpose": "candidate_review",
+      "rows": 6,
+      "bytes": 2616,
+      "sha256": "c32b388add13ada8bfacc760aba920afe7ebe793e5331e0714e6ba18d4736699",
+      "safe_use": "Use to decide what a human should inspect; do not call rows confirmed lightning."
+    },
+    {
+      "path": "outputs/detection/review_batches/02_temporal_persistence_check.csv",
+      "purpose": "candidate_review",
+      "rows": 30,
+      "bytes": 11992,
+      "sha256": "e351b76607f2b217f0ed2a17fce9fe724e1045e916fef16d81178570732bda50",
+      "safe_use": "Use to decide what a human should inspect; do not call rows confirmed lightning."
+    },
+    {
+      "path": "outputs/detection/review_batches/03_negative_artifact_examples.csv",
+      "purpose": "candidate_review",
+      "rows": 20,
+      "bytes": 8148,
+      "sha256": "04b22914f7e8cc652ea790064d32f2c11a5364f627486b1cd5b3ee4df5fcf766",
+      "safe_use": "Use to decide what a human should inspect; do not call rows confirmed lightning."
+    },
+    {
+      "path": "outputs/detection/review_batches/04_strong_single_frame_check.csv",
+      "purpose": "candidate_review",
+      "rows": 20,
+      "bytes": 7236,
+      "sha256": "2ae50f624dbcdf50958c5de47f21c2fee21aa19869ef5c24bde526b687bdaa7b",
+      "safe_use": "Use to decide what a human should inspect; do not call rows confirmed lightning."
+    },
+    {
+      "path": "outputs/detection/review_batches/05_low_priority_hold.csv",
+      "purpose": "candidate_review",
+      "rows": 30,
+      "bytes": 10745,
+      "sha256": "618c480694e24b2579015ebf4d14166a113673da425176db5716eac97fcd649a",
+      "safe_use": "Use to decide what a human should inspect; do not call rows confirmed lightning."
+    },
+    {
+      "path": "outputs/detection/review_sessions/S001_01_known_validation_positive.csv",
+      "purpose": "human_labels",
+      "rows": 6,
+      "bytes": 2867,
+      "sha256": "60f33e962d9d54e4f3720d470c77ae88b033bd11431fd70d31e7357e29b756f0",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/review_sessions/S002_02_temporal_persistence_check.csv",
+      "purpose": "human_labels",
+      "rows": 10,
+      "bytes": 4562,
+      "sha256": "43c6619e700f0230df226f9b641f56b4d4daad8468c08c97661243e837884867",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/review_sessions/S003_02_temporal_persistence_check.csv",
+      "purpose": "human_labels",
+      "rows": 10,
+      "bytes": 4565,
+      "sha256": "ac68665cef46f98b9abd108a43914b657b4f3a3e2b6423748947a655b74314e8",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/review_sessions/S004_02_temporal_persistence_check.csv",
+      "purpose": "human_labels",
+      "rows": 10,
+      "bytes": 4565,
+      "sha256": "0184290f0f1022f9567215f07ffb43e8c931702099379676b14a6c44024d1764",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/review_sessions/S005_03_negative_artifact_examples.csv",
+      "purpose": "human_labels",
+      "rows": 10,
+      "bytes": 4564,
+      "sha256": "52022eab807c93b1d36bca54827e1059feb342f309ab7c06e34b87b9e2e77670",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/review_sessions/S006_03_negative_artifact_examples.csv",
+      "purpose": "human_labels",
+      "rows": 10,
+      "bytes": 4562,
+      "sha256": "664f555c781850ce8f0b4392871baf1c24764d55fd1b045513e15a08929008e4",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/review_sessions/S007_04_strong_single_frame_check.csv",
+      "purpose": "human_labels",
+      "rows": 10,
+      "bytes": 4100,
+      "sha256": "a62e0a913eb81a1748804fc363a49af62c22acbad04c3c47b7ea61ea5b34c043",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/review_sessions/S008_04_strong_single_frame_check.csv",
+      "purpose": "human_labels",
+      "rows": 10,
+      "bytes": 4094,
+      "sha256": "1f997481e05e0a34de61b763a422faee069ad57ae6fa23d13b7f3abe1a661d05",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/review_sessions/S009_05_low_priority_hold.csv",
+      "purpose": "human_labels",
+      "rows": 15,
+      "bytes": 5640,
+      "sha256": "0411ad049a72b59adf27054a70561bb9bc618c40a5c5d24c759e53507b35bc09",
+      "safe_use": "Use to track human review progress and training readiness."
+    },
+    {
+      "path": "outputs/detection/review_sessions/S010_05_low_priority_hold.csv",
+      "purpose": "human_labels",
+      "rows": 15,
+      "bytes": 6111,
+      "sha256": "0eaef1ec31b52b88df8d3cb161416b3a8449c4c07f64b84ba616d7b1edd2ea88",
+      "safe_use": "Use to track human review progress and training readiness."
+    }
+  ]
+}
