@@ -235,6 +235,21 @@ END_OBJECT = IMAGE
         if first["geometry_status"] == "computed":
             self.assertNotEqual(first["jupiter_latitude"], "")
             self.assertNotEqual(first["jupiter_longitude"], "")
+        for row in payload["rows"]:
+            self.assertEqual(
+                row["preview_url"],
+                f"/static-assets/previews/{row['image_id']}.webp",
+            )
+            self.assertEqual(
+                row["crop_url"],
+                f"/static-assets/candidate-crops/{row['candidate_id']}.png",
+            )
+            for field in ("preview_url", "crop_url"):
+                asset = ROOT / "public_site" / row[field].lstrip("/")
+                self.assertTrue(asset.exists(), f"Missing public asset for {row['candidate_id']}: {asset}")
+                with Image.open(asset) as image:
+                    minimum, maximum = image.convert("L").getextrema()
+                self.assertGreater(maximum, minimum, f"Blank public asset: {asset}")
 
     def test_public_frontend_is_generated_from_canonical_web_files(self):
         build_public_site_data.synchronize_frontend()

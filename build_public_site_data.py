@@ -97,11 +97,21 @@ def render_candidate_crop(image_number: str, x: str | float, y: str | float, can
     return f"/static-assets/candidate-crops/{destination.name}"
 
 
+def existing_candidate_crop(candidate_id: str) -> str:
+    destination = PUBLIC_CROP_DIR / f"{candidate_id}.png"
+    return f"/static-assets/candidate-crops/{destination.name}" if destination.exists() else ""
+
+
+def existing_preview(image_number: str) -> str:
+    destination = PUBLIC_PREVIEW_DIR / f"N{image_number}.webp"
+    return f"/static-assets/previews/{destination.name}" if destination.exists() else ""
+
+
 def copy_preview(image_number: str) -> str:
+    destination = PUBLIC_PREVIEW_DIR / f"N{image_number}.webp"
     matches = sorted((ROOT / "data" / "previews").glob(f"N{image_number}_*_full.png"))
     if not matches:
-        return ""
-    destination = PUBLIC_PREVIEW_DIR / f"N{image_number}.webp"
+        return existing_preview(image_number)
     destination.parent.mkdir(parents=True, exist_ok=True)
     if not destination.exists() or destination.stat().st_mtime < matches[0].stat().st_mtime:
         with Image.open(matches[0]) as image:
@@ -131,7 +141,10 @@ def build_queue(include_assets: bool = False) -> None:
                 )
             except (FileNotFoundError, ValueError):
                 crop_url = ""
-        preview_url = copy_preview(row["image_id"].removeprefix("N")) if include_assets else ""
+        else:
+            crop_url = existing_candidate_crop(row["candidate_id"])
+        image_number = row["image_id"].removeprefix("N")
+        preview_url = copy_preview(image_number) if include_assets else existing_preview(image_number)
         rows.append(
             {
                 "review_order": row.get("review_order", ""),
