@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-07-13T15:50:03.227129+00:00",
+  "algorithm_family": "custom classical computer vision",
+  "implementation": [
+    "Python",
+    "NumPy",
+    "Pillow"
+  ],
+  "not_used": [
+    "YOLO",
+    "reinforcement learning",
+    "deep learning",
+    "OpenCV"
+  ],
+  "parameters": {
+    "background_blur_radius_px": 18.0,
+    "detection_snr_threshold": 7.0,
+    "review_snr_threshold": 8.0,
+    "minimum_review_blob_area_px": 3,
+    "maximum_component_area_px": 500,
+    "maximum_track_displacement_px": 85.0,
+    "maximum_track_gap_minutes": 12.0
+  },
+  "measured_outputs": {
+    "date_windows": 9,
+    "images_processed": 221,
+    "candidate_regions": 196233,
+    "review_candidates": 12611,
+    "first_pass_review_rows": 106,
+    "known_validation_rows_in_first_pass": 6
+  },
+  "selection_explanation": "Every connected bright region is retained in per-date candidates.csv. Artifact rules and ranking produce the review-candidate tables. first_pass_review_plan.py then selects a manageable 106-row validation and review batch; 106 is not the number of detections and not a confirmed-lightning count.",
+  "training_policy": {
+    "automatic_retraining": false,
+    "current_action": "Store human labels without changing detector parameters.",
+    "future_action": "A project owner manually starts a versioned training experiment after label quality review."
+  }
+}

@@ -26,6 +26,8 @@ import human_review_audit
 import candidate_geometry_plan
 import candidate_backplanes
 import date_coverage_summary
+import detector_run_audit
+import geometry_validation
 import key_findings_brief
 import label_tools
 import manuscript_claim_matrix
@@ -229,8 +231,10 @@ END_OBJECT = IMAGE
         first = payload["rows"][0]
         self.assertIn("image_subobserver_lat", first)
         self.assertIn("image_center_resolution_km_px", first)
-        self.assertEqual(first["geometry_status"], "pending-backplane")
-        self.assertEqual(first["jupiter_latitude"], "")
+        self.assertIn(first["geometry_status"], {"pending-backplane", "computed", "no-surface-intersection", "projection-failed"})
+        if first["geometry_status"] == "computed":
+            self.assertNotEqual(first["jupiter_latitude"], "")
+            self.assertNotEqual(first["jupiter_longitude"], "")
 
     def test_public_frontend_is_generated_from_canonical_web_files(self):
         build_public_site_data.synchronize_frontend()
@@ -257,6 +261,35 @@ END_OBJECT = IMAGE
         ]
         candidate_backplanes.assign_geometry_groups(rows, tolerance=1.0)
         self.assertEqual(rows[0]["geometry_group_id"], rows[1]["geometry_group_id"])
+        self.assertEqual(rows[0]["geometry_group_size"], 2)
+
+    def test_current_campt_longitude_column_is_supported(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "campt.csv"
+            path.write_text(
+                "Sample,Line,PlanetographicLatitude,PositiveWest360Longitude,Error\n"
+                "731.0,211.0,26.5,162.6,NULL\n",
+                encoding="utf-8",
+            )
+            parsed = candidate_backplanes.parse_campt_flat(path)
+        self.assertEqual(parsed[0]["jupiter_longitude"], "162.6")
+
+    def test_detector_run_manifest_uses_measured_outputs(self):
+        manifest = detector_run_audit.build_manifest()
+        measured = manifest["measured_outputs"]
+        self.assertEqual(measured["images_processed"], 221)
+        self.assertEqual(measured["candidate_regions"], 196233)
+        self.assertEqual(measured["review_candidates"], 12611)
+        self.assertEqual(measured["first_pass_review_rows"], 106)
+        self.assertFalse(manifest["training_policy"]["automatic_retraining"])
+
+    def test_geometry_validation_joins_published_matches(self):
+        geometry_path = geometry_validation.OUTPUT_DIR / "candidate_geometry.csv"
+        if not geometry_path.exists():
+            self.skipTest("Candidate geometry has not been generated")
+        rows, metrics = geometry_validation.build_validation()
+        self.assertEqual(len(rows), 6)
+        self.assertEqual(metrics["published_matches"], 6)
 
     def test_research_exports_have_expected_columns(self):
         summary_path = research_exports.OUTPUT_DIR / "2001-01-01" / "summary.json"

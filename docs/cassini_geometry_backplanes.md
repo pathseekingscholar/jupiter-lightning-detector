@@ -1,59 +1,57 @@
 # Cassini candidate geometry and backplanes
 
-The detector measures candidates in image coordinates first: sample `x` and
-line `y`. Scientific comparison across frames needs a second step that maps each
-pixel to a point on Jupiter.
+The detector measures candidates in image coordinates first: sample `x` and line `y`. Scientific comparison across
+frames needs a second step that maps each pixel to a point on Jupiter.
 
-This repository uses the USGS ISIS Cassini ISS camera model for that mapping:
+This repository uses the USGS ISIS Cassini ISS camera model:
 
 ```text
-PDS calibrated IMG + detached LBL
+raw PDS EDR IMG + detached LBL
   -> ciss2isis
-  -> spiceinit
+  -> spiceinit web=true
   -> campt(sample, line)
   -> Jupiter latitude/longitude
 ```
 
-`candidate_backplanes.py` implements the batch runner. It groups candidate rows
-by image, creates one ISIS cube per image, attaches the appropriate SPICE
-geometry, queries all candidate pixels, and writes:
+`candidate_backplanes.py` groups review rows by image, creates one ISIS cube per image, attaches SPICE geometry, queries
+all candidate pixels, and writes:
 
 ```text
 outputs/detection/candidate_geometry.csv
 outputs/detection/geometry_run_status.json
 ```
 
-Coordinate conventions are explicit in the output. Latitude is
-planetographic when ISIS supplies it. Longitude is stored as positive-west,
-0-360 degrees. The public review interface must not treat image-level OPUS
-center geometry as candidate coordinates.
+Latitude is planetographic when ISIS supplies it. Longitude is positive west from 0 to 360 degrees. Image-level OPUS
+center geometry is never substituted for candidate coordinates.
 
-## Run in an ISIS environment
+## Local setup
 
-Install USGS ISIS and its data area in Linux, WSL, a container, or the
-Andromeda research environment. The commands `ciss2isis`, `spiceinit`, and
-`campt` must be available.
+The repository includes a Docker build pinned to USGS ISIS 10.0.0. Docker is used only for local geometry processing;
+it is not part of the public reviewer.
 
-```bash
-python candidate_backplanes.py --check
-python candidate_backplanes.py --tolerance 1.0
-python build_public_site_data.py
+```powershell
+.\run.ps1 geometry-runtime
+.\run.ps1 geometry-data
+.\run.ps1 geometry-check
+.\run.ps1 geometry-project
+.\run.ps1 public-site-data
 ```
 
-ISIS downloads the mission kernels it needs through its data management
-workflow. The complete Cassini NAIF archive is very large, so use the smallest
-time-covered kernel/data subset appropriate for the 2000-2001 observations.
+`geometry-data` downloads the small Cassini import table and only the shared base camera files needed here.
+`spiceinit web=true` retrieves observation-specific SPICE records. Raw EDR products are downloaded from OPUS on demand
+for camera initialization; detector measurements continue to use calibrated CISSCAL products.
 
 ## Validation gate
 
-Coordinates are not ready for scientific claims merely because the program
-runs. First compare the projected positions for the six published lightning
-marks with the paper's reported locations and inspect limb/no-surface failures.
-Only after that check should the one-degree grouping control be used as evidence
-that candidates occupy the same Jovian location across frames.
+Coordinates are not ready for scientific claims merely because the program runs. First project the six published
+lightning marks and inspect limb or no-surface failures. The paper supplies image x/y references, not a latitude and
+longitude table, so this is an intersection and consistency check rather than comparison to published surface
+coordinates. After that check, the configurable one-degree grouping can identify candidates at nearby Jovian locations.
 
 Official references:
 
-- USGS ISIS `ciss2isis`: https://isis.astrogeology.usgs.gov/9.0.0/Application/presentation/Tabbed/ciss2isis/ciss2isis.html
-- USGS ISIS `campt`: https://isis.astrogeology.usgs.gov/9.0.0/Application/presentation/Tabbed/campt/campt.html
+- USGS ISIS installation: https://astrogeology.usgs.gov/docs/how-to-guides/environment-setup-and-maintenance/installing-isis-via-anaconda/
+- USGS ISIS data area: https://astrogeology.usgs.gov/docs/how-to-guides/environment-setup-and-maintenance/isis-data-area/
+- USGS ISIS `ciss2isis`: https://isis.astrogeology.usgs.gov/dev/Application/presentation/Tabbed/ciss2isis/ciss2isis.html
+- USGS ISIS `campt`: https://isis.astrogeology.usgs.gov/dev/Application/presentation/Tabbed/campt/campt.html
 - NAIF Cassini SPICE archive: https://naif.jpl.nasa.gov/pub/naif/pds/data/co-s_j_e_v-spice-6-v1.0/cosp_1000/aareadme.htm

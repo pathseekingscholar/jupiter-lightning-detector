@@ -69,6 +69,12 @@ DETECTION_RUNS = {
     },
 }
 DEFAULT_RUN_DATE = "2001-01-01"
+BACKGROUND_BLUR_RADIUS = 18.0
+DETECTION_SNR_THRESHOLD = 7.0
+REVIEW_SNR_THRESHOLD = 8.0
+MAX_COMPONENT_AREA = 500
+MAX_TRACK_DISPLACEMENT_PX = 85.0
+MAX_TRACK_GAP_MINUTES = 12.0
 
 
 @dataclass
@@ -205,7 +211,7 @@ def paths_for_item(item: dict[str, str]) -> tuple[Path, Path]:
     return jp.image_paths_for_number(item["image_number"])
 
 
-def highpass_snr(array: np.ndarray, blur_radius: float = 18.0) -> tuple[np.ndarray, np.ndarray]:
+def highpass_snr(array: np.ndarray, blur_radius: float = BACKGROUND_BLUR_RADIUS) -> tuple[np.ndarray, np.ndarray]:
     valid = jp.valid_mask(array)
     values = array[valid]
     lo, hi = np.percentile(values, [2, 99.8])
@@ -302,7 +308,7 @@ def component_candidate(
     )
 
 
-def detect_frame(item: dict[str, str], frame_index: int, threshold: float = 7.0) -> list[Candidate]:
+def detect_frame(item: dict[str, str], frame_index: int, threshold: float = DETECTION_SNR_THRESHOLD) -> list[Candidate]:
     image_path, label_path = paths_for_item(item)
     array = jp.load_calibrated_image(image_path, label_path)
     snr, valid = highpass_snr(array)
@@ -314,7 +320,7 @@ def detect_frame(item: dict[str, str], frame_index: int, threshold: float = 7.0)
     mask[:, -3:] = False
     candidates = []
     for serial, component in enumerate(connected_components(mask), start=1):
-        if len(component) > 500:
+        if len(component) > MAX_COMPONENT_AREA:
             continue
         candidate = component_candidate(item, frame_index, component, snr, serial)
         # Keep small events but mark them; single-pixel events are useful as negatives.
@@ -325,14 +331,18 @@ def detect_frame(item: dict[str, str], frame_index: int, threshold: float = 7.0)
 
 def is_reviewable(candidate: Candidate) -> bool:
     bad_flags = {"single_pixel", "too_small", "sharp_cosmic_ray_like", "streak_like"}
-    return candidate.area >= 3 and candidate.peak_snr >= 8 and not bad_flags.intersection(candidate.flags)
+    return candidate.area >= 3 and candidate.peak_snr >= REVIEW_SNR_THRESHOLD and not bad_flags.intersection(candidate.flags)
 
 
 def parse_time(value: str) -> datetime:
     return datetime.fromisoformat(value)
 
 
-def link_tracks(candidates: list[Candidate], max_displacement: float = 85.0, max_minutes: float = 12.0) -> None:
+def link_tracks(
+    candidates: list[Candidate],
+    max_displacement: float = MAX_TRACK_DISPLACEMENT_PX,
+    max_minutes: float = MAX_TRACK_GAP_MINUTES,
+) -> None:
     by_frame: dict[int, list[Candidate]] = {}
     for candidate in candidates:
         if not is_reviewable(candidate):

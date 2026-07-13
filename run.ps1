@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("init", "download", "analyze", "report", "all", "test", "app", "detect", "detect-all", "exports", "coverage", "coverage-summary", "review", "geometry", "geometry-project", "geometry-check", "geometry-plan", "geometry-inputs", "geometry-acquisition", "filters", "label-audit", "review-plan", "review-sessions", "review-session-audit", "temporal-validation", "blind-review", "blind-reconcile", "evidence-integrity", "label-protocol", "training-readiness", "claim-audit", "research-gates", "manuscript-claims", "issue-backlog", "project-board", "agreement-audit", "key-findings", "evidence-index", "reproduction-audit", "label-template", "label-import", "label-summary", "provenance", "public-site-data", "validate-outputs")]
+    [ValidateSet("init", "download", "analyze", "report", "all", "test", "app", "detect", "detect-all", "detector-audit", "exports", "coverage", "coverage-summary", "review", "geometry", "geometry-runtime", "geometry-data", "geometry-project", "geometry-validate", "geometry-check", "geometry-plan", "geometry-inputs", "geometry-acquisition", "filters", "label-audit", "review-plan", "review-sessions", "review-session-audit", "temporal-validation", "blind-review", "blind-reconcile", "evidence-integrity", "label-protocol", "training-readiness", "claim-audit", "research-gates", "manuscript-claims", "issue-backlog", "project-board", "agreement-audit", "key-findings", "evidence-index", "reproduction-audit", "label-template", "label-import", "label-summary", "provenance", "public-site-data", "validate-outputs")]
     [string]$Command = "all",
     [ValidateSet("2000-12-31", "2001-01-01", "2001-01-04", "2001-01-05", "2001-01-08", "2001-01-09", "2001-01-10", "2001-01-11", "2001-01-13")]
     [string]$Date = "2001-01-01",
@@ -30,6 +30,8 @@ if ($Command -eq "test") {
         Write-Host "Running detector for $runDate"
         & $python detection_pipeline.py detect --date $runDate
     }
+} elseif ($Command -eq "detector-audit") {
+    & $python detector_run_audit.py
 } elseif ($Command -eq "exports") {
     & $python research_exports.py
 } elseif ($Command -eq "coverage") {
@@ -40,8 +42,14 @@ if ($Command -eq "test") {
     & $python review_metrics.py
 } elseif ($Command -eq "geometry") {
     & $python geometry_audit.py
+} elseif ($Command -eq "geometry-runtime") {
+    docker build --tag jupiter-lightning-isis:10.0.0 --file docker\isis\Dockerfile .
+} elseif ($Command -eq "geometry-data") {
+    & $python bootstrap_isis_data.py
 } elseif ($Command -eq "geometry-project") {
     & $python candidate_backplanes.py --tolerance 1.0
+} elseif ($Command -eq "geometry-validate") {
+    & $python geometry_validation.py
 } elseif ($Command -eq "geometry-check") {
     & $python candidate_backplanes.py --check
 } elseif ($Command -eq "geometry-plan") {

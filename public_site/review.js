@@ -6,7 +6,7 @@
   const REVIEWER_STORAGE_KEY = "jupiterReviewerName";
   const LABEL_FIELDS = [
     "candidate_id", "image_id", "run_date", "x", "y",
-    "jupiter_latitude", "jupiter_longitude", "geometry_status",
+    "jupiter_latitude", "jupiter_longitude", "geometry_status", "geometry_group_id", "geometry_group_size",
     "snr", "blob_size", "candidate_score", "artifact_flags",
     "reviewer_label", "human_label", "label", "reviewer", "notes",
     "review_note", "timestamp", "reviewed_at", "sheet_status", "source"
@@ -65,6 +65,7 @@
       candidate_score: toNumber(row.candidate_score),
       jupiter_latitude: normalizeOptionalNumber(row.jupiter_latitude),
       jupiter_longitude: normalizeOptionalNumber(row.jupiter_longitude),
+      geometry_group_size: normalizeOptionalNumber(row.geometry_group_size),
       image_subobserver_lat: normalizeOptionalNumber(row.image_subobserver_lat),
       image_subobserver_lon_w: normalizeOptionalNumber(row.image_subobserver_lon_w),
       image_center_resolution_km_px: normalizeOptionalNumber(row.image_center_resolution_km_px),
@@ -314,6 +315,7 @@
         <div><b>Review batch</b>${escapeHtml(row.review_batch)}</div>
         <div><b>Jupiter latitude</b>${geometryValue(row.jupiter_latitude)}</div>
         <div><b>Jupiter longitude</b>${geometryValue(row.jupiter_longitude)}</div>
+        <div><b>Surface group</b>${escapeHtml(row.geometry_group_id || "not grouped")}${row.geometry_group_size === "" ? "" : ` (${row.geometry_group_size} candidate${row.geometry_group_size === 1 ? "" : "s"})`}</div>
         <div><b>Geometry status</b>${escapeHtml(row.geometry_status)}</div>
         <div><b>Image viewing center</b>${escapeHtml(imageContext)}</div>
         <div><b>Image resolution</b>${row.image_center_resolution_km_px === "" ? "n/a" : `${Number(row.image_center_resolution_km_px).toFixed(2)} km/px`}</div>
@@ -364,6 +366,8 @@
       jupiter_latitude: row.jupiter_latitude === "" ? "" : String(row.jupiter_latitude),
       jupiter_longitude: row.jupiter_longitude === "" ? "" : String(row.jupiter_longitude),
       geometry_status: row.geometry_status,
+      geometry_group_id: row.geometry_group_id || "",
+      geometry_group_size: row.geometry_group_size === "" ? "" : String(row.geometry_group_size),
       snr: row.snr.toFixed(2),
       blob_size: row.blob_size,
       candidate_score: row.candidate_score.toFixed(4),

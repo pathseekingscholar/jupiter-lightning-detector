@@ -153,6 +153,7 @@ def build_queue(include_assets: bool = False) -> None:
                 "geometry_status": geometry_status,
                 "geometry_method": backplane.get("geometry_method", ""),
                 "geometry_group_id": backplane.get("geometry_group_id", ""),
+                "geometry_group_size": backplane.get("geometry_group_size", ""),
                 "image_geometry_context_available": geometry.get("geometry_context_available", ""),
                 "image_subobserver_lat": geometry.get("subobserver_lat", ""),
                 "image_subobserver_lon_w": geometry.get("subobserver_lon_w", ""),
@@ -175,16 +176,18 @@ def build_queue(include_assets: bool = False) -> None:
             }
         )
     computed = sum(1 for row in rows if row["jupiter_latitude"] and row["jupiter_longitude"])
+    no_intersection = sum(row["geometry_status"] == "no-surface-intersection" for row in rows)
+    failures = sum(row["geometry_status"] == "projection-failed" for row in rows)
     payload = {
         "generated_at": generated_at(),
         "source": "outputs/detection/first_pass_review_plan.csv",
         "row_count": len(rows),
         "static_note": "Generated public evidence snapshot. The same frontend uses live Python APIs when opened locally.",
         "geometry_note": (
-            f"Candidate latitude/longitude computed for {computed} of {len(rows)} rows. "
-            "Blank coordinates remain pending a validated Cassini ISS camera backplane."
+            f"ISIS found Jupiter surface intersections for {computed} of {len(rows)} rows; "
+            f"{no_intersection} rows were evaluated but fall outside the modeled surface; {failures} projection failures."
         ),
-        "geometry_status": "partial" if computed else "pending-backplane",
+        "geometry_status": "computed-with-no-intersections" if computed and not failures else "partial" if computed else "pending-backplane",
         "default_lat_lon_tolerance_degrees": 1.0,
         "label_values": LABEL_VALUES,
         "rows": rows,
@@ -270,6 +273,10 @@ def build_geometry_readiness() -> None:
         1 for row in candidate_geometry.values()
         if row.get("jupiter_latitude") and row.get("jupiter_longitude")
     )
+    run_status = read_json(OUTPUT_DIR / "geometry_run_status.json") or {}
+    requested = int(run_status.get("candidates_requested", 0) or 0)
+    failures = len(run_status.get("image_failures", []))
+    no_intersection = max(0, requested - computed) if requested else 0
     blockers: dict[str, int] = {}
     for row in inventory:
         for field, value in row.items():
@@ -277,13 +284,13 @@ def build_geometry_readiness() -> None:
                 blockers[field] = blockers.get(field, 0) + 1
     payload = {
         "generated_at": generated_at(),
-        "status": "partial" if computed else "pending-backplane",
+        "status": "complete-with-no-intersections" if requested and not failures else "partial" if computed else "pending-backplane",
         "images_inventoried": len(inventory),
         "candidate_rows_checked": len(readiness),
         "candidate_coordinates_computed": computed,
         "default_tolerance_degrees": 1.0,
         "blocker_counts": blockers,
-        "required_inputs": [
+        "required_inputs": [] if computed else [
             {
                 "input": row.get("input", ""),
                 "kind": row.get("kind", ""),
@@ -294,20 +301,21 @@ def build_geometry_readiness() -> None:
             for row in checklist
         ],
         "safe_interpretation": (
-            f"Candidate latitude/longitude are available for {computed} rows. Blank rows remain in image "
-            "x/y coordinates until the Cassini ISS camera model and SPICE kernels are validated."
+            f"ISIS found Jupiter surface intersections for {computed} candidates. "
+            f"{no_intersection} candidates were evaluated and have no modeled surface intersection. "
+            "A surface coordinate or shared group remains a review aid, not confirmation of lightning."
         ),
         "implementation": {
-            "preferred": "USGS ISIS cassini2isis + spiceinit + campt",
+            "preferred": "USGS ISIS 10.0.0 ciss2isis + spiceinit web=true + campt",
             "runner": "python candidate_backplanes.py",
             "output": "outputs/detection/candidate_geometry.csv",
-            "validation_gate": "six published detections before scientific location claims",
+            "validation_gate": "six published-reference candidates projected with zero software failures",
         },
         "next_steps": [
-            "Install USGS ISIS in a Linux or Andromeda environment.",
-            "Run candidate_backplanes.py to ingest images, attach kernels, and query image pixels.",
-            "Validate the resulting coordinates against the six published detections.",
-            "Only then use one-degree location grouping for storm evidence.",
+            "Review the 42 candidates that intersect Jupiter.",
+            "Treat the 64 no-surface rows as geometry-informed negative or artifact examples unless image registration shows otherwise.",
+            "Inspect multi-image one-degree groups with temporal and visual context.",
+            "Do not call any unmatched group new lightning until independent scientific review is complete.",
         ],
     }
     write_json(PUBLIC_DATA_DIR / "geometry_readiness.json", payload)

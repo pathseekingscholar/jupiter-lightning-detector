@@ -37,6 +37,7 @@ Run the detector for the example dates:
 
 ```powershell
 .\run.ps1 detect-all
+.\run.ps1 detector-audit
 
 # Or run one date at a time:
 .\run.ps1 detect -Date 2000-12-31
@@ -52,6 +53,8 @@ Run the detector for the example dates:
 .\run.ps1 coverage-summary
 .\run.ps1 review
 .\run.ps1 geometry
+.\run.ps1 geometry-runtime
+.\run.ps1 geometry-data
 .\run.ps1 geometry-check
 .\run.ps1 geometry-project
 .\run.ps1 geometry-plan
@@ -572,22 +575,31 @@ The importer validates labels and writes `candidate_labels.json` plus
 label JSON so positives, negatives, uncertain labels, and total labels can be
 checked without hand-filtering the raw label file.
 
-## Next Scientific Feature
+## Candidate Surface Geometry
 
-The current detector works in x/y pixels. Future validation should map
-candidates to Jupiter latitude and longitude. If the same storm appears at the
-same planet location across multiple frames or days, that is stronger evidence
-than a single bright spot.
+The detector first works in image x/y pixels. The separate geometry stage now
+maps review candidates to Jupiter planetographic latitude and positive-west
+longitude with the USGS ISIS Cassini ISS camera model. A configurable
+one-degree surface grouping helps reviewers compare candidates at nearby
+locations; it does not by itself confirm that they are the same storm.
+
+The local setup is pinned to ISIS 10.0.0 in `docker/isis/Dockerfile`. Run
+`.\run.ps1 geometry-runtime` once to build it, `.\run.ps1 geometry-data` once
+to acquire the minimal camera-model data, then `.\run.ps1 geometry-project` to
+project the current first-pass queue. Raw OPUS EDR files are acquired on demand
+for camera initialization. Detector photometry still comes from calibrated
+CISSCAL images.
 
 `.\run.ps1 geometry` writes `geometry_readiness.csv` and
 `geometry_readiness_report.md`. These files document which processed frames
-have local OPUS viewing-geometry context and why candidate-level latitude and
-longitude still require a camera/SPICE projection step.
+have local OPUS viewing-geometry context. These image-level values are context,
+not substitutes for candidate coordinates.
 
 `.\run.ps1 geometry-plan` writes `candidate_geometry_plan.csv` and
 `candidate_geometry_plan.md`. These files join the first-pass review candidates
 to the available image-level geometry and list the exact next step for each
-candidate. They are a work plan, not solved latitude/longitude coordinates.
+candidate. The completed projection output is
+`outputs/detection/candidate_geometry.csv`.
 
 `.\run.ps1 geometry-inputs` writes `geometry_input_inventory.csv` and
 `geometry_input_inventory.md`. It inventories local calibrated products, PDS

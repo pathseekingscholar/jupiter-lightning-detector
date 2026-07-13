@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-07-13T16:08:28.737909+00:00",
+  "status": "complete-with-no-intersections",
+  "candidates_requested": 106,
+  "candidates_computed": 42,
+  "candidates_no_surface_intersection": 64,
+  "projection_failures": 0,
+  "runtime": "docker",
+  "docker_image": "jupiter-lightning-isis:10.0.0",
+  "image_failures": [],
+  "coordinate_convention": {
+    "latitude": "planetographic degrees when available",
+    "longitude": "positive west, 0-360 degrees"
+  },
+  "validation_next_step": "Run .\\run.ps1 geometry-validate after projection."
+}

@@ -9,6 +9,8 @@ const HEADERS = [
   "jupiter_latitude",
   "jupiter_longitude",
   "geometry_status",
+  "geometry_group_id",
+  "geometry_group_size",
   "snr",
   "blob_size",
   "candidate_score",

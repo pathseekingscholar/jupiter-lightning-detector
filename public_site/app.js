@@ -56,6 +56,14 @@ async function loadRuntime() {
     : "Public evidence snapshot";
 }
 
+function configureRuntimeNavigation() {
+  if (state.backendAvailable) return;
+  ["manual", "automation"].forEach((name) => {
+    document.querySelector(`[data-tab-target="${name}"]`)?.setAttribute("hidden", "");
+  });
+  $("brief-title").textContent = "Review a Cassini candidate. Inspect the image. Record what the feature looks like.";
+}
+
 function publicDataPath(name) {
   return `/static-data/api/${name}.json`;
 }
@@ -1092,6 +1100,7 @@ function selectTab(name) {
 
 async function init() {
   await loadRuntime();
+  configureRuntimeNavigation();
   renderStrip();
   controls.forEach((id) => $(id).addEventListener("input", scheduleUpdate));
   $("run-detector").addEventListener("click", runDetectorAgain);
@@ -1153,6 +1162,7 @@ async function init() {
     loadDetectorCharacteristics(),
     refreshDetectorStatus(),
   ]);
+  if (!state.backendAvailable) selectTab("review");
 }
 
 init();

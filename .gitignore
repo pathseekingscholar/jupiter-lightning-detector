@@ -19,6 +19,7 @@ kernels/
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal
+print.prt
 
 # Locally extracted reference material
 proposal.txt

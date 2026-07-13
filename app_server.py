@@ -446,6 +446,8 @@ def save_candidate_label(payload: dict) -> dict:
         "jupiter_latitude": payload.get("jupiter_latitude", ""),
         "jupiter_longitude": payload.get("jupiter_longitude", ""),
         "geometry_status": payload.get("geometry_status", ""),
+        "geometry_group_id": payload.get("geometry_group_id", ""),
+        "geometry_group_size": payload.get("geometry_group_size", ""),
         "brightness": payload.get("brightness", payload.get("peak_snr", "")),
         "blob_size": payload.get("blob_size", payload.get("area_px", "")),
         "snr": payload.get("snr", payload.get("peak_snr", "")),

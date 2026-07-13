@@ -1,73 +1,23 @@
 {
-  "generated_at": "2026-07-13T15:02:39.984254+00:00",
-  "status": "pending-backplane",
+  "generated_at": "2026-07-08T00:00:00+00:00",
+  "status": "complete-with-no-intersections",
   "images_inventoried": 221,
   "candidate_rows_checked": 221,
-  "candidate_coordinates_computed": 0,
+  "candidate_coordinates_computed": 42,
   "default_tolerance_degrees": 1.0,
   "blocker_counts": {},
-  "required_inputs": [
-    {
-      "input": "",
-      "kind": "",
-      "status": "missing",
-      "local_matches": "",
-      "required_for": "pixel_to_camera_ray"
-    },
-    {
-      "input": "",
-      "kind": "",
-      "status": "missing",
-      "local_matches": "",
-      "required_for": "camera_frame_to_spacecraft_frame"
-    },
-    {
-      "input": "",
-      "kind": "",
-      "status": "missing",
-      "local_matches": "",
-      "required_for": "spacecraft_pointing_at_image_time"
-    },
-    {
-      "input": "",
-      "kind": "",
-      "status": "missing",
-      "local_matches": "",
-      "required_for": "spacecraft_and_jupiter_position"
-    },
-    {
-      "input": "",
-      "kind": "",
-      "status": "missing",
-      "local_matches": "",
-      "required_for": "image_sclk_to_et"
-    },
-    {
-      "input": "",
-      "kind": "",
-      "status": "missing",
-      "local_matches": "",
-      "required_for": "utc_to_et"
-    },
-    {
-      "input": "",
-      "kind": "",
-      "status": "missing",
-      "local_matches": "",
-      "required_for": "ray_jupiter_intercept"
-    }
-  ],
-  "safe_interpretation": "Candidate latitude/longitude are available for 0 rows. Blank rows remain in image x/y coordinates until the Cassini ISS camera model and SPICE kernels are validated.",
+  "required_inputs": [],
+  "safe_interpretation": "ISIS found Jupiter surface intersections for 42 candidates. 64 candidates were evaluated and have no modeled surface intersection. A surface coordinate or shared group remains a review aid, not confirmation of lightning.",
   "implementation": {
-    "preferred": "USGS ISIS cassini2isis + spiceinit + campt",
+    "preferred": "USGS ISIS 10.0.0 ciss2isis + spiceinit web=true + campt",
     "runner": "python candidate_backplanes.py",
     "output": "outputs/detection/candidate_geometry.csv",
-    "validation_gate": "six published detections before scientific location claims"
+    "validation_gate": "six published-reference candidates projected with zero software failures"
   },
   "next_steps": [
-    "Install USGS ISIS in a Linux or Andromeda environment.",
-    "Run candidate_backplanes.py to ingest images, attach kernels, and query image pixels.",
-    "Validate the resulting coordinates against the six published detections.",
-    "Only then use one-degree location grouping for storm evidence."
+    "Review the 42 candidates that intersect Jupiter.",
+    "Treat the 64 no-surface rows as geometry-informed negative or artifact examples unless image registration shows otherwise.",
+    "Inspect multi-image one-degree groups with temporal and visual context.",
+    "Do not call any unmatched group new lightning until independent scientific review is complete."
   ]
 }
